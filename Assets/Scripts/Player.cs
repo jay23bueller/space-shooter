@@ -76,19 +76,6 @@ public class Player : MonoBehaviour
     //Attempt to fire a laser
     private void fireLaser()
     {
-        //One approach
-        //if (_canFire && Input.GetKeyDown(KeyCode.Space))
-        //{
-        //    Instantiate(_laserPrefab, _laserSpawnLocationTransform.position, _laserSpawnLocationTransform.rotation);
-        //    _canFire = false;
-        //    _cooldownTimer = Time.time + _cooldownDuration;
-        //}
-        //else if(Time.time >= _cooldownTimer)
-        //{
-        //    _canFire = true;
-        //}
-        
-        //Approach two
         if(_canFire && Input.GetKeyDown(KeyCode.Space))
         {
             Instantiate(_laserPrefab, _laserSpawnTransform.position, _laserSpawnTransform.rotation);
