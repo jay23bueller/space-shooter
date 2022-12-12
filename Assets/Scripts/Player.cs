@@ -16,6 +16,14 @@ public class Player : MonoBehaviour
     #region Variables
     [SerializeField]
     private float _speed = 3.5f;
+    [SerializeField]
+    private GameObject _laserPrefab;
+    [SerializeField]
+    private Transform _laserSpawnTransform;
+    private bool _canFire = true;
+    //private float _cooldownTimer;
+    [SerializeField]
+    private float _laserCooldownDuration = .2f;
 
     #endregion
 
@@ -31,6 +39,7 @@ public class Player : MonoBehaviour
     void Update()
     {
         moveCharacter();
+        fireLaser();
     }
     #endregion
 
@@ -62,6 +71,37 @@ public class Player : MonoBehaviour
 
         transform.Translate(horizontalDirection);
 
+    }
+
+    //Attempt to fire a laser
+    private void fireLaser()
+    {
+        //One approach
+        //if (_canFire && Input.GetKeyDown(KeyCode.Space))
+        //{
+        //    Instantiate(_laserPrefab, _laserSpawnLocationTransform.position, _laserSpawnLocationTransform.rotation);
+        //    _canFire = false;
+        //    _cooldownTimer = Time.time + _cooldownDuration;
+        //}
+        //else if(Time.time >= _cooldownTimer)
+        //{
+        //    _canFire = true;
+        //}
+        
+        //Approach two
+        if(_canFire && Input.GetKeyDown(KeyCode.Space))
+        {
+            Instantiate(_laserPrefab, _laserSpawnTransform.position, _laserSpawnTransform.rotation);
+            _canFire = false;
+            StartCoroutine(resetLaserCooldown());
+        }
+            
+    }
+
+    private IEnumerator resetLaserCooldown()
+    {
+        yield return new WaitForSeconds(_laserCooldownDuration);
+        _canFire = true;
     }
     #endregion
 }
