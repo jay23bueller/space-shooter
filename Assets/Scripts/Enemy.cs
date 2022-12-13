@@ -19,6 +19,18 @@ public class Enemy : MonoBehaviour
     #endregion
 
     #region UnityMethods
+
+    private void Start()
+    {
+        transform.position = Camera.main.ViewportToWorldPoint(
+            new Vector3(
+                Random.Range(LEFT_BOUND, RIGHT_BOUND),
+                TOP_BOUND,
+                Camera.main.WorldToViewportPoint(transform.position).z
+                )
+            );
+    }
+
     // Update is called once per frame
     void Update()
     {

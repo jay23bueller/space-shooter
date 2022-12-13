@@ -11,6 +11,7 @@ public class Player : MonoBehaviour
     private const float RIGHT_BOUND = 1.02f;
     private const float TOP_BOUND = 0.5f;
     private const float BOTTOM_BOUND = 0.05f;
+    private const string SPAWN_MANAGER_TAG = "SpawnManager";
     #endregion
 
     #region Variables
@@ -25,6 +26,7 @@ public class Player : MonoBehaviour
     private float _laserCooldownDuration = .2f;
     [SerializeField]
     private int _lives = 3;
+    private SpawnManager _spawnManager;
     #endregion
 
     #region UnityMethods
@@ -33,6 +35,10 @@ public class Player : MonoBehaviour
     {
         //Set starting position
         transform.position = new Vector3(0f,0f,0f);
+        _spawnManager = GameObject.FindGameObjectWithTag(SPAWN_MANAGER_TAG).GetComponent<SpawnManager>();
+
+        if (_spawnManager == null)
+            Debug.LogError("The Spawn Manager is NULL");
     }
 
     // Update is called once per frame
@@ -97,7 +103,11 @@ public class Player : MonoBehaviour
         _lives--;
 
         if (_lives <= 0)
+        {
+            _spawnManager.Stop();
             Destroy(gameObject);
+        }
+            
     }
 
     #endregion
