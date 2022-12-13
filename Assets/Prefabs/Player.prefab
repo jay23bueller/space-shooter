@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 3809230103289895603}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -110,9 +110,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _speed: 3.5
-  _laserPrefab: {fileID: 3701914356288798206, guid: a773c3fa5de731b469877f219fff185b, type: 3}
+  _laserPrefab: {fileID: 7891439289125116962, guid: a773c3fa5de731b469877f219fff185b, type: 3}
   _laserSpawnTransform: {fileID: 3809230103954661261}
   _laserCooldownDuration: 0.2
+  _lives: 3
 --- !u!1 &3809230103954661262
 GameObject:
   m_ObjectHideFlags: 0

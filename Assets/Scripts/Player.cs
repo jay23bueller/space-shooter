@@ -21,10 +21,10 @@ public class Player : MonoBehaviour
     [SerializeField]
     private Transform _laserSpawnTransform;
     private bool _canFire = true;
-    //private float _cooldownTimer;
     [SerializeField]
     private float _laserCooldownDuration = .2f;
-
+    [SerializeField]
+    private int _lives = 3;
     #endregion
 
     #region UnityMethods
@@ -41,6 +41,7 @@ public class Player : MonoBehaviour
         moveCharacter();
         fireLaser();
     }
+
     #endregion
 
     #region Methods
@@ -90,5 +91,14 @@ public class Player : MonoBehaviour
         yield return new WaitForSeconds(_laserCooldownDuration);
         _canFire = true;
     }
+
+    public void TakeDamage()
+    {
+        _lives--;
+
+        if (_lives <= 0)
+            Destroy(gameObject);
+    }
+
     #endregion
 }
