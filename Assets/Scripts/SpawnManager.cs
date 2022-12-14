@@ -23,13 +23,25 @@ public class SpawnManager : MonoBehaviour
     #endregion
 
     #region Methods
- 
+
     private IEnumerator spawnEnemy()
     {
-        while(_canSpawn)
+        while (_canSpawn)
         {
-            GameObject newEnemy = Instantiate(_enemyPrefab);
-            newEnemy.transform.parent = _enemyContainer.transform;
+            Vector3 spawnLocation = Camera.main.ViewportToWorldPoint(
+                new Vector3(
+                Random.Range(Enemy.LEFT_BOUND, Enemy.RIGHT_BOUND),
+                Enemy.TOP_BOUND,
+                Camera.main.WorldToViewportPoint(_enemyContainer.transform.position).z
+                ));
+
+            GameObject newEnemy = Instantiate(
+                _enemyPrefab,
+                spawnLocation,
+                Quaternion.identity,
+                _enemyContainer.transform
+                );
+
             yield return new WaitForSeconds(Random.Range(_minSpawnTime, _maxSpawnTime + 1));
         }
 
@@ -39,6 +51,7 @@ public class SpawnManager : MonoBehaviour
     {
         _canSpawn = false;
         Destroy(_enemyContainer);
+
     }
     #endregion
 }

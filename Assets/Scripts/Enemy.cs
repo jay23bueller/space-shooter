@@ -4,51 +4,52 @@ using UnityEngine;
 public class Enemy : MonoBehaviour
 {
     #region Constants
-    private const float LEFT_BOUND = 0.05f;
-    private const float RIGHT_BOUND = 0.95f;
-    private const float TOP_BOUND = 1.0f;
-    private const float BOTTOM_BOUND = -0.01f;
     private const string PLAYER_TAG = "Player";
     private const string LASER_TAG = "Laser";
     private const string ENEMY_TAG = "Enemy";
     #endregion
 
     #region Variables
+    public readonly static float LEFT_BOUND = 0.05f;
+    public readonly static float RIGHT_BOUND = 0.95f;
+    public readonly static float TOP_BOUND = 1.0f;
+    public readonly static float BOTTOM_BOUND = -0.01f;
     [SerializeField]
     private float _speed = 4.0f;
+    private Rigidbody _rigidbody;
     #endregion
 
     #region UnityMethods
 
-    private void Start()
+
+
+    void Start()
     {
-        transform.position = Camera.main.ViewportToWorldPoint(
-            new Vector3(
-                Random.Range(LEFT_BOUND, RIGHT_BOUND),
-                TOP_BOUND,
-                Camera.main.WorldToViewportPoint(transform.position).z
-                )
-            );
+        _rigidbody = GetComponent<Rigidbody>();
+
     }
 
     // Update is called once per frame
-    void Update()
+
+
+    void FixedUpdate()
     {
         move();
     }
 
     void OnTriggerEnter(Collider other)
     {
-        if (other != null) {
-            if(other.CompareTag(PLAYER_TAG))
+        if (other != null)
+        {
+            if (other.CompareTag(PLAYER_TAG))
                 other.GetComponent<Player>().TakeDamage();
-            
 
-            if(other.CompareTag(LASER_TAG))
+
+            if (other.CompareTag(LASER_TAG))
                 Destroy(other.gameObject);
-            
 
-            if(!other.CompareTag(ENEMY_TAG))
+
+            if (!other.CompareTag(ENEMY_TAG))
                 Destroy(gameObject);
         }
     }
@@ -61,14 +62,21 @@ public class Enemy : MonoBehaviour
     //at a random x location
     private void move()
     {
-        Vector3 currentViewportPosition = Camera.main.WorldToViewportPoint(transform.position);
+        Vector3 currentViewportPosition = Camera.main.WorldToViewportPoint(_rigidbody.position);
         if (currentViewportPosition.y < BOTTOM_BOUND)
-            transform.position = Camera.main.ViewportToWorldPoint(
+        {
+
+            _rigidbody.position = Camera.main.ViewportToWorldPoint(
                 new Vector3(Random.Range(LEFT_BOUND, RIGHT_BOUND),
                 TOP_BOUND,
                 currentViewportPosition.z));
+
+        }
         else
-            transform.Translate(Vector3.down * _speed * Time.deltaTime);
+        {
+            _rigidbody.MovePosition(_rigidbody.position + (Vector3.down * _speed * Time.deltaTime));
+        }
+
     }
     #endregion
 }
