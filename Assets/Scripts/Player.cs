@@ -27,6 +27,7 @@ public class Player : MonoBehaviour
     [SerializeField]
     private int _lives = 3;
     private SpawnManager _spawnManager;
+    private float _initialViewportZPosition;
     #endregion
 
     #region UnityMethods
@@ -35,6 +36,7 @@ public class Player : MonoBehaviour
     {
         //Set starting position
         transform.position = new Vector3(0f,0f,0f);
+        _initialViewportZPosition = Camera.main.WorldToViewportPoint(transform.position).z;
         _spawnManager = GameObject.FindGameObjectWithTag(SPAWN_MANAGER_TAG).GetComponent<SpawnManager>();
 
         if (_spawnManager == null)
@@ -59,8 +61,8 @@ public class Player : MonoBehaviour
         Vector3 verticalDirection = Vector3.up * Input.GetAxis(VERTICAL_AXIS) * _speed * Time.deltaTime;
         Vector3 horizontalDirection = Vector3.right * Input.GetAxis(HORIZONTAL_AXIS) * _speed * Time.deltaTime;
 
-        Vector3 nextVerticalViewportPosition = Camera.main.WorldToViewportPoint(transform.position + verticalDirection);
-        Vector3 nextHorizontalViewportPosition = Camera.main.WorldToViewportPoint(transform.position + verticalDirection);
+        Vector2 nextVerticalViewportPosition = Camera.main.WorldToViewportPoint(transform.position + verticalDirection);
+        Vector2 nextHorizontalViewportPosition = Camera.main.WorldToViewportPoint(transform.position + verticalDirection);
 
         //If the character's new position is within the top and bottom bounds, then move it
         if (nextVerticalViewportPosition.y < TOP_BOUND && nextVerticalViewportPosition.y > BOTTOM_BOUND)
@@ -69,11 +71,11 @@ public class Player : MonoBehaviour
         //If the character's new position is outside the left or right bounds, teleport the character
         if (nextHorizontalViewportPosition.x > RIGHT_BOUND)
         {
-            transform.position = Camera.main.ViewportToWorldPoint(new Vector3(0f, nextHorizontalViewportPosition.y, nextHorizontalViewportPosition.z));
+            transform.position = Camera.main.ViewportToWorldPoint(new Vector3(0f, nextHorizontalViewportPosition.y, _initialViewportZPosition));
         }
         else if (nextHorizontalViewportPosition.x < LEFT_BOUND)
         {
-            transform.position = Camera.main.ViewportToWorldPoint(new Vector3(1f, nextHorizontalViewportPosition.y, nextHorizontalViewportPosition.z));
+            transform.position = Camera.main.ViewportToWorldPoint(new Vector3(1f, nextHorizontalViewportPosition.y, _initialViewportZPosition));
         }
 
         transform.Translate(horizontalDirection);

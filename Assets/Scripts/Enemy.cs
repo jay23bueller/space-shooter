@@ -12,11 +12,11 @@ public class Enemy : MonoBehaviour
     #region Variables
     public readonly static float LEFT_BOUND = 0.05f;
     public readonly static float RIGHT_BOUND = 0.95f;
-    public readonly static float TOP_BOUND = 1.0f;
-    public readonly static float BOTTOM_BOUND = -0.01f;
+    public readonly static float TOP_BOUND = 1.05f;
+    public readonly static float BOTTOM_BOUND = -0.05f;
     [SerializeField]
     private float _speed = 4.0f;
-    private Rigidbody _rigidbody;
+    private Rigidbody2D _rigidbody;
     #endregion
 
     #region UnityMethods
@@ -25,7 +25,7 @@ public class Enemy : MonoBehaviour
 
     void Start()
     {
-        _rigidbody = GetComponent<Rigidbody>();
+        _rigidbody = GetComponent<Rigidbody2D>();
 
     }
 
@@ -35,7 +35,7 @@ public class Enemy : MonoBehaviour
         move();
     }
 
-    void OnTriggerEnter(Collider other)
+    void OnTriggerEnter2D(Collider2D other)
     {
         if (other != null)
         {
@@ -65,14 +65,13 @@ public class Enemy : MonoBehaviour
         {
 
             _rigidbody.position = Camera.main.ViewportToWorldPoint(
-                new Vector3(Random.Range(LEFT_BOUND, RIGHT_BOUND),
-                TOP_BOUND,
-                currentViewportPosition.z));
+                new Vector2(Random.Range(LEFT_BOUND, RIGHT_BOUND),
+                TOP_BOUND));
 
         }
         else
         {
-            _rigidbody.MovePosition(_rigidbody.position + (Vector3.down * _speed * Time.deltaTime));
+            _rigidbody.MovePosition(_rigidbody.position + (Vector2.down * _speed * Time.deltaTime));
         }
 
     }
