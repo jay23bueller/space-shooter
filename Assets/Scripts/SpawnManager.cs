@@ -14,24 +14,31 @@ public class SpawnManager : MonoBehaviour
     private int _maxSpawnTime = 5;
     [SerializeField]
     private GameObject _enemyContainer;
+    [SerializeField]
+    private GameObject _tripleShotPowerupPrefab;
+    public readonly static float LEFT_BOUND = 0.05f;
+    public readonly static float RIGHT_BOUND = 0.95f;
+    public readonly static float TOP_BOUND = 1.05f;
+    public readonly static float BOTTOM_BOUND = -0.05f;
     #endregion
     #region UnityMethods
     private void Start()
     {
-        StartCoroutine(spawnEnemy());
+        StartCoroutine(SpawnEnemy());
+        StartCoroutine(SpawnPowerup());
     }
     #endregion
 
     #region Methods
 
-    private IEnumerator spawnEnemy()
+    private IEnumerator SpawnEnemy()
     {
         while (_canSpawn)
         {
             Vector3 spawnLocation = Camera.main.ViewportToWorldPoint(
                 new Vector3(
-                Random.Range(Enemy.LEFT_BOUND, Enemy.RIGHT_BOUND),
-                Enemy.TOP_BOUND,
+                Random.Range(LEFT_BOUND,RIGHT_BOUND),
+                TOP_BOUND,
                 Camera.main.WorldToViewportPoint(_enemyContainer.transform.position).z
                 ));
 
@@ -45,6 +52,25 @@ public class SpawnManager : MonoBehaviour
             yield return new WaitForSeconds(Random.Range(_minSpawnTime, _maxSpawnTime + 1));
         }
 
+    }
+
+    private IEnumerator SpawnPowerup()
+    {
+        while(_canSpawn)
+        {
+            yield return new WaitForSeconds(Random.Range(3.0f, 7.0f));
+            Vector3 spawnLocation = Camera.main.ViewportToWorldPoint(
+                new Vector3(
+                    Random.Range(LEFT_BOUND, RIGHT_BOUND),
+                    TOP_BOUND,
+                    Camera.main.WorldToViewportPoint(transform.position).z
+                ));
+            Instantiate(
+                _tripleShotPowerupPrefab, 
+                spawnLocation, 
+                Quaternion.identity
+                );
+        }
     }
 
     public void Stop()

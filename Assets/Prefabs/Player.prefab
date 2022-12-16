@@ -51,6 +51,8 @@ MonoBehaviour:
   _laserSpawnTransform: {fileID: 5545497931039135892}
   _laserCooldownDuration: 0.2
   _lives: 3
+  _isTripleShotEnabled: 0
+  _tripleShotPrefab: {fileID: 4438895529425976725, guid: cd84cd942911eaf44b3e9402d7811787, type: 3}
 --- !u!212 &5545497930555065299
 SpriteRenderer:
   m_ObjectHideFlags: 0

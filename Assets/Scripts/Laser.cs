@@ -13,14 +13,21 @@ public class Laser : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        move();
+        Move();
+    }
+
+    private void OnDestroy()
+    {
+        //TripleShot
+        if (transform.parent != null)
+            Destroy(transform.parent.gameObject);
     }
     #endregion
 
     #region Methods
     // Move laser till it's out of the viewport
     // at the moment, it is assumed to be moving to the top
-    private void move()
+    private void Move()
     {
         if (Camera.main.WorldToViewportPoint(transform.position).y < 1.0f)
             transform.Translate(transform.up * _speed * Time.deltaTime);

@@ -28,6 +28,10 @@ public class Player : MonoBehaviour
     private int _lives = 3;
     private SpawnManager _spawnManager;
     private float _initialViewportZPosition;
+    private bool _isTripleShotEnabled;
+    [SerializeField]
+    private GameObject _tripleShotPrefab;
+    private Coroutine _resetTripleShotCoroutine;
     #endregion
 
     #region UnityMethods
@@ -46,8 +50,8 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        moveCharacter();
-        fireLaser();
+        MoveCharacter();
+        FireLaser();
     }
 
     #endregion
@@ -55,7 +59,7 @@ public class Player : MonoBehaviour
     #region Methods
 
     //Move the character based on input within the viewport
-    private void moveCharacter()
+    private void MoveCharacter()
     {
 
         Vector3 verticalDirection = Vector3.up * Input.GetAxis(VERTICAL_AXIS) * _speed * Time.deltaTime;
@@ -83,18 +87,21 @@ public class Player : MonoBehaviour
     }
 
     //Attempt to fire a laser
-    private void fireLaser()
+    private void FireLaser()
     {
         if(_canFire && Input.GetKeyDown(KeyCode.Space))
         {
-            Instantiate(_laserPrefab, _laserSpawnTransform.position, _laserSpawnTransform.rotation);
+            if (_isTripleShotEnabled)
+                Instantiate(_tripleShotPrefab, transform.position, Quaternion.identity);
+            else
+                Instantiate(_laserPrefab, _laserSpawnTransform.position, _laserSpawnTransform.rotation);
             _canFire = false;
-            StartCoroutine(resetLaserCooldown());
+            StartCoroutine(ResetLaserCooldown());
         }
             
     }
 
-    private IEnumerator resetLaserCooldown()
+    private IEnumerator ResetLaserCooldown()
     {
         yield return new WaitForSeconds(_laserCooldownDuration);
         _canFire = true;
@@ -110,6 +117,20 @@ public class Player : MonoBehaviour
             Destroy(gameObject);
         }
             
+    }
+
+    public void EnableTripleShot()
+    {
+        _isTripleShotEnabled = true;
+        if (_resetTripleShotCoroutine != null)
+            StopCoroutine(_resetTripleShotCoroutine);
+        _resetTripleShotCoroutine = StartCoroutine(ResetTripleShotRoutine());
+    }
+
+    private IEnumerator ResetTripleShotRoutine()
+    {
+        yield return new WaitForSeconds(5f);
+        _isTripleShotEnabled = false;
     }
 
     #endregion

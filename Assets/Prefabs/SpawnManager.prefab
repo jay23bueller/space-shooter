@@ -44,10 +44,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8991ab792aac8dd4c8f95ef0ae1b8fb4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _enemyPrefab: {fileID: 1347617643270974644, guid: e2d2d57ba1c939e478f15be250ff584e, type: 3}
+  _enemyPrefab: {fileID: 1347617643270974644, guid: 1453059216668fe45a95e5997196cafc, type: 3}
   _minSpawnTime: 1
   _maxSpawnTime: 5
   _enemyContainer: {fileID: 7683424367433563454}
+  _tripleShotPowerupPrefab: {fileID: 935228819368299148, guid: 5f6d837e4b713834cab608ceb95dbdbf, type: 3}
 --- !u!1 &7683424367433563454
 GameObject:
   m_ObjectHideFlags: 0

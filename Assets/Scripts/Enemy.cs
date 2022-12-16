@@ -10,10 +10,6 @@ public class Enemy : MonoBehaviour
     #endregion
 
     #region Variables
-    public readonly static float LEFT_BOUND = 0.05f;
-    public readonly static float RIGHT_BOUND = 0.95f;
-    public readonly static float TOP_BOUND = 1.05f;
-    public readonly static float BOTTOM_BOUND = -0.05f;
     [SerializeField]
     private float _speed = 4.0f;
     private Rigidbody2D _rigidbody;
@@ -32,7 +28,7 @@ public class Enemy : MonoBehaviour
 
     void FixedUpdate()
     {
-        move();
+        Move();
     }
 
     void OnTriggerEnter2D(Collider2D other)
@@ -45,6 +41,8 @@ public class Enemy : MonoBehaviour
 
             if (other.CompareTag(LASER_TAG))
                 Destroy(other.gameObject);
+            
+                
 
 
             if (!other.CompareTag(ENEMY_TAG))
@@ -58,15 +56,15 @@ public class Enemy : MonoBehaviour
 
     //Move the character to the bottom and if it is out of the viewport, teleport it to the top
     //at a random x location
-    private void move()
+    private void Move()
     {
         Vector3 currentViewportPosition = Camera.main.WorldToViewportPoint(_rigidbody.position);
-        if (currentViewportPosition.y < BOTTOM_BOUND)
+        if (currentViewportPosition.y < SpawnManager.BOTTOM_BOUND)
         {
 
             _rigidbody.position = Camera.main.ViewportToWorldPoint(
-                new Vector2(Random.Range(LEFT_BOUND, RIGHT_BOUND),
-                TOP_BOUND));
+                new Vector2(Random.Range(SpawnManager.LEFT_BOUND, SpawnManager.RIGHT_BOUND),
+                SpawnManager.TOP_BOUND));
 
         }
         else
