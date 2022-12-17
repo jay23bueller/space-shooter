@@ -15,7 +15,7 @@ public class SpawnManager : MonoBehaviour
     [SerializeField]
     private GameObject _enemyContainer;
     [SerializeField]
-    private GameObject _tripleShotPowerupPrefab;
+    private GameObject[] _powerups;
     public readonly static float LEFT_BOUND = 0.05f;
     public readonly static float RIGHT_BOUND = 0.95f;
     public readonly static float TOP_BOUND = 1.05f;
@@ -66,8 +66,8 @@ public class SpawnManager : MonoBehaviour
                     Camera.main.WorldToViewportPoint(transform.position).z
                 ));
             Instantiate(
-                _tripleShotPowerupPrefab, 
-                spawnLocation, 
+                _powerups[Random.Range(0,_powerups.Length)],
+                spawnLocation,
                 Quaternion.identity
                 );
         }

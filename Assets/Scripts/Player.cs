@@ -17,6 +17,7 @@ public class Player : MonoBehaviour
     #region Variables
     [SerializeField]
     private float _speed = 3.5f;
+    private float _speedMultiplier = 1.0f;
     [SerializeField]
     private GameObject _laserPrefab;
     [SerializeField]
@@ -29,9 +30,13 @@ public class Player : MonoBehaviour
     private SpawnManager _spawnManager;
     private float _initialViewportZPosition;
     private bool _isTripleShotEnabled;
+    private bool _isShieldEnabled = false;
+    [SerializeField]
+    private GameObject _shieldGO;
     [SerializeField]
     private GameObject _tripleShotPrefab;
     private Coroutine _resetTripleShotCoroutine;
+    private Coroutine _resetSpeedBoostCoroutine;
     #endregion
 
     #region UnityMethods
@@ -54,6 +59,7 @@ public class Player : MonoBehaviour
         FireLaser();
     }
 
+
     #endregion
 
     #region Methods
@@ -62,8 +68,8 @@ public class Player : MonoBehaviour
     private void MoveCharacter()
     {
 
-        Vector3 verticalDirection = Vector3.up * Input.GetAxis(VERTICAL_AXIS) * _speed * Time.deltaTime;
-        Vector3 horizontalDirection = Vector3.right * Input.GetAxis(HORIZONTAL_AXIS) * _speed * Time.deltaTime;
+        Vector3 verticalDirection = Vector3.up * Input.GetAxis(VERTICAL_AXIS) * _speed * _speedMultiplier * Time.deltaTime;
+        Vector3 horizontalDirection = Vector3.right * Input.GetAxis(HORIZONTAL_AXIS) * _speed * _speedMultiplier * Time.deltaTime;
 
         Vector2 nextVerticalViewportPosition = Camera.main.WorldToViewportPoint(transform.position + verticalDirection);
         Vector2 nextHorizontalViewportPosition = Camera.main.WorldToViewportPoint(transform.position + verticalDirection);
@@ -109,6 +115,14 @@ public class Player : MonoBehaviour
 
     public void TakeDamage()
     {
+        if (_isShieldEnabled)
+        {
+            _isShieldEnabled = false;
+            _shieldGO.SetActive(false);
+            return;
+        }
+            
+
         _lives--;
 
         if (_lives <= 0)
@@ -119,18 +133,46 @@ public class Player : MonoBehaviour
             
     }
 
+    public void EnableShield()
+    {
+        _isShieldEnabled = true;
+        _shieldGO.SetActive(true);
+    }
+
     public void EnableTripleShot()
     {
         _isTripleShotEnabled = true;
         if (_resetTripleShotCoroutine != null)
             StopCoroutine(_resetTripleShotCoroutine);
-        _resetTripleShotCoroutine = StartCoroutine(ResetTripleShotRoutine());
+        _resetTripleShotCoroutine = StartCoroutine(ResetPowerup(0));
     }
 
-    private IEnumerator ResetTripleShotRoutine()
+    private IEnumerator ResetPowerup(int powerupID)
     {
-        yield return new WaitForSeconds(5f);
-        _isTripleShotEnabled = false;
+        yield return new WaitForSeconds(5.0f);
+
+        switch (powerupID)
+        {
+            case 0:
+                //Triple Shot
+                _isTripleShotEnabled = false;
+                break;
+            case 1:
+                //Speed Boost
+                _speedMultiplier = 1f;
+                break;
+            default:
+                Debug.LogError("Incorrect powerupID was passed!");
+                break;
+        }
+    }
+
+    public void EnableSpeedBoost()
+    {
+        _speedMultiplier = 3f;
+        if (_resetSpeedBoostCoroutine != null)
+            StopCoroutine(_resetSpeedBoostCoroutine);
+        _resetSpeedBoostCoroutine = StartCoroutine(ResetPowerup(1));
     }
 
     #endregion

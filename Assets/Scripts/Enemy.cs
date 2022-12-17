@@ -7,6 +7,7 @@ public class Enemy : MonoBehaviour
     private const string PLAYER_TAG = "Player";
     private const string LASER_TAG = "Laser";
     private const string ENEMY_TAG = "Enemy";
+    private const string POWERUP_TAG = "Powerup";
     #endregion
 
     #region Variables
@@ -41,11 +42,8 @@ public class Enemy : MonoBehaviour
 
             if (other.CompareTag(LASER_TAG))
                 Destroy(other.gameObject);
-            
-                
 
-
-            if (!other.CompareTag(ENEMY_TAG))
+            if (!other.CompareTag(ENEMY_TAG) && !other.CompareTag(POWERUP_TAG))
                 Destroy(gameObject);
         }
     }

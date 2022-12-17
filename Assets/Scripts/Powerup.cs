@@ -6,6 +6,8 @@ public class Powerup : MonoBehaviour
 {
     #region Variables
     private float _speed = 3.0f;
+    [SerializeField] //0 = TripleShot, 1 = SpeedBoost, 2 = Shield
+    private int _powerupID;
     #endregion
 
     #region UnityMethods
@@ -21,7 +23,24 @@ public class Powerup : MonoBehaviour
         {
             if(collision.CompareTag("Player"))
             {
-                collision.GetComponent<Player>().EnableTripleShot();
+                switch(_powerupID)
+                {
+                    case 0:
+                        //Triple Shot
+                        collision.GetComponent<Player>().EnableTripleShot();
+                        break;
+                    case 1:
+                        //Speed Boost
+                        collision.GetComponent<Player>().EnableSpeedBoost();
+                        break;
+                    case 2:
+                        //Shields
+                        collision.GetComponent<Player>().EnableShield();
+                        break;
+                    default:
+                        Debug.LogError("Didn't assign correct powerupID!");
+                        break;
+                }
                 Destroy(gameObject);
             }
         }
