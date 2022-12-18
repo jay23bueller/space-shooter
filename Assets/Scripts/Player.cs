@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Player : MonoBehaviour
 {
@@ -30,13 +31,16 @@ public class Player : MonoBehaviour
     private SpawnManager _spawnManager;
     private float _initialViewportZPosition;
     private bool _isTripleShotEnabled;
-    private bool _isShieldEnabled = false;
+    private bool _isShieldEnabled;
     [SerializeField]
     private GameObject _shieldGO;
     [SerializeField]
     private GameObject _tripleShotPrefab;
     private Coroutine _resetTripleShotCoroutine;
     private Coroutine _resetSpeedBoostCoroutine;
+    private int _score;
+    [SerializeField]
+    private UIManager _uiManager;
     #endregion
 
     #region UnityMethods
@@ -50,6 +54,9 @@ public class Player : MonoBehaviour
 
         if (_spawnManager == null)
             Debug.LogError("The Spawn Manager is NULL");
+
+        if (_uiManager == null)
+            Debug.LogError("The UI Manager is NULL");
     }
 
     // Update is called once per frame
@@ -124,10 +131,12 @@ public class Player : MonoBehaviour
             
 
         _lives--;
+        _uiManager.UpdateLivesImage(_lives);
 
         if (_lives <= 0)
         {
             _spawnManager.Stop();
+            _uiManager.DisplayGameOver();
             Destroy(gameObject);
         }
             
@@ -174,6 +183,14 @@ public class Player : MonoBehaviour
             StopCoroutine(_resetSpeedBoostCoroutine);
         _resetSpeedBoostCoroutine = StartCoroutine(ResetPowerup(1));
     }
+
+    public void AddScore(int value)
+    {
+        _score += value;
+        _uiManager.UpdateScoreText(_score);
+    }
+
+
 
     #endregion
 }

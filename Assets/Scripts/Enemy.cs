@@ -14,6 +14,7 @@ public class Enemy : MonoBehaviour
     [SerializeField]
     private float _speed = 4.0f;
     private Rigidbody2D _rigidbody;
+    private Player _player;
     #endregion
 
     #region UnityMethods
@@ -23,6 +24,7 @@ public class Enemy : MonoBehaviour
     void Start()
     {
         _rigidbody = GetComponent<Rigidbody2D>();
+        _player = GameObject.FindGameObjectWithTag(PLAYER_TAG).GetComponent<Player>();
 
     }
 
@@ -41,7 +43,12 @@ public class Enemy : MonoBehaviour
 
 
             if (other.CompareTag(LASER_TAG))
+            {
+                if(_player != null)
+                    _player.AddScore(10);
                 Destroy(other.gameObject);
+            }
+                
 
             if (!other.CompareTag(ENEMY_TAG) && !other.CompareTag(POWERUP_TAG))
                 Destroy(gameObject);
