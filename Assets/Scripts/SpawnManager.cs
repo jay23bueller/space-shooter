@@ -22,11 +22,7 @@ public class SpawnManager : MonoBehaviour
     public readonly static float BOTTOM_BOUND = -0.05f;
     #endregion
     #region UnityMethods
-    private void Start()
-    {
-        StartCoroutine(SpawnEnemy());
-        StartCoroutine(SpawnPowerup());
-    }
+
     #endregion
 
     #region Methods
@@ -78,6 +74,18 @@ public class SpawnManager : MonoBehaviour
         _canSpawn = false;
         Destroy(_enemyContainer);
 
+    }
+
+    public void StartWave()
+    {
+        StartCoroutine(StartWaveRoutine());
+    }
+
+    private IEnumerator StartWaveRoutine()
+    {
+        yield return new WaitForSeconds(3f);
+        StartCoroutine(SpawnEnemy());
+        StartCoroutine(SpawnPowerup());
     }
     #endregion
 }

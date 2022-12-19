@@ -41,6 +41,8 @@ public class Player : MonoBehaviour
     private int _score;
     [SerializeField]
     private UIManager _uiManager;
+    [SerializeField]
+    private GameObject[] _engines;
     #endregion
 
     #region UnityMethods
@@ -139,6 +141,8 @@ public class Player : MonoBehaviour
             _uiManager.DisplayGameOver();
             Destroy(gameObject);
         }
+        else
+            _engines[_lives - 1].SetActive(true);
             
     }
 

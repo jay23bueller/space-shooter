@@ -15,6 +15,7 @@ public class Enemy : MonoBehaviour
     private float _speed = 4.0f;
     private Rigidbody2D _rigidbody;
     private Player _player;
+    private Animator _anim;
     #endregion
 
     #region UnityMethods
@@ -25,6 +26,7 @@ public class Enemy : MonoBehaviour
     {
         _rigidbody = GetComponent<Rigidbody2D>();
         _player = GameObject.FindGameObjectWithTag(PLAYER_TAG).GetComponent<Player>();
+        _anim = GetComponent<Animator>();
 
     }
 
@@ -51,7 +53,12 @@ public class Enemy : MonoBehaviour
                 
 
             if (!other.CompareTag(ENEMY_TAG) && !other.CompareTag(POWERUP_TAG))
-                Destroy(gameObject);
+            {
+                GetComponent<Collider2D>().enabled = false;
+                _speed = 0f;
+                _anim.SetTrigger("OnEnemyDeath");
+            }
+                
         }
     }
 
@@ -76,6 +83,12 @@ public class Enemy : MonoBehaviour
         {
             _rigidbody.MovePosition(_rigidbody.position + (Vector2.down * _speed * Time.deltaTime));
         }
+
+    }
+
+    public void Die()
+    {
+        Destroy(gameObject);
 
     }
     #endregion
