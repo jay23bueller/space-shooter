@@ -16,6 +16,7 @@ public class Enemy : MonoBehaviour
     private Rigidbody2D _rigidbody;
     private Player _player;
     private Animator _anim;
+    private AudioSource _audioSource;
     #endregion
 
     #region UnityMethods
@@ -27,6 +28,7 @@ public class Enemy : MonoBehaviour
         _rigidbody = GetComponent<Rigidbody2D>();
         _player = GameObject.FindGameObjectWithTag(PLAYER_TAG).GetComponent<Player>();
         _anim = GetComponent<Animator>();
+        _audioSource = GetComponent<AudioSource>();
 
     }
 

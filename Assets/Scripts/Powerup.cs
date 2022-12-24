@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions.Must;
 
 public class Powerup : MonoBehaviour
 {
@@ -8,9 +9,12 @@ public class Powerup : MonoBehaviour
     private float _speed = 3.0f;
     [SerializeField] //0 = TripleShot, 1 = SpeedBoost, 2 = Shield
     private int _powerupID;
+    [SerializeField]
+    private AudioClip _powerupAudioClip;
     #endregion
 
     #region UnityMethods
+
 
     private void Update()
     {
@@ -41,6 +45,7 @@ public class Powerup : MonoBehaviour
                         Debug.LogError("Didn't assign correct powerupID!");
                         break;
                 }
+                AudioSource.PlayClipAtPoint(_powerupAudioClip, transform.position, 3f);
                 Destroy(gameObject);
             }
         }

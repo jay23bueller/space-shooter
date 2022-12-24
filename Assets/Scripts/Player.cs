@@ -43,6 +43,11 @@ public class Player : MonoBehaviour
     private UIManager _uiManager;
     [SerializeField]
     private GameObject[] _engines;
+    private AudioSource _audioSource;
+    [SerializeField]
+    private AudioClip _laserAudioClip;
+    [SerializeField]
+    private GameObject _explosionGO;
     #endregion
 
     #region UnityMethods
@@ -59,6 +64,11 @@ public class Player : MonoBehaviour
 
         if (_uiManager == null)
             Debug.LogError("The UI Manager is NULL");
+
+        _audioSource = GetComponent<AudioSource>();
+
+        if (_audioSource == null)
+            Debug.LogError("Player missing AudioSource component!");
     }
 
     // Update is called once per frame
@@ -110,6 +120,7 @@ public class Player : MonoBehaviour
                 Instantiate(_tripleShotPrefab, transform.position, Quaternion.identity);
             else
                 Instantiate(_laserPrefab, _laserSpawnTransform.position, _laserSpawnTransform.rotation);
+            _audioSource.PlayOneShot(_laserAudioClip);
             _canFire = false;
             StartCoroutine(ResetLaserCooldown());
         }
@@ -139,6 +150,7 @@ public class Player : MonoBehaviour
         {
             _spawnManager.Stop();
             _uiManager.DisplayGameOver();
+            Instantiate(_explosionGO, transform.position, Quaternion.identity);
             Destroy(gameObject);
         }
         else
