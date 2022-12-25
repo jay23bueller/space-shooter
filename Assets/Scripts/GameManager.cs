@@ -14,6 +14,7 @@ public class GameManager : MonoBehaviour
     void Update()
     {
         RestartGame();
+        QuitGame();
     }
 
     #endregion
