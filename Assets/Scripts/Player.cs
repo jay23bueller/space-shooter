@@ -117,9 +117,20 @@ public class Player : MonoBehaviour
         if(_canFire && Input.GetKeyDown(KeyCode.Space))
         {
             if (_isTripleShotEnabled)
-                Instantiate(_tripleShotPrefab, transform.position, Quaternion.identity);
+            {
+                Laser[] lasers = Instantiate(_tripleShotPrefab, transform.position, Quaternion.identity).GetComponentsInChildren<Laser>();
+                foreach(Laser laser in lasers)
+                {
+                    laser.InitializeFiring(1);
+                }
+            }
+                
             else
-                Instantiate(_laserPrefab, _laserSpawnTransform.position, _laserSpawnTransform.rotation);
+            {
+                Laser laser = Instantiate(_laserPrefab, _laserSpawnTransform.position, _laserSpawnTransform.rotation).GetComponent<Laser>();
+                laser.InitializeFiring(1);
+            }
+                
             _audioSource.PlayOneShot(_laserAudioClip);
             _canFire = false;
             StartCoroutine(ResetLaserCooldown());
@@ -148,6 +159,7 @@ public class Player : MonoBehaviour
 
         if (_lives <= 0)
         {
+            GetComponent<BoxCollider2D>().enabled = false;
             _spawnManager.Stop();
             _uiManager.DisplayGameOver();
             Instantiate(_explosionGO, transform.position, Quaternion.identity);

@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 
@@ -17,6 +18,10 @@ public class Enemy : MonoBehaviour
     private Player _player;
     private Animator _anim;
     private AudioSource _audioSource;
+    [SerializeField]
+    private AudioClip _laserAudioClip;
+    [SerializeField]
+    private GameObject _laserPrefab;
     #endregion
 
     #region UnityMethods
@@ -29,13 +34,16 @@ public class Enemy : MonoBehaviour
         _player = GameObject.FindGameObjectWithTag(PLAYER_TAG).GetComponent<Player>();
         _anim = GetComponent<Animator>();
         _audioSource = GetComponent<AudioSource>();
+        StartCoroutine(FireLaser());
+        _rigidbody.velocity = Vector2.down * _speed;
 
     }
 
 
-    void FixedUpdate()
+
+    private void FixedUpdate()
     {
-        Move();
+        Teleport();
     }
 
     void OnTriggerEnter2D(Collider2D other)
@@ -54,9 +62,11 @@ public class Enemy : MonoBehaviour
             }
                 
 
-            if (!other.CompareTag(ENEMY_TAG) && !other.CompareTag(POWERUP_TAG))
+            if (!other.CompareTag(ENEMY_TAG) && !other.CompareTag(POWERUP_TAG) && !other.CompareTag("EnemyLaser"))
             {
                 GetComponent<Collider2D>().enabled = false;
+                _rigidbody.velocity = Vector2.zero;
+                StopAllCoroutines();
                 _speed = 0f;
                 _anim.SetTrigger("OnEnemyDeath");
             }
@@ -70,22 +80,34 @@ public class Enemy : MonoBehaviour
 
     //Move the character to the bottom and if it is out of the viewport, teleport it to the top
     //at a random x location
-    private void Move()
+    private void Teleport()
     {
         Vector3 currentViewportPosition = Camera.main.WorldToViewportPoint(_rigidbody.position);
         if (currentViewportPosition.y < SpawnManager.BOTTOM_BOUND)
         {
-
             _rigidbody.position = Camera.main.ViewportToWorldPoint(
                 new Vector2(Random.Range(SpawnManager.LEFT_BOUND, SpawnManager.RIGHT_BOUND),
                 SpawnManager.TOP_BOUND));
-
         }
-        else
+    }
+
+    private IEnumerator FireLaser()
+    {
+        while(true)
         {
-            _rigidbody.MovePosition(_rigidbody.position + (Vector2.down * _speed * Time.deltaTime));
-        }
+            yield return new WaitForSeconds(Random.Range(3f, 7f));
 
+
+            GameObject laserGO = Instantiate(_laserPrefab, transform.position, transform.rotation);
+            foreach(Laser laser in laserGO.GetComponentsInChildren<Laser>())
+            {
+                laser.InitializeFiring(0);
+            };
+
+            
+            _audioSource.PlayOneShot(_laserAudioClip);
+            
+        }
     }
 
     public void Die()

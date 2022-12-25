@@ -41,9 +41,8 @@ public class SpawnManager : MonoBehaviour
             GameObject newEnemy = Instantiate(
                 _enemyPrefab,
                 spawnLocation,
-                Quaternion.identity,
-                _enemyContainer.transform
-                );
+                Quaternion.AngleAxis(180, Vector3.forward),
+                _enemyContainer.transform);
 
             yield return new WaitForSeconds(Random.Range(_minSpawnTime, _maxSpawnTime + 1));
         }
