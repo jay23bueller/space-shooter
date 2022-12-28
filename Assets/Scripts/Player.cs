@@ -16,9 +16,35 @@ public class Player : MonoBehaviour
     #endregion
 
     #region Variables
+
+    //Movement
     [SerializeField]
     private float _speed = 3.5f;
+    [SerializeField]
     private float _speedMultiplier = 1.0f;
+    private float _defaultSpeedMultiplier = 1.0f;
+
+
+    //Thruster
+    [SerializeField]
+    private float _thrusterMultiplier = 1.3f;
+    private bool _isThrustersEnabled;
+    [SerializeField]
+    private GameObject _thrusterGO;
+
+    //SpeedBoost
+    private Coroutine _resetSpeedBoostCoroutine;
+    private bool _isSpeedBoostEnabled;
+    [SerializeField]
+    private float _speedBoostMultipler = 2.0f;
+
+    //TripleShot
+    [SerializeField]
+    private GameObject _tripleShotPrefab;
+    private Coroutine _resetTripleShotCoroutine;
+    private bool _isTripleShotEnabled;
+
+    //Laser
     [SerializeField]
     private GameObject _laserPrefab;
     [SerializeField]
@@ -26,21 +52,26 @@ public class Player : MonoBehaviour
     private bool _canFire = true;
     [SerializeField]
     private float _laserCooldownDuration = .2f;
+
+
     [SerializeField]
     private int _lives = 3;
-    private SpawnManager _spawnManager;
+
     private float _initialViewportZPosition;
-    private bool _isTripleShotEnabled;
+
+    //Shield
     private bool _isShieldEnabled;
     [SerializeField]
     private GameObject _shieldGO;
-    [SerializeField]
-    private GameObject _tripleShotPrefab;
-    private Coroutine _resetTripleShotCoroutine;
-    private Coroutine _resetSpeedBoostCoroutine;
-    private int _score;
+
+    //Managers
+    private SpawnManager _spawnManager;
     [SerializeField]
     private UIManager _uiManager;
+
+    private int _score;
+
+    //Effects
     [SerializeField]
     private GameObject[] _engines;
     private AudioSource _audioSource;
@@ -74,8 +105,10 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        CheckThrusterSpeed();
         MoveCharacter();
         FireLaser();
+
     }
 
 
@@ -83,9 +116,33 @@ public class Player : MonoBehaviour
 
     #region Methods
 
+    private void CheckThrusterSpeed()
+    {
+        if (Input.GetKey(KeyCode.LeftShift))
+            _isThrustersEnabled = true;
+        if (Input.GetKeyUp(KeyCode.LeftShift))
+            _isThrustersEnabled = false;
+
+    }
+
     //Move the character based on input within the viewport
     private void MoveCharacter()
     {
+        if(_isSpeedBoostEnabled)
+        {
+            _speedMultiplier = _speedBoostMultipler;
+        } 
+        else if(_isThrustersEnabled)
+        {
+            _speedMultiplier = _thrusterMultiplier;
+        }
+        else
+        {
+            _speedMultiplier = _defaultSpeedMultiplier;
+        }
+
+        //The thruster gameobject should give a visual feedback for the movement speed
+        _thrusterGO.transform.localScale = new Vector3(_speedMultiplier,1f,1f);
 
         Vector3 verticalDirection = Vector3.up * Input.GetAxis(VERTICAL_AXIS) * _speed * _speedMultiplier * Time.deltaTime;
         Vector3 horizontalDirection = Vector3.right * Input.GetAxis(HORIZONTAL_AXIS) * _speed * _speedMultiplier * Time.deltaTime;
@@ -196,7 +253,7 @@ public class Player : MonoBehaviour
                 break;
             case 1:
                 //Speed Boost
-                _speedMultiplier = 1f;
+                _isSpeedBoostEnabled = false;
                 break;
             default:
                 Debug.LogError("Incorrect powerupID was passed!");
@@ -206,7 +263,7 @@ public class Player : MonoBehaviour
 
     public void EnableSpeedBoost()
     {
-        _speedMultiplier = 3f;
+        _isSpeedBoostEnabled = true;
         if (_resetSpeedBoostCoroutine != null)
             StopCoroutine(_resetSpeedBoostCoroutine);
         _resetSpeedBoostCoroutine = StartCoroutine(ResetPowerup(1));

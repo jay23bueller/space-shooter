@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1019,6 +1019,11 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!1 &1248492595 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5134041638373190953, guid: acf95df6e14323a45a79d9cdf4ac4806, type: 3}
+  m_PrefabInstance: {fileID: 5545497930695794168}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &1617881539 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
@@ -1469,6 +1474,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3080387536488851901, guid: acf95df6e14323a45a79d9cdf4ac4806, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5545497930555065297, guid: acf95df6e14323a45a79d9cdf4ac4806, type: 3}
       propertyPath: m_Name
       value: Player
@@ -1477,6 +1486,18 @@ PrefabInstance:
       propertyPath: _uiManager
       value: 
       objectReference: {fileID: 163892733}
+    - target: {fileID: 5545497930555065300, guid: acf95df6e14323a45a79d9cdf4ac4806, type: 3}
+      propertyPath: _thrusterGO
+      value: 
+      objectReference: {fileID: 1248492595}
+    - target: {fileID: 5545497930555065300, guid: acf95df6e14323a45a79d9cdf4ac4806, type: 3}
+      propertyPath: _thrusterMultiplier
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5545497930555065300, guid: acf95df6e14323a45a79d9cdf4ac4806, type: 3}
+      propertyPath: _speedBoostMultipler
+      value: 2.2
+      objectReference: {fileID: 0}
     - target: {fileID: 5545497930555065301, guid: acf95df6e14323a45a79d9cdf4ac4806, type: 3}
       propertyPath: m_RootOrder
       value: 3

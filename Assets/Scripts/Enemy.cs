@@ -9,7 +9,7 @@ public class Enemy : MonoBehaviour
     private const string LASER_TAG = "Laser";
     private const string ENEMY_TAG = "Enemy";
     private const string POWERUP_TAG = "Powerup";
-    private const string ENEMYLASER_TAG = "EnemyLaser";
+    private const string ENEMYLASER_TAG = "EnemyLaser"; //enums, tags are stored as an array, can use specific indexes
     #endregion
 
     #region Variables
