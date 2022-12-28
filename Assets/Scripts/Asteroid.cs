@@ -4,11 +4,15 @@ using UnityEngine;
 
 public class Asteroid : MonoBehaviour
 {
+    #region Variables
     private Rigidbody2D _rigidbody;
     [SerializeField]
     private SpawnManager _spawnManager;
     [SerializeField]
     private GameObject _explosionGO;
+    #endregion
+
+    #region UnityMethods
     // Start is called before the first frame update
     void Start()
     {
@@ -30,4 +34,5 @@ public class Asteroid : MonoBehaviour
             }
         }
     }
+    #endregion
 }

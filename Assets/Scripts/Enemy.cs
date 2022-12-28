@@ -9,6 +9,7 @@ public class Enemy : MonoBehaviour
     private const string LASER_TAG = "Laser";
     private const string ENEMY_TAG = "Enemy";
     private const string POWERUP_TAG = "Powerup";
+    private const string ENEMYLASER_TAG = "EnemyLaser";
     #endregion
 
     #region Variables
@@ -62,7 +63,7 @@ public class Enemy : MonoBehaviour
             }
                 
 
-            if (!other.CompareTag(ENEMY_TAG) && !other.CompareTag(POWERUP_TAG) && !other.CompareTag("EnemyLaser"))
+            if (!other.CompareTag(ENEMY_TAG) && !other.CompareTag(POWERUP_TAG) && !other.CompareTag(ENEMYLASER_TAG))
             {
                 GetComponent<Collider2D>().enabled = false;
                 _rigidbody.velocity = Vector2.zero;
