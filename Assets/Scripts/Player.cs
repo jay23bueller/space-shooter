@@ -56,13 +56,14 @@ public class Player : MonoBehaviour
 
     [SerializeField]
     private int _lives = 3;
-
     private float _initialViewportZPosition;
 
     //Shield
     private bool _isShieldEnabled;
     [SerializeField]
     private GameObject _shieldGO;
+    private int _shieldMaxHealth = 3;
+    private int _shieldCurrentHealth;
 
     //Managers
     private SpawnManager _spawnManager;
@@ -203,13 +204,12 @@ public class Player : MonoBehaviour
 
     public void TakeDamage()
     {
-        if (_isShieldEnabled)
+        if(_isShieldEnabled)
         {
-            _isShieldEnabled = false;
-            _shieldGO.SetActive(false);
+            UpdateShield();
             return;
         }
-            
+        
 
         _lives--;
         _uiManager.UpdateLivesImage(_lives);
@@ -227,8 +227,32 @@ public class Player : MonoBehaviour
             
     }
 
+    private void UpdateShield()
+    {
+
+        _shieldCurrentHealth--;
+
+        switch (_shieldCurrentHealth)
+        {
+            case 0:
+                _isShieldEnabled = false;
+                _shieldGO.SetActive(false);
+                _shieldGO.GetComponent<SpriteRenderer>().color = Color.white;
+                break;
+            case 1:
+                _shieldGO.GetComponent<SpriteRenderer>().color = Color.red;
+                break;
+            case 2:
+                _shieldGO.GetComponent<SpriteRenderer>().color = Color.yellow;
+                break;
+        };
+        
+
+    }
+
     public void EnableShield()
     {
+        _shieldCurrentHealth = _shieldMaxHealth;
         _isShieldEnabled = true;
         _shieldGO.SetActive(true);
     }

@@ -257,12 +257,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _speed: 3.5
+  _speedMultiplier: 1
+  _thrusterBoostMultiplier: 1.3
+  _thrusterGO: {fileID: 5134041638373190953}
+  _speedBoostMultipler: 2.2
+  _tripleShotPrefab: {fileID: 4438895529425976725, guid: cd84cd942911eaf44b3e9402d7811787, type: 3}
   _laserPrefab: {fileID: 7891439289125116962, guid: a773c3fa5de731b469877f219fff185b, type: 3}
   _laserSpawnTransform: {fileID: 5545497931039135892}
   _laserCooldownDuration: 0.2
   _lives: 3
   _shieldGO: {fileID: 2486407404339729726}
-  _tripleShotPrefab: {fileID: 4438895529425976725, guid: cd84cd942911eaf44b3e9402d7811787, type: 3}
   _uiManager: {fileID: 0}
   _engines:
   - {fileID: 660491569113670107}
