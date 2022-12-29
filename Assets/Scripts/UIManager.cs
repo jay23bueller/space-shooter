@@ -20,18 +20,22 @@ public class UIManager : MonoBehaviour
     private GameObject _restartGO;
     [SerializeField]
     private GameManager _gameManager;
+    [SerializeField]
+    private TMP_Text _ammoText;
     #endregion
     #region UnityMethods
     // Start is called before the first frame update
-    void Start()
-    {
-        _scoreText.text = "Score: 0";
-    }
+
     #endregion
     #region Methods
     public void UpdateScoreText(int score)
     {
-        _scoreText.text = "Score: " + score;
+        _scoreText.text = $"<b>SCORE: {score}</b>";
+    }
+
+    public void UpdateAmmoText(int ammoCount)
+    {
+        _ammoText.text = $"<b>AMMO: {ammoCount}</b>";
     }
 
     public void UpdateLivesImage(int livesRemaining)

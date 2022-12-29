@@ -52,7 +52,12 @@ public class Player : MonoBehaviour
     private bool _canFire = true;
     [SerializeField]
     private float _laserCooldownDuration = .2f;
-
+    [SerializeField]
+    private int _laserCurrentCount = 15;
+    [SerializeField]
+    private AudioClip _laserAudioClip;
+    [SerializeField]
+    private AudioClip _outOfAmmoClip;
 
     [SerializeField]
     private int _lives = 3;
@@ -76,8 +81,7 @@ public class Player : MonoBehaviour
     [SerializeField]
     private GameObject[] _engines;
     private AudioSource _audioSource;
-    [SerializeField]
-    private AudioClip _laserAudioClip;
+
     [SerializeField]
     private GameObject _explosionGO;
     #endregion
@@ -90,6 +94,8 @@ public class Player : MonoBehaviour
         transform.position = new Vector3(0f,0f,0f);
         _initialViewportZPosition = Camera.main.WorldToViewportPoint(transform.position).z;
         _spawnManager = GameObject.FindGameObjectWithTag(SPAWN_MANAGER_TAG).GetComponent<SpawnManager>();
+        _uiManager.UpdateScoreText(_score);
+        _uiManager.UpdateAmmoText(_laserCurrentCount);
 
         if (_spawnManager == null)
             Debug.LogError("The Spawn Manager is NULL");
@@ -174,24 +180,34 @@ public class Player : MonoBehaviour
     {
         if(_canFire && Input.GetKeyDown(KeyCode.Space))
         {
-            if (_isTripleShotEnabled)
+            if(_laserCurrentCount > 0)
             {
-                Laser[] lasers = Instantiate(_tripleShotPrefab, transform.position, Quaternion.identity).GetComponentsInChildren<Laser>();
-                foreach(Laser laser in lasers)
+                _laserCurrentCount--;
+                _uiManager.UpdateAmmoText(_laserCurrentCount);
+                if (_isTripleShotEnabled)
                 {
+                    Laser[] lasers = Instantiate(_tripleShotPrefab, transform.position, Quaternion.identity).GetComponentsInChildren<Laser>();
+                    foreach (Laser laser in lasers)
+                    {
+                        laser.InitializeFiring(1);
+                    }
+                }
+
+                else
+                {
+                    Laser laser = Instantiate(_laserPrefab, _laserSpawnTransform.position, _laserSpawnTransform.rotation).GetComponent<Laser>();
                     laser.InitializeFiring(1);
                 }
+                _audioSource.PlayOneShot(_laserAudioClip);
+                _canFire = false;
+                StartCoroutine(ResetLaserCooldown());
             }
-                
             else
             {
-                Laser laser = Instantiate(_laserPrefab, _laserSpawnTransform.position, _laserSpawnTransform.rotation).GetComponent<Laser>();
-                laser.InitializeFiring(1);
+                _audioSource.PlayOneShot(_outOfAmmoClip);
             }
-                
-            _audioSource.PlayOneShot(_laserAudioClip);
-            _canFire = false;
-            StartCoroutine(ResetLaserCooldown());
+   
+
         }
             
     }
@@ -253,6 +269,7 @@ public class Player : MonoBehaviour
     public void EnableShield()
     {
         _shieldCurrentHealth = _shieldMaxHealth;
+        _shieldGO.GetComponent<SpriteRenderer>().color = Color.white;
         _isShieldEnabled = true;
         _shieldGO.SetActive(true);
     }

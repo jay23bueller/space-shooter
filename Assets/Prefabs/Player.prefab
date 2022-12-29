@@ -265,13 +265,15 @@ MonoBehaviour:
   _laserPrefab: {fileID: 7891439289125116962, guid: a773c3fa5de731b469877f219fff185b, type: 3}
   _laserSpawnTransform: {fileID: 5545497931039135892}
   _laserCooldownDuration: 0.2
+  _laserMaxCount: 15
+  _laserAudioClip: {fileID: 8300000, guid: 75676f361bdfeaf41a46623e95df3dbc, type: 3}
+  _outOfAmmoClip: {fileID: 8300000, guid: 62962b27427c488489ef01a6169ef40f, type: 3}
   _lives: 3
   _shieldGO: {fileID: 2486407404339729726}
   _uiManager: {fileID: 0}
   _engines:
   - {fileID: 660491569113670107}
   - {fileID: 7216556702876315167}
-  _laserAudioClip: {fileID: 8300000, guid: 75676f361bdfeaf41a46623e95df3dbc, type: 3}
   _explosionGO: {fileID: 8978835077582414172, guid: 62eac0f433665e349bd09acf6fe53bd5, type: 3}
 --- !u!212 &5545497930555065299
 SpriteRenderer:
