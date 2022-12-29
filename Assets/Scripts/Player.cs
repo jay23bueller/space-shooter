@@ -27,7 +27,7 @@ public class Player : MonoBehaviour
 
     //Thruster
     [SerializeField]
-    private float _thrusterMultiplier = 1.3f;
+    private float _thrusterBoostMultiplier = 1.3f;
     private bool _isThrustersEnabled;
     [SerializeField]
     private GameObject _thrusterGO;
@@ -105,7 +105,7 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        CheckThrusterSpeed();
+        CheckForThrusterBoost();
         MoveCharacter();
         FireLaser();
 
@@ -116,7 +116,7 @@ public class Player : MonoBehaviour
 
     #region Methods
 
-    private void CheckThrusterSpeed()
+    private void CheckForThrusterBoost()
     {
         if (Input.GetKey(KeyCode.LeftShift))
             _isThrustersEnabled = true;
@@ -134,7 +134,7 @@ public class Player : MonoBehaviour
         } 
         else if(_isThrustersEnabled)
         {
-            _speedMultiplier = _thrusterMultiplier;
+            _speedMultiplier = _thrusterBoostMultiplier;
         }
         else
         {
