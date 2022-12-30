@@ -60,8 +60,7 @@ public class Player : MonoBehaviour
     [SerializeField]
     private int _laserMaxCount = 15;
 
-    [SerializeField]
-    private int _lives = 3;
+
     private float _initialViewportZPosition;
 
     //Shield
@@ -76,6 +75,9 @@ public class Player : MonoBehaviour
     [SerializeField]
     private UIManager _uiManager;
 
+    //Score
+    [SerializeField]
+    private int _healthDropScoreDivisor = 200;
     private int _score;
 
     //Effects
@@ -85,6 +87,11 @@ public class Player : MonoBehaviour
 
     [SerializeField]
     private GameObject _explosionGO;
+
+    //Lives
+    [SerializeField]
+    private int _lives = 3;
+    private int _maxLives = 3;
     #endregion
 
     #region UnityMethods
@@ -220,19 +227,19 @@ public class Player : MonoBehaviour
         _canFire = true;
     }
 
-    public void TakeDamage()
+    public void UpdateLives(int value)
     {
-        if(_isShieldEnabled)
+        if(value < 0 && _isShieldEnabled)
         {
             UpdateShield();
             return;
         }
         
-
-        _lives--;
+        
+        _lives = Mathf.Clamp(_lives+value, 0, _maxLives);
         _uiManager.UpdateLivesImage(_lives);
 
-        if (_lives <= 0)
+        if (_lives == 0)
         {
             GetComponent<BoxCollider2D>().enabled = false;
             _spawnManager.Stop();
@@ -241,7 +248,12 @@ public class Player : MonoBehaviour
             Destroy(gameObject);
         }
         else
-            _engines[_lives - 1].SetActive(true);
+        {
+            int index = value < 0 ? _lives - 1 : _lives - 2;
+            Debug.Log($"the index when value is {value} is: {index}");
+           _engines[index].SetActive(value < 0 ? true : false);
+        }
+            
             
     }
 
@@ -321,6 +333,9 @@ public class Player : MonoBehaviour
     public void AddScore(int value)
     {
         _score += value;
+        if (_score % _healthDropScoreDivisor == 0)
+            _spawnManager.SpawnHealth();
+
         _uiManager.UpdateScoreText(_score);
     }
 

@@ -52,7 +52,11 @@ MonoBehaviour:
   - {fileID: 935228819368299148, guid: 107a0784677ef7248bb2b29ced462add, type: 3}
   - {fileID: 6798021054927502858, guid: e0ef36cb2060e0a439a83437f1198c06, type: 3}
   - {fileID: 795033785503102533, guid: 07f9176aef8eecd4a9c6cbedd6ba93e4, type: 3}
-  - {fileID: 795033785503102533, guid: b5b41b5bf9803f842bce22a16fe13834, type: 3}
+  - {fileID: 795033785503102533, guid: 17a61f7fb80b17443951a15e643eeed3, type: 3}
+  - {fileID: 795033785503102533, guid: ee76fc9e484386b4485eaaff5568a6a4, type: 3}
+  _turnsBeforeSpawningAmmo: 5
+  _enemySpawnsBeforeAmmoDrop: 4
+  _healthDropClip: {fileID: 8300000, guid: 334f936dbdf682a4bad3969822bb9c71, type: 3}
 --- !u!1 &7683424367433563454
 GameObject:
   m_ObjectHideFlags: 0

@@ -23,6 +23,8 @@ public class SpawnManager : MonoBehaviour
     private int _turnsBeforeSpawningAmmo = 4;
     [SerializeField]
     private int _enemySpawnsBeforeAmmoDrop = 4;
+    [SerializeField]
+    private AudioClip _healthDropClip;
     public readonly static float LEFT_BOUND = 0.05f;
     public readonly static float RIGHT_BOUND = 0.95f;
     public readonly static float TOP_BOUND = 1.05f;
@@ -83,6 +85,24 @@ public class SpawnManager : MonoBehaviour
                 );
             _powerupSpawnCount++;
         }
+    }
+
+    public void SpawnHealth()
+    {
+        Vector3 spawnLocation = Camera.main.ViewportToWorldPoint(
+            new Vector3(
+                .5f,
+                TOP_BOUND,
+                Camera.main.WorldToViewportPoint(transform.position).z
+                ));
+            
+        Instantiate(
+            _powerups[4],
+            spawnLocation,
+            Quaternion.identity
+            );
+
+        AudioSource.PlayClipAtPoint(_healthDropClip, Camera.main.transform.position);
     }
 
     public void Stop()

@@ -175,7 +175,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &206703344
 GameObject:
@@ -1666,7 +1666,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 34559481051888760, guid: 1c48d4b10b6b82a448f544ccecd918e2, type: 3}
       propertyPath: m_RootOrder
-      value: 6
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 34559481051888760, guid: 1c48d4b10b6b82a448f544ccecd918e2, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1725,6 +1725,10 @@ PrefabInstance:
       propertyPath: _uiManager
       value: 
       objectReference: {fileID: 163892733}
+    - target: {fileID: 5545497930555065300, guid: acf95df6e14323a45a79d9cdf4ac4806, type: 3}
+      propertyPath: _healthDropScoreDivisor
+      value: 200
+      objectReference: {fileID: 0}
     - target: {fileID: 5545497930555065301, guid: acf95df6e14323a45a79d9cdf4ac4806, type: 3}
       propertyPath: m_RootOrder
       value: 2
@@ -1825,14 +1829,6 @@ PrefabInstance:
     - target: {fileID: 5637057628212662890, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
       propertyPath: m_Name
       value: SpawnManager
-      objectReference: {fileID: 0}
-    - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
-      propertyPath: _powerups.Array.data[3]
-      value: 
-      objectReference: {fileID: 795033785503102533, guid: b5b41b5bf9803f842bce22a16fe13834, type: 3}
-    - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
-      propertyPath: _turnsBeforeSpawningAmmo
-      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}

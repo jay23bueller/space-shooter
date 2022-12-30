@@ -56,7 +56,7 @@ public class Enemy : MonoBehaviour
         if (other != null)
         {
             if (other.CompareTag(PLAYER_TAG))
-                other.GetComponent<Player>().TakeDamage();
+                other.GetComponent<Player>().UpdateLives(-1);
 
 
             if (other.CompareTag(LASER_TAG))

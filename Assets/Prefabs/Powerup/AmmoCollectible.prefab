@@ -13,7 +13,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 935228819368299148, guid: 107a0784677ef7248bb2b29ced462add, type: 3}
       propertyPath: m_Name
-      value: AmmoPowerup
+      value: AmmoCollectible
       objectReference: {fileID: 0}
     - target: {fileID: 5568688700901041232, guid: 107a0784677ef7248bb2b29ced462add, type: 3}
       propertyPath: m_Sprite

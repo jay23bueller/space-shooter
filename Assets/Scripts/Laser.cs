@@ -31,7 +31,7 @@ public class Laser : MonoBehaviour
         {
             if(collision.CompareTag("Player") && _isEnemyLaser)
             {
-                collision.GetComponent<Player>().TakeDamage();
+                collision.GetComponent<Player>().UpdateLives(-1);
                 Destroy(gameObject);
             }
         }

@@ -45,11 +45,15 @@ public class Powerup : MonoBehaviour
                         //Ammo
                         collision.GetComponent<Player>().AddAmmo();
                         break;
+                    case 4:
+                        //Life
+                        collision.GetComponent<Player>().UpdateLives(1);
+                        break;
                     default:
                         Debug.LogError("Didn't assign correct powerupID!");
                         break;
                 }
-                AudioSource.PlayClipAtPoint(_powerupAudioClip, transform.position, 3f);
+                AudioSource.PlayClipAtPoint(_powerupAudioClip, Camera.main.transform.position, .8f);
                 Destroy(gameObject);
             }
         }
