@@ -21,6 +21,8 @@ public class SpawnManager : MonoBehaviour
     private int _enemiesDestroyedCount;
     [SerializeField]
     private int _turnsBeforeSpawningAmmo = 4;
+    [SerializeField]
+    private int _enemySpawnsBeforeAmmoDrop = 4;
     public readonly static float LEFT_BOUND = 0.05f;
     public readonly static float RIGHT_BOUND = 0.95f;
     public readonly static float TOP_BOUND = 1.05f;
@@ -100,7 +102,7 @@ public class SpawnManager : MonoBehaviour
         if(_canSpawn)
         {
             _enemiesDestroyedCount++;
-            if(_enemiesDestroyedCount % 4 == 0)
+            if(_enemiesDestroyedCount % _enemySpawnsBeforeAmmoDrop == 0)
             {
                 Instantiate(
                     _powerups[3],

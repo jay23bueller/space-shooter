@@ -10,10 +10,10 @@ GameObject:
   m_Component:
   - component: {fileID: 5880269001961533549}
   - component: {fileID: 5568688700901041232}
+  - component: {fileID: 8406687651757190619}
   - component: {fileID: 1089882136512374934}
   - component: {fileID: 3120649806814688746}
   - component: {fileID: -5199103053590701418}
-  - component: {fileID: 8406687651757190619}
   m_Layer: 0
   m_Name: TripleShotPowerup
   m_TagString: Powerup
@@ -86,6 +86,25 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!95 &8406687651757190619
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 935228819368299148}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: afedd02789665064fbe7af4e40d0917c, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!58 &1089882136512374934
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -137,22 +156,3 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _powerupID: 0
   _powerupAudioClip: {fileID: 8300000, guid: 5ee343246919d2b4bba63ae629e95494, type: 3}
---- !u!95 &8406687651757190619
-Animator:
-  serializedVersion: 3
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 935228819368299148}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: afedd02789665064fbe7af4e40d0917c, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0

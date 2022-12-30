@@ -12,7 +12,7 @@ public class EnemyDestroyedBehaviour : StateMachineBehaviour
 
     public override void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        if(!_toldSpawnManager && stateInfo.normalizedTime > .4f && stateInfo.normalizedTime < 1f)
+        if(!_toldSpawnManager && stateInfo.normalizedTime > .4f)
         {
             _toldSpawnManager = true;
             animator.GetComponent<Enemy>().InformSpawnManager();
