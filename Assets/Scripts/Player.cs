@@ -52,12 +52,13 @@ public class Player : MonoBehaviour
     private bool _canFire = true;
     [SerializeField]
     private float _laserCooldownDuration = .2f;
-    [SerializeField]
     private int _laserCurrentCount = 15;
     [SerializeField]
     private AudioClip _laserAudioClip;
     [SerializeField]
     private AudioClip _outOfAmmoClip;
+    [SerializeField]
+    private int _laserMaxCount = 15;
 
     [SerializeField]
     private int _lives = 3;
@@ -94,6 +95,7 @@ public class Player : MonoBehaviour
         transform.position = new Vector3(0f,0f,0f);
         _initialViewportZPosition = Camera.main.WorldToViewportPoint(transform.position).z;
         _spawnManager = GameObject.FindGameObjectWithTag(SPAWN_MANAGER_TAG).GetComponent<SpawnManager>();
+        _laserCurrentCount = _laserMaxCount;
         _uiManager.UpdateScoreText(_score);
         _uiManager.UpdateAmmoText(_laserCurrentCount);
 
@@ -300,6 +302,12 @@ public class Player : MonoBehaviour
                 Debug.LogError("Incorrect powerupID was passed!");
                 break;
         }
+    }
+
+    public void AddAmmo()
+    {
+        _laserCurrentCount = Mathf.Clamp(_laserCurrentCount+5, 0, _laserMaxCount);
+        _uiManager.UpdateAmmoText(_laserCurrentCount);
     }
 
     public void EnableSpeedBoost()

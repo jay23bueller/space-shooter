@@ -10,6 +10,7 @@ public class Enemy : MonoBehaviour
     private const string ENEMY_TAG = "Enemy";
     private const string POWERUP_TAG = "Powerup";
     private const string ENEMYLASER_TAG = "EnemyLaser"; //enums, tags are stored as an array, can use specific indexes
+    private const string SPAWNMANAGER_TAG = "SpawnManager";
     #endregion
 
     #region Variables
@@ -23,6 +24,8 @@ public class Enemy : MonoBehaviour
     private AudioClip _laserAudioClip;
     [SerializeField]
     private GameObject _laserPrefab;
+    private SpawnManager _spawnManager;
+    private bool _wasKilled;
     #endregion
 
     #region UnityMethods
@@ -35,6 +38,7 @@ public class Enemy : MonoBehaviour
         _player = GameObject.FindGameObjectWithTag(PLAYER_TAG).GetComponent<Player>();
         _anim = GetComponent<Animator>();
         _audioSource = GetComponent<AudioSource>();
+        _spawnManager = GameObject.FindGameObjectWithTag(SPAWNMANAGER_TAG).GetComponent<SpawnManager>();
         StartCoroutine(FireLaser());
         _rigidbody.velocity = Vector2.down * _speed;
 
@@ -59,6 +63,7 @@ public class Enemy : MonoBehaviour
             {
                 if(_player != null)
                     _player.AddScore(10);
+                _wasKilled = true;
                 Destroy(other.gameObject);
             }
                 
@@ -74,6 +79,7 @@ public class Enemy : MonoBehaviour
                 
         }
     }
+
 
     #endregion
 
@@ -111,10 +117,15 @@ public class Enemy : MonoBehaviour
         }
     }
 
+    public void InformSpawnManager()
+    {
+        if(_wasKilled)
+        _spawnManager.EnemyDestroyed(transform.position);
+    }
+
     public void Die()
     {
         Destroy(gameObject);
-
     }
     #endregion
 }

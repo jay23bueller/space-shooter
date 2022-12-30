@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using UnityEngine;
 
 public class SpawnManager : MonoBehaviour
@@ -16,6 +17,10 @@ public class SpawnManager : MonoBehaviour
     private GameObject _enemyContainer;
     [SerializeField]
     private GameObject[] _powerups;
+    private int _powerupSpawnCount = 1;
+    private int _enemiesDestroyedCount;
+    [SerializeField]
+    private int _turnsBeforeSpawningAmmo = 4;
     public readonly static float LEFT_BOUND = 0.05f;
     public readonly static float RIGHT_BOUND = 0.95f;
     public readonly static float TOP_BOUND = 1.05f;
@@ -53,7 +58,16 @@ public class SpawnManager : MonoBehaviour
     {
         while(_canSpawn)
         {
+            int powerupIndex;
+            if (_powerupSpawnCount % _turnsBeforeSpawningAmmo == 0)
+                powerupIndex = 3;
+            else
+                powerupIndex = Random.Range(0, _powerups.Length-1);
+
+
             yield return new WaitForSeconds(Random.Range(3.0f, 7.0f));
+            
+            
             Vector3 spawnLocation = Camera.main.ViewportToWorldPoint(
                 new Vector3(
                     Random.Range(LEFT_BOUND, RIGHT_BOUND),
@@ -61,10 +75,11 @@ public class SpawnManager : MonoBehaviour
                     Camera.main.WorldToViewportPoint(transform.position).z
                 ));
             Instantiate(
-                _powerups[Random.Range(0,_powerups.Length)],
+                _powerups[powerupIndex],
                 spawnLocation,
                 Quaternion.identity
                 );
+            _powerupSpawnCount++;
         }
     }
 
@@ -78,6 +93,23 @@ public class SpawnManager : MonoBehaviour
     public void StartWave()
     {
         StartCoroutine(StartWaveRoutine());
+    }
+
+    public void EnemyDestroyed(Vector2 position)
+    {
+        if(_canSpawn)
+        {
+            _enemiesDestroyedCount++;
+            if(_enemiesDestroyedCount % 4 == 0)
+            {
+                Instantiate(
+                    _powerups[3],
+                    position,
+                    Quaternion.identity
+                    );
+            }
+        }
+        
     }
 
     private IEnumerator StartWaveRoutine()

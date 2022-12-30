@@ -7,7 +7,7 @@ public class Powerup : MonoBehaviour
 {
     #region Variables
     private float _speed = 3.0f;
-    [SerializeField] //0 = TripleShot, 1 = SpeedBoost, 2 = Shield
+    [SerializeField] //0 = TripleShot, 1 = SpeedBoost, 2 = Shield, 3 = Ammo
     private int _powerupID;
     [SerializeField]
     private AudioClip _powerupAudioClip;
@@ -40,6 +40,10 @@ public class Powerup : MonoBehaviour
                     case 2:
                         //Shields
                         collision.GetComponent<Player>().EnableShield();
+                        break;
+                    case 3:
+                        //Ammo
+                        collision.GetComponent<Player>().AddAmmo();
                         break;
                     default:
                         Debug.LogError("Didn't assign correct powerupID!");
