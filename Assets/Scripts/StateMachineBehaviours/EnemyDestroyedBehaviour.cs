@@ -4,19 +4,16 @@ using UnityEngine;
 
 public class EnemyDestroyedBehaviour : StateMachineBehaviour
 {
-    private bool _toldSpawnManager;
+
     public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         animator.GetComponent<AudioSource>().Play();
+        animator.GetComponent<Enemy>().InformSpawnManager(stateInfo.length * .4f);
     }
 
     public override void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        if(!_toldSpawnManager && stateInfo.normalizedTime > .4f)
-        {
-            _toldSpawnManager = true;
-            animator.GetComponent<Enemy>().InformSpawnManager();
-        }
+
         if(stateInfo.normalizedTime >= 1f)
             animator.GetComponent<Enemy>().Die();
     }

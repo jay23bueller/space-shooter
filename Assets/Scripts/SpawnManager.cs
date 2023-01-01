@@ -16,6 +16,10 @@ public class SpawnManager : MonoBehaviour
     [SerializeField]
     private GameObject _enemyContainer;
     [SerializeField]
+    private List<GameObject> _enemies = new List<GameObject>();
+    [SerializeField]
+    private Player _player;
+    [SerializeField]
     private GameObject[] _powerups;
     private int _powerupSpawnCount = 1;
     private int _enemiesDestroyedCount;
@@ -25,6 +29,8 @@ public class SpawnManager : MonoBehaviour
     private int _enemySpawnsBeforeAmmoDrop = 4;
     [SerializeField]
     private AudioClip _healthDropClip;
+    [SerializeField]
+    private int _homingMissileSpawnInterval = 10;
     public readonly static float LEFT_BOUND = 0.05f;
     public readonly static float RIGHT_BOUND = 0.95f;
     public readonly static float TOP_BOUND = 1.05f;
@@ -47,11 +53,12 @@ public class SpawnManager : MonoBehaviour
                 Camera.main.WorldToViewportPoint(_enemyContainer.transform.position).z
                 ));
 
-            GameObject newEnemy = Instantiate(
+             _enemies.Add(Instantiate(
                 _enemyPrefab,
                 spawnLocation,
                 Quaternion.AngleAxis(180, Vector3.forward),
-                _enemyContainer.transform);
+                _enemyContainer.transform));
+
 
             yield return new WaitForSeconds(Random.Range(_minSpawnTime, _maxSpawnTime + 1));
         }
@@ -66,7 +73,7 @@ public class SpawnManager : MonoBehaviour
             if (_powerupSpawnCount % _turnsBeforeSpawningAmmo == 0)
                 powerupIndex = 3;
             else
-                powerupIndex = Random.Range(0, _powerups.Length-1);
+                powerupIndex = Random.Range(0, 2);
 
 
             yield return new WaitForSeconds(Random.Range(3.0f, 7.0f));
@@ -87,6 +94,26 @@ public class SpawnManager : MonoBehaviour
         }
     }
 
+    private IEnumerator SpawnHomingMissile()
+    {
+        while (_canSpawn)
+        {
+            yield return new WaitForSeconds(_homingMissileSpawnInterval);
+
+            Vector3 spawnLocation = Camera.main.ViewportToWorldPoint(
+                new Vector3(
+                    Random.Range(LEFT_BOUND, RIGHT_BOUND),
+                    TOP_BOUND,
+                    Camera.main.WorldToViewportPoint(transform.position).z
+                ));
+            Instantiate(
+                _powerups[5],
+                spawnLocation,
+                Quaternion.identity
+                );
+            _powerupSpawnCount++;
+        }
+    }
     public void SpawnHealth()
     {
         Vector3 spawnLocation = Camera.main.ViewportToWorldPoint(
@@ -108,30 +135,40 @@ public class SpawnManager : MonoBehaviour
     public void Stop()
     {
         _canSpawn = false;
+        _enemies.Clear();
         Destroy(_enemyContainer);
 
     }
 
     public void StartWave()
     {
+        _player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
         StartCoroutine(StartWaveRoutine());
     }
 
-    public void EnemyDestroyed(Vector2 position)
+    public void EnemyDestroyed(GameObject enemy, float powerupSpawnDelayDuration)
     {
         if(_canSpawn)
         {
+            _enemies.Remove(enemy);
+            Vector3 position = enemy.transform.position;
             _enemiesDestroyedCount++;
             if(_enemiesDestroyedCount % _enemySpawnsBeforeAmmoDrop == 0)
             {
-                Instantiate(
-                    _powerups[3],
-                    position,
-                    Quaternion.identity
-                    );
+                StartCoroutine(SpawnPowerupAtEnemyPosition(position, powerupSpawnDelayDuration));
             }
         }
         
+    }
+
+    private IEnumerator SpawnPowerupAtEnemyPosition(Vector3 position, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        Instantiate(
+            _powerups[3],
+            position,
+            Quaternion.identity
+            );
     }
 
     private IEnumerator StartWaveRoutine()
@@ -139,6 +176,39 @@ public class SpawnManager : MonoBehaviour
         yield return new WaitForSeconds(3f);
         StartCoroutine(SpawnEnemy());
         StartCoroutine(SpawnPowerup());
+        StartCoroutine(SpawnHomingMissile());
+    }
+
+    public Transform FindNearestEnemyToPlayer()
+    {
+        Transform closestEnemyTransform = null;
+        float distance = -1f;
+        foreach (GameObject enemy in _enemies)
+        {
+            if (_player == null)
+                return null;
+
+            if (distance == -1 || closestEnemyTransform == null)
+            {
+                closestEnemyTransform = enemy != null ? enemy.transform : null;
+
+                if (closestEnemyTransform != null)
+                    distance = Vector3.Distance(_player.transform.position, closestEnemyTransform.position);
+            }
+            else if (enemy != null)
+            {
+                float newEnemyDistance = Vector3.Distance(_player.transform.position, enemy.transform.position);
+                if (newEnemyDistance < distance)
+                {
+                    closestEnemyTransform = enemy != null ? enemy.transform : closestEnemyTransform;
+                    if (enemy != null)
+                        distance = newEnemyDistance;
+                }
+            }
+        }
+
+        return closestEnemyTransform;
+
     }
     #endregion
 }

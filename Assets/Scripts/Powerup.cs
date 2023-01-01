@@ -3,12 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions.Must;
 
+public enum Powerups
+{
+    TripleShot,
+    HomingMissile,
+    HealthCollectible,
+    AmmoCollectible,
+    Shield,
+    SpeedBoost
+}
 public class Powerup : MonoBehaviour
 {
     #region Variables
     private float _speed = 3.0f;
     [SerializeField] //0 = TripleShot, 1 = SpeedBoost, 2 = Shield, 3 = Ammo
-    private int _powerupID;
+    private Powerups _powerup;
     [SerializeField]
     private AudioClip _powerupAudioClip;
     #endregion
@@ -27,26 +36,23 @@ public class Powerup : MonoBehaviour
         {
             if(collision.CompareTag("Player"))
             {
-                switch(_powerupID)
+                switch(_powerup)
                 {
-                    case 0:
-                        //Triple Shot
-                        collision.GetComponent<Player>().EnableTripleShot();
+                    case Powerups.TripleShot:
+                    case Powerups.HomingMissile:
+                        FiringMode mode = _powerup == Powerups.TripleShot ? FiringMode.TripleShot : FiringMode.HomingMissile;
+                        collision.GetComponent<Player>().EnableWeapon(mode);
                         break;
-                    case 1:
-                        //Speed Boost
+                    case Powerups.SpeedBoost:
                         collision.GetComponent<Player>().EnableSpeedBoost();
                         break;
-                    case 2:
-                        //Shields
+                    case Powerups.Shield:
                         collision.GetComponent<Player>().EnableShield();
                         break;
-                    case 3:
-                        //Ammo
+                    case Powerups.AmmoCollectible:
                         collision.GetComponent<Player>().AddAmmo();
                         break;
-                    case 4:
-                        //Life
+                    case Powerups.HealthCollectible:
                         collision.GetComponent<Player>().UpdateLives(1);
                         break;
                     default:

@@ -6,9 +6,9 @@ public class Laser : MonoBehaviour
 {
     #region Variables
     [SerializeField]
-    private float _speed = 8.0f;
-    private bool _canMove;
-    private bool _isEnemyLaser;
+    protected float _speed = 8.0f;
+    protected bool _canMove;
+    protected bool _isEnemyWeapon;
     #endregion
 
     #region UnityMethods
@@ -25,23 +25,28 @@ public class Laser : MonoBehaviour
             Destroy(transform.parent.gameObject);
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision != null)
+        CollisionCheck(ref collision);
+    }
+    #endregion
+
+    #region Methods
+    protected void CollisionCheck(ref Collider2D collision)
+    {
+        if (collision != null)
         {
-            if(collision.CompareTag("Player") && _isEnemyLaser)
+            if (collision.CompareTag("Player") && _isEnemyWeapon)
             {
                 collision.GetComponent<Player>().UpdateLives(-1);
                 Destroy(gameObject);
             }
         }
     }
-    #endregion
 
-    #region Methods
     // Move laser till it's out of the viewport
     // at the moment, it is assumed to be moving to the top
-    private void Move()
+    protected virtual void Move()
     {
         if (_canMove)
         {
@@ -54,12 +59,12 @@ public class Laser : MonoBehaviour
 
     }
 
-    public void InitializeFiring(int owner)
+    public virtual void InitializeFiring(int owner)
     {
         switch(owner)
         {
             case 0:
-                _isEnemyLaser = true;
+                _isEnemyWeapon = true;
                 tag = "EnemyLaser";
                 break;
             case 1:

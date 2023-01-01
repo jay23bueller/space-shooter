@@ -27,6 +27,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6210930796060426911}
   m_Father: {fileID: 0}
@@ -48,15 +49,19 @@ MonoBehaviour:
   _minSpawnTime: 1
   _maxSpawnTime: 5
   _enemyContainer: {fileID: 7683424367433563454}
+  _enemies: []
+  _player: {fileID: 0}
   _powerups:
   - {fileID: 935228819368299148, guid: 107a0784677ef7248bb2b29ced462add, type: 3}
   - {fileID: 6798021054927502858, guid: e0ef36cb2060e0a439a83437f1198c06, type: 3}
   - {fileID: 795033785503102533, guid: 07f9176aef8eecd4a9c6cbedd6ba93e4, type: 3}
   - {fileID: 795033785503102533, guid: 17a61f7fb80b17443951a15e643eeed3, type: 3}
   - {fileID: 795033785503102533, guid: ee76fc9e484386b4485eaaff5568a6a4, type: 3}
+  - {fileID: 8280209617936306660, guid: a0208e748cf29174faf9d9c0bfd81660, type: 3}
   _turnsBeforeSpawningAmmo: 5
-  _enemySpawnsBeforeAmmoDrop: 4
+  _enemySpawnsBeforeAmmoDrop: 5
   _healthDropClip: {fileID: 8300000, guid: 334f936dbdf682a4bad3969822bb9c71, type: 3}
+  _homingMissileSpawnInterval: 21
 --- !u!1 &7683424367433563454
 GameObject:
   m_ObjectHideFlags: 0
@@ -83,6 +88,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5637057628212662888}
   m_RootOrder: 0

@@ -3,6 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+public enum FiringMode
+{
+    Default,
+    HomingMissile,
+    TripleShot
+}
 public class Player : MonoBehaviour
 {
     #region Constants
@@ -41,24 +47,37 @@ public class Player : MonoBehaviour
     //TripleShot
     [SerializeField]
     private GameObject _tripleShotPrefab;
-    private Coroutine _resetTripleShotCoroutine;
+    private Coroutine _resetWeaponRountine;
     private bool _isTripleShotEnabled;
+
+
+    //Current Weapon
+    private bool _canFire = true;
+    [SerializeField]
+    private int _ammoMaxCount = 15;
+    private int _ammoCurrentCount = 15;
+    [SerializeField]
+    private AudioClip _outOfAmmoClip;
+    private FiringMode _firingMode;
 
     //Laser
     [SerializeField]
     private GameObject _laserPrefab;
     [SerializeField]
     private Transform _laserSpawnTransform;
-    private bool _canFire = true;
     [SerializeField]
     private float _laserCooldownDuration = .2f;
-    private int _laserCurrentCount = 15;
     [SerializeField]
     private AudioClip _laserAudioClip;
+
+    //Missile
     [SerializeField]
-    private AudioClip _outOfAmmoClip;
+    private GameObject _missilePrefab;
+    private float _weaponCooldownDuration;
     [SerializeField]
-    private int _laserMaxCount = 15;
+    private AudioClip _missileAudioClip;
+    [SerializeField]
+    private float _missileCooldownDuration = 1f;
 
 
     private float _initialViewportZPosition;
@@ -102,9 +121,9 @@ public class Player : MonoBehaviour
         transform.position = new Vector3(0f,0f,0f);
         _initialViewportZPosition = Camera.main.WorldToViewportPoint(transform.position).z;
         _spawnManager = GameObject.FindGameObjectWithTag(SPAWN_MANAGER_TAG).GetComponent<SpawnManager>();
-        _laserCurrentCount = _laserMaxCount;
+        _ammoCurrentCount = _ammoMaxCount;
         _uiManager.UpdateScoreText(_score);
-        _uiManager.UpdateAmmoText(_laserCurrentCount);
+        _uiManager.UpdateAmmoText(_ammoCurrentCount);
 
         if (_spawnManager == null)
             Debug.LogError("The Spawn Manager is NULL");
@@ -123,7 +142,7 @@ public class Player : MonoBehaviour
     {
         CheckForThrusterBoost();
         MoveCharacter();
-        FireLaser();
+        FireWeapon();
 
     }
 
@@ -184,30 +203,40 @@ public class Player : MonoBehaviour
 
     }
 
-    //Attempt to fire a laser
-    private void FireLaser()
+    //Attempt to fire weapon
+    private void FireWeapon()
     {
         if(_canFire && Input.GetKeyDown(KeyCode.Space))
         {
-            if(_laserCurrentCount > 0)
+            if(_ammoCurrentCount > 0)
             {
-                _laserCurrentCount--;
-                _uiManager.UpdateAmmoText(_laserCurrentCount);
-                if (_isTripleShotEnabled)
-                {
-                    Laser[] lasers = Instantiate(_tripleShotPrefab, transform.position, Quaternion.identity).GetComponentsInChildren<Laser>();
-                    foreach (Laser laser in lasers)
-                    {
-                        laser.InitializeFiring(1);
-                    }
-                }
+                _ammoCurrentCount--;
+                _uiManager.UpdateAmmoText(_ammoCurrentCount);
 
-                else
+                switch (_firingMode)
                 {
-                    Laser laser = Instantiate(_laserPrefab, _laserSpawnTransform.position, _laserSpawnTransform.rotation).GetComponent<Laser>();
-                    laser.InitializeFiring(1);
+                    case FiringMode.Default:
+                    case FiringMode.TripleShot:
+                        List<Laser> lasers = new List<Laser>();
+                        if (FiringMode.Default == _firingMode)
+                            lasers.Add(Instantiate(_laserPrefab, _laserSpawnTransform.position, _laserSpawnTransform.rotation).GetComponent<Laser>());
+                        else
+                            lasers.AddRange(Instantiate(_tripleShotPrefab, _laserSpawnTransform.position, _laserSpawnTransform.rotation).GetComponentsInChildren<Laser>());
+                        
+                        foreach (Laser laser in lasers)
+                        {
+                            laser.InitializeFiring(1);
+                        }
+                        _audioSource.PlayOneShot(_laserAudioClip);
+                        break;
+
+                    case FiringMode.HomingMissile:
+                        Missile missile = Instantiate(_missilePrefab, _laserSpawnTransform.position, _laserSpawnTransform.rotation).GetComponent<Missile>();
+                        missile.InitializeFiring(1);
+                        _audioSource.PlayOneShot(_missileAudioClip);
+                        break;
                 }
-                _audioSource.PlayOneShot(_laserAudioClip);
+                
                 _canFire = false;
                 StartCoroutine(ResetLaserCooldown());
             }
@@ -223,10 +252,13 @@ public class Player : MonoBehaviour
 
     private IEnumerator ResetLaserCooldown()
     {
-        yield return new WaitForSeconds(_laserCooldownDuration);
+        yield return new WaitForSeconds(_weaponCooldownDuration);
         _canFire = true;
     }
 
+    //The incoming value at the moment should be 1 or -1
+    // -1 losing a life
+    // 1 gaining a life
     public void UpdateLives(int value)
     {
         if(value < 0 && _isShieldEnabled)
@@ -249,8 +281,9 @@ public class Player : MonoBehaviour
         }
         else
         {
+            //Assumed that when a life is gained the index of the engine,
+            //will be two indices behind the current _lives value
             int index = value < 0 ? _lives - 1 : _lives - 2;
-            Debug.Log($"the index when value is {value} is: {index}");
            _engines[index].SetActive(value < 0 ? true : false);
         }
             
@@ -288,38 +321,37 @@ public class Player : MonoBehaviour
         _shieldGO.SetActive(true);
     }
 
-    public void EnableTripleShot()
+    public void EnableWeapon(FiringMode mode)
     {
-        _isTripleShotEnabled = true;
-        if (_resetTripleShotCoroutine != null)
-            StopCoroutine(_resetTripleShotCoroutine);
-        _resetTripleShotCoroutine = StartCoroutine(ResetPowerup(0));
+        _firingMode = mode;
+        if (_resetWeaponRountine != null)
+            StopCoroutine(_resetWeaponRountine);
+        Powerups powerup = _firingMode == FiringMode.TripleShot ? Powerups.TripleShot : Powerups.HomingMissile;
+        _weaponCooldownDuration = mode == FiringMode.HomingMissile ? _missileCooldownDuration : _laserCooldownDuration;
+        _resetWeaponRountine = StartCoroutine(ResetPowerup(powerup));
     }
 
-    private IEnumerator ResetPowerup(int powerupID)
+    private IEnumerator ResetPowerup(Powerups powerup)
     {
         yield return new WaitForSeconds(5.0f);
 
-        switch (powerupID)
+        switch (powerup)
         {
-            case 0:
-                //Triple Shot
-                _isTripleShotEnabled = false;
+            case Powerups.TripleShot:
+            case Powerups.HomingMissile: 
+                _firingMode = FiringMode.Default;
+                _weaponCooldownDuration = _laserCooldownDuration;
                 break;
-            case 1:
-                //Speed Boost
+            case Powerups.SpeedBoost:
                 _isSpeedBoostEnabled = false;
-                break;
-            default:
-                Debug.LogError("Incorrect powerupID was passed!");
                 break;
         }
     }
 
     public void AddAmmo()
     {
-        _laserCurrentCount = Mathf.Clamp(_laserCurrentCount+5, 0, _laserMaxCount);
-        _uiManager.UpdateAmmoText(_laserCurrentCount);
+        _ammoCurrentCount = Mathf.Clamp(_ammoCurrentCount+5, 0, _ammoMaxCount);
+        _uiManager.UpdateAmmoText(_ammoCurrentCount);
     }
 
     public void EnableSpeedBoost()
@@ -327,7 +359,7 @@ public class Player : MonoBehaviour
         _isSpeedBoostEnabled = true;
         if (_resetSpeedBoostCoroutine != null)
             StopCoroutine(_resetSpeedBoostCoroutine);
-        _resetSpeedBoostCoroutine = StartCoroutine(ResetPowerup(1));
+        _resetSpeedBoostCoroutine = StartCoroutine(ResetPowerup(Powerups.SpeedBoost));
     }
 
     public void AddScore(int value)

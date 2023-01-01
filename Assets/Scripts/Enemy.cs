@@ -117,10 +117,10 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    public void InformSpawnManager()
+    public void InformSpawnManager(float powerupSpawnDelayDuration)
     {
         if(_wasKilled)
-        _spawnManager.EnemyDestroyed(transform.position);
+        _spawnManager.EnemyDestroyed(gameObject, powerupSpawnDelayDuration);
     }
 
     public void Die()
