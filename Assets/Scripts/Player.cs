@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public enum FiringMode
 {
@@ -48,7 +47,6 @@ public class Player : MonoBehaviour
     [SerializeField]
     private GameObject _tripleShotPrefab;
     private Coroutine _resetWeaponRountine;
-    private bool _isTripleShotEnabled;
 
 
     //Current Weapon
@@ -224,9 +222,8 @@ public class Player : MonoBehaviour
                             lasers.AddRange(Instantiate(_tripleShotPrefab, _laserSpawnTransform.position, _laserSpawnTransform.rotation).GetComponentsInChildren<Laser>());
                         
                         foreach (Laser laser in lasers)
-                        {
                             laser.InitializeFiring(1);
-                        }
+                        
                         _audioSource.PlayOneShot(_laserAudioClip);
                         break;
 
@@ -238,7 +235,7 @@ public class Player : MonoBehaviour
                 }
                 
                 _canFire = false;
-                StartCoroutine(ResetLaserCooldown());
+                StartCoroutine(ResetWeaponCooldown());
             }
             else
             {
@@ -250,7 +247,7 @@ public class Player : MonoBehaviour
             
     }
 
-    private IEnumerator ResetLaserCooldown()
+    private IEnumerator ResetWeaponCooldown()
     {
         yield return new WaitForSeconds(_weaponCooldownDuration);
         _canFire = true;
@@ -326,23 +323,23 @@ public class Player : MonoBehaviour
         _firingMode = mode;
         if (_resetWeaponRountine != null)
             StopCoroutine(_resetWeaponRountine);
-        Powerups powerup = _firingMode == FiringMode.TripleShot ? Powerups.TripleShot : Powerups.HomingMissile;
+        PowerupType powerup = _firingMode == FiringMode.TripleShot ? PowerupType.TripleShot : PowerupType.HomingMissile;
         _weaponCooldownDuration = mode == FiringMode.HomingMissile ? _missileCooldownDuration : _laserCooldownDuration;
         _resetWeaponRountine = StartCoroutine(ResetPowerup(powerup));
     }
 
-    private IEnumerator ResetPowerup(Powerups powerup)
+    private IEnumerator ResetPowerup(PowerupType powerup)
     {
         yield return new WaitForSeconds(5.0f);
 
         switch (powerup)
         {
-            case Powerups.TripleShot:
-            case Powerups.HomingMissile: 
+            case PowerupType.TripleShot:
+            case PowerupType.HomingMissile: 
                 _firingMode = FiringMode.Default;
                 _weaponCooldownDuration = _laserCooldownDuration;
                 break;
-            case Powerups.SpeedBoost:
+            case PowerupType.SpeedBoost:
                 _isSpeedBoostEnabled = false;
                 break;
         }
@@ -359,7 +356,7 @@ public class Player : MonoBehaviour
         _isSpeedBoostEnabled = true;
         if (_resetSpeedBoostCoroutine != null)
             StopCoroutine(_resetSpeedBoostCoroutine);
-        _resetSpeedBoostCoroutine = StartCoroutine(ResetPowerup(Powerups.SpeedBoost));
+        _resetSpeedBoostCoroutine = StartCoroutine(ResetPowerup(PowerupType.SpeedBoost));
     }
 
     public void AddScore(int value)

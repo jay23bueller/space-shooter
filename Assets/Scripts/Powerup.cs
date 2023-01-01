@@ -1,9 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Assertions.Must;
 
-public enum Powerups
+public enum PowerupType
 {
     TripleShot,
     HomingMissile,
@@ -17,7 +14,7 @@ public class Powerup : MonoBehaviour
     #region Variables
     private float _speed = 3.0f;
     [SerializeField] //0 = TripleShot, 1 = SpeedBoost, 2 = Shield, 3 = Ammo
-    private Powerups _powerup;
+    private PowerupType _powerup;
     [SerializeField]
     private AudioClip _powerupAudioClip;
     #endregion
@@ -38,21 +35,21 @@ public class Powerup : MonoBehaviour
             {
                 switch(_powerup)
                 {
-                    case Powerups.TripleShot:
-                    case Powerups.HomingMissile:
-                        FiringMode mode = _powerup == Powerups.TripleShot ? FiringMode.TripleShot : FiringMode.HomingMissile;
+                    case PowerupType.TripleShot:
+                    case PowerupType.HomingMissile:
+                        FiringMode mode = _powerup == PowerupType.TripleShot ? FiringMode.TripleShot : FiringMode.HomingMissile;
                         collision.GetComponent<Player>().EnableWeapon(mode);
                         break;
-                    case Powerups.SpeedBoost:
+                    case PowerupType.SpeedBoost:
                         collision.GetComponent<Player>().EnableSpeedBoost();
                         break;
-                    case Powerups.Shield:
+                    case PowerupType.Shield:
                         collision.GetComponent<Player>().EnableShield();
                         break;
-                    case Powerups.AmmoCollectible:
+                    case PowerupType.AmmoCollectible:
                         collision.GetComponent<Player>().AddAmmo();
                         break;
-                    case Powerups.HealthCollectible:
+                    case PowerupType.HealthCollectible:
                         collision.GetComponent<Player>().UpdateLives(1);
                         break;
                     default:
