@@ -41,10 +41,10 @@ public class Player : MonoBehaviour
     private float _thrusterDrainRate = -2.5f;
     [SerializeField]
     private float _thrusterGainRate = 2.5f;
-    private float _thrusterMaxPower = 100f;
-    private float _thrusterMinPower = 0f;
+    private float _thrusterMaxEnergy = 100f;
+    private float _thrusterMinEnergy = 0f;
     [SerializeField]
-    private float _thrusterCurrentPower;
+    private float _thrusterCurrentEnergy;
     private bool _punishPlayer;
     private bool _fullyCharged;
     private bool _justPunished;
@@ -153,7 +153,7 @@ public class Player : MonoBehaviour
         if (_audioSource == null)
             Debug.LogError("Player missing AudioSource component!");
 
-        _thrusterCurrentPower = _thrusterMaxPower;
+        _thrusterCurrentEnergy = _thrusterMaxEnergy;
     }
 
     // Update is called once per frame
@@ -196,7 +196,7 @@ public class Player : MonoBehaviour
 
     private void UpdateThrusterUI()
     {
-        _uiManager.UpdateThrusterSlider(_thrusterCurrentPower, _justPunished);
+        _uiManager.UpdateThrusterSlider(_thrusterCurrentEnergy, _justPunished);
     }
 
     private IEnumerator PunishPlayerRoutine()
@@ -209,7 +209,7 @@ public class Player : MonoBehaviour
 
     private void CheckThrusterPower()
     {
-        if(_thrusterCurrentPower == _thrusterMinPower && !_punishPlayer && !_justPunished)
+        if(_thrusterCurrentEnergy == _thrusterMinEnergy && !_punishPlayer && !_justPunished)
         {
             _justPunished = true;
             StartCoroutine(PunishPlayerRoutine());
@@ -217,14 +217,14 @@ public class Player : MonoBehaviour
         if(!_fullyCharged && !_punishPlayer)
         {
 
-            float batteryCharge = Time.deltaTime * _thrusterGainRate * ((_thrusterCurrentPower < .5f * _thrusterMaxPower) && _justPunished ? _thrusterRecoveryMultiplier : 1f);
+            float batteryCharge = Time.deltaTime * _thrusterGainRate * ((_thrusterCurrentEnergy < .5f * _thrusterMaxEnergy) && _justPunished ? _thrusterRecoveryMultiplier : 1f);
 
-            _thrusterCurrentPower = Mathf.Clamp(batteryCharge + _thrusterCurrentPower, _thrusterMinPower, _thrusterMaxPower);
-            if (_thrusterCurrentPower >= .5f * _thrusterMaxPower)
+            _thrusterCurrentEnergy = Mathf.Clamp(batteryCharge + _thrusterCurrentEnergy, _thrusterMinEnergy, _thrusterMaxEnergy);
+            if (_thrusterCurrentEnergy >= .5f * _thrusterMaxEnergy)
             {
                 _justPunished = false;
             }
-            if (_thrusterCurrentPower == _thrusterMaxPower)
+            if (_thrusterCurrentEnergy == _thrusterMaxEnergy)
                 _fullyCharged = true;
         }
     }
@@ -238,9 +238,8 @@ public class Player : MonoBehaviour
         else if (_engagingThrusters && !_justPunished)
         {
             _speedMultiplier = _thrusterBoostMultiplier;
-            _thrusterCurrentPower = Mathf.Clamp(_thrusterCurrentPower +(_thrusterDrainRate * Time.deltaTime), _thrusterMinPower, _thrusterMaxPower);
+            _thrusterCurrentEnergy = Mathf.Clamp(_thrusterCurrentEnergy +(_thrusterDrainRate * Time.deltaTime), _thrusterMinEnergy, _thrusterMaxEnergy);
             _fullyCharged = false;
-            Debug.Log(_thrusterCurrentPower);
         }
         else
         {
