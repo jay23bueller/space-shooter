@@ -22,6 +22,10 @@ public class UIManager : MonoBehaviour
     private GameManager _gameManager;
     [SerializeField]
     private TMP_Text _ammoText;
+    [SerializeField]
+    private Slider _thrusterSlider;
+    [SerializeField]
+    private GameObject _thrusterFillGO;
     #endregion
     #region UnityMethods
     // Start is called before the first frame update
@@ -42,6 +46,15 @@ public class UIManager : MonoBehaviour
     {
         if(livesRemaining >= 0)
             _livesImage.sprite = _livesSprites[livesRemaining];
+    }
+
+    public void UpdateThrusterSlider(float value, bool isResetting)
+    {
+        if (isResetting)
+            _thrusterFillGO.GetComponent<Image>().color = Color.red;
+        else
+            _thrusterFillGO.GetComponent<Image>().color = Color.HSVToRGB(.43f,1f,1f);
+        _thrusterSlider.value = value;
     }
 
     public void DisplayGameOver()

@@ -31,11 +31,30 @@ public class Player : MonoBehaviour
 
 
     //Thruster
+    [AddComponentMenu("Thrusters")]
     [SerializeField]
     private float _thrusterBoostMultiplier = 1.3f;
-    private bool _isThrustersEnabled;
+    private bool _engagingThrusters;
     [SerializeField]
     private GameObject _thrusterGO;
+    [SerializeField]
+    private float _thrusterDrainRate = -2.5f;
+    [SerializeField]
+    private float _thrusterGainRate = 2.5f;
+    private float _thrusterMaxPower = 100f;
+    private float _thrusterMinPower = 0f;
+    [SerializeField]
+    private float _thrusterCurrentPower;
+    private bool _punishPlayer;
+    private bool _fullyCharged;
+    private bool _justPunished;
+    [SerializeField]
+    private float _thrusterRecoveryMultiplier = 2.0f;
+    [SerializeField]
+    private AudioClip _outOfThrusterEnergyClip;
+    private float _delayThrusterDisabledSoundTimer;
+    [SerializeField]
+    private float _thrusterDisabledSoundInterval = .3f;
 
     //SpeedBoost
     private Coroutine _resetSpeedBoostCoroutine;
@@ -133,13 +152,17 @@ public class Player : MonoBehaviour
 
         if (_audioSource == null)
             Debug.LogError("Player missing AudioSource component!");
+
+        _thrusterCurrentPower = _thrusterMaxPower;
     }
 
     // Update is called once per frame
     void Update()
     {
-        CheckForThrusterBoost();
+        CheckThrusterPower();
+        CheckForThrusterInput();
         MoveCharacter();
+        UpdateThrusterUI();
         FireWeapon();
 
     }
@@ -149,30 +172,86 @@ public class Player : MonoBehaviour
 
     #region Methods
 
-    private void CheckForThrusterBoost()
+    private void CheckForThrusterInput()
     {
         if (Input.GetKey(KeyCode.LeftShift))
-            _isThrustersEnabled = true;
+        {
+            if (!_punishPlayer)
+                _engagingThrusters = true;
+            else if(Time.time > _delayThrusterDisabledSoundTimer)
+            {
+                _delayThrusterDisabledSoundTimer = _thrusterDisabledSoundInterval + Time.time;
+                _audioSource.PlayOneShot(_outOfThrusterEnergyClip);
+            }
+                
+        }
+            
         if (Input.GetKeyUp(KeyCode.LeftShift))
-            _isThrustersEnabled = false;
+        {
+            _engagingThrusters = false;
+        }
+            
 
     }
 
-    //Move the character based on input within the viewport
-    private void MoveCharacter()
+    private void UpdateThrusterUI()
     {
-        if(_isSpeedBoostEnabled)
+        _uiManager.UpdateThrusterSlider(_thrusterCurrentPower, _justPunished);
+    }
+
+    private IEnumerator PunishPlayerRoutine()
+    {
+        _punishPlayer = true;
+        yield return new WaitForSeconds(2f);
+        _punishPlayer = false;
+
+    }
+
+    private void CheckThrusterPower()
+    {
+        if(_thrusterCurrentPower == _thrusterMinPower && !_punishPlayer && !_justPunished)
+        {
+            _justPunished = true;
+            StartCoroutine(PunishPlayerRoutine());
+        }
+        if(!_fullyCharged && !_punishPlayer)
+        {
+
+            float batteryCharge = Time.deltaTime * _thrusterGainRate * ((_thrusterCurrentPower < .5f * _thrusterMaxPower) && _justPunished ? _thrusterRecoveryMultiplier : 1f);
+
+            _thrusterCurrentPower = Mathf.Clamp(batteryCharge + _thrusterCurrentPower, _thrusterMinPower, _thrusterMaxPower);
+            if (_thrusterCurrentPower >= .5f * _thrusterMaxPower)
+            {
+                _justPunished = false;
+            }
+            if (_thrusterCurrentPower == _thrusterMaxPower)
+                _fullyCharged = true;
+        }
+    }
+
+    private void SetBoost()
+    {
+        if (_isSpeedBoostEnabled)
         {
             _speedMultiplier = _speedBoostMultipler;
-        } 
-        else if(_isThrustersEnabled)
+        }
+        else if (_engagingThrusters && !_justPunished)
         {
             _speedMultiplier = _thrusterBoostMultiplier;
+            _thrusterCurrentPower = Mathf.Clamp(_thrusterCurrentPower +(_thrusterDrainRate * Time.deltaTime), _thrusterMinPower, _thrusterMaxPower);
+            _fullyCharged = false;
+            Debug.Log(_thrusterCurrentPower);
         }
         else
         {
             _speedMultiplier = _defaultSpeedMultiplier;
         }
+    }
+
+    //Move the character based on input within the viewport
+    private void MoveCharacter()
+    {
+        SetBoost();
 
         //The thruster gameobject should give a visual feedback for the movement speed
         _thrusterGO.transform.localScale = new Vector3(_speedMultiplier,1f,1f);
