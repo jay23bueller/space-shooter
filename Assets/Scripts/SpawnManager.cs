@@ -106,12 +106,11 @@ public class SpawnManager : MonoBehaviour
     }
     public void SpawnHealth()
     {
-        Vector3 spawnLocation = Camera.main.ViewportToWorldPoint(
+        Vector3 spawnLocation = 
             new Vector3(
-                .5f,
-                GameManager.ENVIRONMENT_TOP_BOUND,
-                Camera.main.WorldToViewportPoint(transform.position).z
-                ));
+                GameManager.RIGHT_BOUND * .5f,
+                GameManager.ENVIRONMENT_TOP_BOUND
+                );
             
         Instantiate(
             _powerups[4],

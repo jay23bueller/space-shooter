@@ -1336,7 +1336,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _cameraShakeMagnitudeX: 0.2
-  _cameraShakeMagnitudeY: 0.4
+  _cameraShakeMagnitudeY: 0.2
 --- !u!1 &1065287288
 GameObject:
   m_ObjectHideFlags: 0

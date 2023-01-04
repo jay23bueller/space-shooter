@@ -10,14 +10,24 @@ public class CameraBehaviour : MonoBehaviour
     private float _cameraShakeMagnitudeX = 6f;
     [SerializeField]
     private float _cameraShakeMagnitudeY = 5f;
+    [SerializeField]
+    private float _minSampleValue = 0f;
+    [SerializeField]
+    private float _maxSampleValue = 1000f;
     private Vector3 _startPosition;
     private bool _canShake = true;
+    [SerializeField]
+    private float _shakeDelayDuration = .05f;
+    private WaitForSeconds _shakeDelayWFS;
+    [SerializeField]
+    private int _maxShakeAmount = 15;
     #endregion
 
     #region UnityMethods
     private void Start()
     {
         _startPosition = transform.position;
+        _shakeDelayWFS = new WaitForSeconds(_shakeDelayDuration);
     }
     #endregion
 
@@ -31,26 +41,32 @@ public class CameraBehaviour : MonoBehaviour
     private IEnumerator ShakeCameraRoutine()
     {
         _canShake = false;
-        for(int i = 0; i < 15; i++)
+        for(int i = 0; i < _maxShakeAmount; i++)
         {
             Vector3 displacement = GetRandomDisplacementFromStartPosition();
             transform.position = displacement;
-            yield return new WaitForSeconds(.05f);
+            yield return _shakeDelayWFS;
             transform.position = _startPosition;
         }
         _canShake = true;
     }
 
-    private float GetRandomPerlinNoiseSamplePoint()
+    private float GetRandomPerlinNoiseSamplePointFromSampleArea()
     {
-        return  Mathf.PerlinNoise(Random.Range(0f, 1f), Random.Range(0f, 1f));
+        float randomX = Random.Range(_minSampleValue, _maxSampleValue);
+        float randomY = Random.Range(_minSampleValue, _maxSampleValue);
+        return Mathf.PerlinNoise(randomX, randomY);
     }
 
     private Vector3 GetRandomDisplacementFromStartPosition()
     {
+        float xScaledDisplacement = _cameraShakeMagnitudeX * Random.Range(-1f, 1f) * GetRandomPerlinNoiseSamplePointFromSampleArea() + _startPosition.x;
+
+        float yScaledDisplacement = _cameraShakeMagnitudeY * Random.Range(-1f, 1f) * GetRandomPerlinNoiseSamplePointFromSampleArea() + _startPosition.y;
+        
         return new Vector3(
-            _cameraShakeMagnitudeX * Random.Range(-1f, 1f) * GetRandomPerlinNoiseSamplePoint() +_startPosition.x, 
-            _cameraShakeMagnitudeY * Random.Range(-1f, 1f) * GetRandomPerlinNoiseSamplePoint() +_startPosition.y, 
+            xScaledDisplacement, 
+            yScaledDisplacement, 
             _startPosition.z
             );
     }
