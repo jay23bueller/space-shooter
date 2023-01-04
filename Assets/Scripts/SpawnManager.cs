@@ -31,10 +31,6 @@ public class SpawnManager : MonoBehaviour
     private AudioClip _healthDropClip;
     [SerializeField]
     private int _homingMissileSpawnInterval = 10;
-    public readonly static float LEFT_BOUND = 0.05f;
-    public readonly static float RIGHT_BOUND = 0.95f;
-    public readonly static float TOP_BOUND = 1.05f;
-    public readonly static float BOTTOM_BOUND = -0.05f;
     #endregion
     #region UnityMethods
 
@@ -46,12 +42,11 @@ public class SpawnManager : MonoBehaviour
     {
         while (_canSpawn)
         {
-            Vector3 spawnLocation = Camera.main.ViewportToWorldPoint(
+            Vector3 spawnLocation = 
                 new Vector3(
-                Random.Range(LEFT_BOUND,RIGHT_BOUND),
-                TOP_BOUND,
-                Camera.main.WorldToViewportPoint(_enemyContainer.transform.position).z
-                ));
+                Random.Range(GameManager.LEFT_BOUND,GameManager.RIGHT_BOUND),
+                GameManager.ENVIRONMENT_TOP_BOUND
+               );
 
              _enemies.Add(Instantiate(
                 _enemyPrefab,
@@ -79,12 +74,12 @@ public class SpawnManager : MonoBehaviour
             yield return new WaitForSeconds(Random.Range(3.0f, 7.0f));
             
             
-            Vector3 spawnLocation = Camera.main.ViewportToWorldPoint(
+            Vector3 spawnLocation = 
                 new Vector3(
-                    Random.Range(LEFT_BOUND, RIGHT_BOUND),
-                    TOP_BOUND,
-                    Camera.main.WorldToViewportPoint(transform.position).z
-                ));
+                    Random.Range(GameManager.LEFT_BOUND, GameManager.RIGHT_BOUND), 
+                    GameManager.ENVIRONMENT_TOP_BOUND
+                    );
+
             Instantiate(
                 _powerups[powerupIndex],
                 spawnLocation,
@@ -100,12 +95,7 @@ public class SpawnManager : MonoBehaviour
         {
             yield return new WaitForSeconds(_homingMissileSpawnInterval);
 
-            Vector3 spawnLocation = Camera.main.ViewportToWorldPoint(
-                new Vector3(
-                    Random.Range(LEFT_BOUND, RIGHT_BOUND),
-                    TOP_BOUND,
-                    Camera.main.WorldToViewportPoint(transform.position).z
-                ));
+            Vector3 spawnLocation = new Vector3(Random.Range(GameManager.LEFT_BOUND, GameManager.RIGHT_BOUND), GameManager.ENVIRONMENT_TOP_BOUND);
             Instantiate(
                 _powerups[5],
                 spawnLocation,
@@ -119,7 +109,7 @@ public class SpawnManager : MonoBehaviour
         Vector3 spawnLocation = Camera.main.ViewportToWorldPoint(
             new Vector3(
                 .5f,
-                TOP_BOUND,
+                GameManager.ENVIRONMENT_TOP_BOUND,
                 Camera.main.WorldToViewportPoint(transform.position).z
                 ));
             

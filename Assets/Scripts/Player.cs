@@ -13,10 +13,6 @@ public class Player : MonoBehaviour
     #region Constants
     private const string VERTICAL_AXIS = "Vertical";
     private const string HORIZONTAL_AXIS = "Horizontal";
-    private const float LEFT_BOUND = -0.01f;
-    private const float RIGHT_BOUND = 1.02f;
-    private const float TOP_BOUND = 0.5f;
-    private const float BOTTOM_BOUND = 0.05f;
     private const string SPAWN_MANAGER_TAG = "SpawnManager";
     #endregion
 
@@ -97,8 +93,6 @@ public class Player : MonoBehaviour
     private float _missileCooldownDuration = 1f;
 
 
-    private float _initialViewportZPosition;
-
     //Shield
     private bool _isShieldEnabled;
     [SerializeField]
@@ -138,7 +132,6 @@ public class Player : MonoBehaviour
     {
         //Set starting position
         transform.position = new Vector3(0f,0f,0f);
-        _initialViewportZPosition = Camera.main.WorldToViewportPoint(transform.position).z;
         _spawnManager = GameObject.FindGameObjectWithTag(SPAWN_MANAGER_TAG).GetComponent<SpawnManager>();
         _ammoCurrentCount = _ammoMaxCount;
         _uiManager.UpdateScoreText(_score);
@@ -260,21 +253,21 @@ public class Player : MonoBehaviour
         Vector3 verticalDirection = Vector3.up * Input.GetAxis(VERTICAL_AXIS) * _speed * _speedMultiplier * Time.deltaTime;
         Vector3 horizontalDirection = Vector3.right * Input.GetAxis(HORIZONTAL_AXIS) * _speed * _speedMultiplier * Time.deltaTime;
 
-        Vector2 nextVerticalViewportPosition = Camera.main.WorldToViewportPoint(transform.position + verticalDirection);
-        Vector2 nextHorizontalViewportPosition = Camera.main.WorldToViewportPoint(transform.position + verticalDirection);
+        Vector2 nextVerticalViewportPosition = transform.position + verticalDirection;
+        Vector2 nextHorizontalViewportPosition = transform.position + horizontalDirection;
 
         //If the character's new position is within the top and bottom bounds, then move it
-        if (nextVerticalViewportPosition.y < TOP_BOUND && nextVerticalViewportPosition.y > BOTTOM_BOUND)
+        if (nextVerticalViewportPosition.y < GameManager.PLAYER_TOP_BOUND && nextVerticalViewportPosition.y > GameManager.PLAYER_BOTTOM_BOUND)
             transform.Translate(verticalDirection);
 
         //If the character's new position is outside the left or right bounds, teleport the character
-        if (nextHorizontalViewportPosition.x > RIGHT_BOUND)
+        if (nextHorizontalViewportPosition.x > GameManager.RIGHT_BOUND)
         {
-            transform.position = Camera.main.ViewportToWorldPoint(new Vector3(0f, nextHorizontalViewportPosition.y, _initialViewportZPosition));
+            transform.position = new Vector3(GameManager.LEFT_BOUND, nextHorizontalViewportPosition.y);
         }
-        else if (nextHorizontalViewportPosition.x < LEFT_BOUND)
+        else if (nextHorizontalViewportPosition.x < GameManager.LEFT_BOUND)
         {
-            transform.position = Camera.main.ViewportToWorldPoint(new Vector3(1f, nextHorizontalViewportPosition.y, _initialViewportZPosition));
+            transform.position = new Vector3(GameManager.RIGHT_BOUND, nextHorizontalViewportPosition.y);
         }
 
         transform.Translate(horizontalDirection);

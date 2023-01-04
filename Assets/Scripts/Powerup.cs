@@ -67,7 +67,7 @@ public class Powerup : MonoBehaviour
 
     private void Move()
     {
-        if (Camera.main.WorldToViewportPoint(transform.position).y < -0.01f)
+        if (transform.position.y < GameManager.ENVIRONMENT_BOTTOM_BOUND - 0.01f)
             Destroy(gameObject);
         else
             transform.Translate(Vector2.down * _speed * Time.deltaTime);

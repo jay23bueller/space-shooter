@@ -89,12 +89,11 @@ public class Enemy : MonoBehaviour
     //at a random x location
     private void Teleport()
     {
-        Vector3 currentViewportPosition = Camera.main.WorldToViewportPoint(_rigidbody.position);
-        if (currentViewportPosition.y < SpawnManager.BOTTOM_BOUND)
+        if (_rigidbody.position.y < GameManager.ENVIRONMENT_BOTTOM_BOUND)
         {
-            _rigidbody.position = Camera.main.ViewportToWorldPoint(
-                new Vector2(Random.Range(SpawnManager.LEFT_BOUND, SpawnManager.RIGHT_BOUND),
-                SpawnManager.TOP_BOUND));
+            _rigidbody.position = new Vector2(
+                Random.Range(GameManager.LEFT_BOUND, GameManager.RIGHT_BOUND),
+                GameManager.ENVIRONMENT_TOP_BOUND);
         }
     }
 
