@@ -87,7 +87,7 @@ SpriteRenderer:
   m_SpriteSortPoint: 0
 --- !u!95 &614237269346675943
 Animator:
-  serializedVersion: 4
+  serializedVersion: 5
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -104,7 +104,7 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
+  m_KeepAnimatorStateOnDisable: 0
 --- !u!1 &5134041638373190953
 GameObject:
   m_ObjectHideFlags: 0
@@ -192,7 +192,7 @@ SpriteRenderer:
   m_SpriteSortPoint: 0
 --- !u!95 &3677368872624592128
 Animator:
-  serializedVersion: 4
+  serializedVersion: 5
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -209,7 +209,7 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
+  m_KeepAnimatorStateOnDisable: 0
 --- !u!1 &5545497930555065297
 GameObject:
   m_ObjectHideFlags: 0
@@ -269,9 +269,10 @@ MonoBehaviour:
   _thrusterGO: {fileID: 5134041638373190953}
   _thrusterDrainRate: -60
   _thrusterGainRate: 20
-  _thrusterCurrentPower: 0
+  _thrusterCurrentEnergy: 0
   _thrusterRecoveryMultiplier: 2
   _outOfThrusterEnergyClip: {fileID: 8300000, guid: 921b419f394f4fa46a91f1116280ce6a, type: 3}
+  _thrusterDisabledSoundInterval: 0.3
   _speedBoostMultipler: 2.2
   _tripleShotPrefab: {fileID: 4438895529425976725, guid: fe5e825ae27098c4f86cfac3a3740061, type: 3}
   _ammoMaxCount: 15
@@ -291,6 +292,7 @@ MonoBehaviour:
   - {fileID: 7216556702876315167}
   _explosionGO: {fileID: 8978835077582414172, guid: 62eac0f433665e349bd09acf6fe53bd5, type: 3}
   _lives: 3
+  _playerLostLifeClip: {fileID: 8300000, guid: 47b55571dcb226a40859697b71750682, type: 3}
 --- !u!212 &5545497930555065299
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -371,7 +373,7 @@ BoxCollider2D:
   m_EdgeRadius: 0
 --- !u!95 &2130232753
 Animator:
-  serializedVersion: 4
+  serializedVersion: 5
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -388,7 +390,7 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
+  m_KeepAnimatorStateOnDisable: 0
 --- !u!82 &1408624831
 AudioSource:
   m_ObjectHideFlags: 0
@@ -603,7 +605,7 @@ SpriteRenderer:
   m_SpriteSortPoint: 0
 --- !u!95 &8184227421854228294
 Animator:
-  serializedVersion: 4
+  serializedVersion: 5
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -620,7 +622,7 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
+  m_KeepAnimatorStateOnDisable: 0
 --- !u!1001 &3543521030250139325
 PrefabInstance:
   m_ObjectHideFlags: 0

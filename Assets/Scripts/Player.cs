@@ -128,6 +128,8 @@ public class Player : MonoBehaviour
     [SerializeField]
     private int _lives = 3;
     private int _maxLives = 3;
+    [SerializeField]
+    private AudioClip _playerLostLifeClip;
     #endregion
 
     #region UnityMethods
@@ -341,7 +343,11 @@ public class Player : MonoBehaviour
             UpdateShield();
             return;
         }
-        
+        if (value < 0)
+        {
+            Camera.main.GetComponent<CameraBehaviour>().ShakeCamera();
+            _audioSource.PlayOneShot(_playerLostLifeClip);
+        }
         
         _lives = Mathf.Clamp(_lives+value, 0, _maxLives);
         _uiManager.UpdateLivesImage(_lives);
