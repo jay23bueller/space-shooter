@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Security.Cryptography;
 using UnityEngine;
 
 public class SpawnManager : MonoBehaviour
@@ -68,7 +67,7 @@ public class SpawnManager : MonoBehaviour
             if (_powerupSpawnCount % _turnsBeforeSpawningAmmo == 0)
                 powerupIndex = 3;
             else
-                powerupIndex = Random.Range(0, 2);
+                powerupIndex = Random.Range(0, 3);
 
 
             yield return new WaitForSeconds(Random.Range(3.0f, 7.0f));

@@ -1337,6 +1337,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _cameraShakeMagnitudeX: 0.2
   _cameraShakeMagnitudeY: 0.2
+  _minSampleValue: 0
+  _maxSampleValue: 1000
+  _shakeDelayDuration: 0.05
+  _maxShakeAmount: 15
 --- !u!1 &1065287288
 GameObject:
   m_ObjectHideFlags: 0
