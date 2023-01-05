@@ -23,7 +23,6 @@ public class Enemy : MonoBehaviour
     #region Variables
     [SerializeField]
     private float _speed = 4.0f;
-    private Rigidbody2D _rigidbody;
     private Player _player;
     private Animator _anim;
     private AudioSource _audioSource;
@@ -38,8 +37,8 @@ public class Enemy : MonoBehaviour
     private bool _canMove;
 
     //Circular Movement
-    private Vector3 _slantedStartPosition;
-    private Vector3 _slantedEndPosition;
+    private Vector3 _diagonalStartPosition;
+    private Vector3 _diagonalEndPosition;
     [SerializeField]
     private float _radius;
     private Vector3 _slantedDirection;
@@ -71,7 +70,6 @@ public class Enemy : MonoBehaviour
 
     void Start()
     {
-        _rigidbody = GetComponent<Rigidbody2D>();
         _player = GameObject.FindGameObjectWithTag(PLAYER_TAG).GetComponent<Player>();
         _anim = GetComponent<Animator>();
         _audioSource = GetComponent<AudioSource>();
@@ -108,7 +106,7 @@ public class Enemy : MonoBehaviour
             if (!other.CompareTag(ENEMY_TAG) && !other.CompareTag(POWERUP_TAG) && !other.CompareTag(ENEMYLASER_TAG))
             {
                 GetComponent<Collider2D>().enabled = false;
-                _rigidbody.velocity = Vector2.zero;
+                _canMove = false;
                 StopAllCoroutines();
                 _speed = 0f;
                 _anim.SetTrigger("OnEnemyDeath");
@@ -117,11 +115,6 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    private void OnDrawGizmos()
-    {
-        if (_canMove)
-            Gizmos.DrawSphere(_slantedStartPosition, .4f);
-    }
 
     #endregion
 
@@ -135,16 +128,16 @@ public class Enemy : MonoBehaviour
 
         if (transform.position.y < GameManager.ENVIRONMENT_BOTTOM_BOUND)
         {
-            transform.position = new Vector2(
+            transform.position = new Vector3(
                 Random.Range(GameManager.LEFT_BOUND, GameManager.RIGHT_BOUND),
                 GameManager.ENVIRONMENT_TOP_BOUND);
             _zigZagX = transform.position.x;
         }
 
         if(transform.position.x < GameManager.LEFT_BOUND)
-            transform.position = new Vector2(GameManager.RIGHT_BOUND, _rigidbody.position.y);
+            transform.position = new Vector3(GameManager.RIGHT_BOUND, transform.position.y);
         if (transform.position.x > GameManager.RIGHT_BOUND)
-            transform.position = new Vector2(GameManager.LEFT_BOUND, _rigidbody.position.y);
+            transform.position = new Vector3(GameManager.LEFT_BOUND, transform.position.y);
 
         _currentMovement();
     }
@@ -157,10 +150,10 @@ public class Enemy : MonoBehaviour
                 _currentMovement = MoveHorizontally;
                 break;
             case MovementMode.Circular:
-                _slantedStartPosition = new Vector2(isMirrored ? GameManager.RIGHT_BOUND : GameManager.LEFT_BOUND, GameManager.ENVIRONMENT_TOP_BOUND);
-                _slantedEndPosition = (Quaternion.AngleAxis(isMirrored ? _rightSlant : _leftSlant, Vector3.forward) * Vector3.right * _distanceFromSlant) + _slantedStartPosition;
-                _slantedDirection = (_slantedEndPosition - _slantedStartPosition).normalized;
-                _radiusEndPosition = _slantedEndPosition + ((isMirrored ? Vector3.left : Vector3.right) * _radius);
+                _diagonalStartPosition = new Vector3(isMirrored ? GameManager.RIGHT_BOUND : GameManager.LEFT_BOUND, GameManager.ENVIRONMENT_TOP_BOUND);
+                _diagonalEndPosition = (Quaternion.AngleAxis(isMirrored ? _rightSlant : _leftSlant, Vector3.forward) * Vector3.right * _distanceFromSlant) + _diagonalStartPosition;
+                _slantedDirection = (_diagonalEndPosition - _diagonalStartPosition).normalized;
+                _radiusEndPosition = _diagonalEndPosition + ((isMirrored ? Vector3.left : Vector3.right) * _radius);
                 _circularRotationSpeed *= isMirrored ? -1f : 1f;
                 _circularRadian = isMirrored ? 180f * Mathf.Deg2Rad : 0f;
                 _currentMovement = MoveCircular;
@@ -208,7 +201,7 @@ public class Enemy : MonoBehaviour
     {
         if(!_initializedCircularSlant)
         {
-            if (Vector3.Distance(transform.position, _slantedEndPosition) > .15f)
+            if (Vector3.Distance(transform.position, _diagonalEndPosition) > .15f)
             {
                 transform.position += _slantedDirection * _speed * Time.deltaTime;
             }
@@ -232,7 +225,7 @@ public class Enemy : MonoBehaviour
         {
             _circularRadian = (_circularRadian + ((Mathf.Deg2Rad * _circularRotationSpeed)*Time.deltaTime)) % (Mathf.Deg2Rad * 360f);
           
-            transform.position = (_radius * new Vector3(Mathf.Cos(_circularRadian), Mathf.Sin(_circularRadian))) + _slantedEndPosition;
+            transform.position = (_radius * new Vector3(Mathf.Cos(_circularRadian), Mathf.Sin(_circularRadian))) + _diagonalEndPosition;
         }
 
     }
