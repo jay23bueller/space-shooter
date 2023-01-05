@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -30,9 +31,13 @@ public class SpawnManager : MonoBehaviour
     private AudioClip _healthDropClip;
     [SerializeField]
     private int _homingMissileSpawnInterval = 10;
+    private int _numOfMovementModes;
     #endregion
     #region UnityMethods
-
+    private void Start()
+    {
+        _numOfMovementModes = Enum.GetNames(typeof(MovementMode)).Length;
+    }
     #endregion
 
     #region Methods
@@ -41,20 +46,58 @@ public class SpawnManager : MonoBehaviour
     {
         while (_canSpawn)
         {
-            Vector3 spawnLocation = 
-                new Vector3(
-                Random.Range(GameManager.LEFT_BOUND,GameManager.RIGHT_BOUND),
-                GameManager.ENVIRONMENT_TOP_BOUND
-               );
 
-             _enemies.Add(Instantiate(
+            MovementMode mode = (MovementMode)UnityEngine.Random.Range(0, _numOfMovementModes);
+            bool isMirrored = false;
+            Vector3 spawnLocation = Vector3.zero;
+
+            if(mode == MovementMode.Circular || mode == MovementMode.ZigZag)
+            {
+                isMirrored = UnityEngine.Random.Range(-1, 2) < 0 ? true : false;
+            }
+
+            switch (mode)
+            {
+                case MovementMode.ZigZag:
+                case MovementMode.Vertical:
+                    spawnLocation =
+                        new Vector3(
+                            UnityEngine.Random.Range(GameManager.LEFT_BOUND, GameManager.RIGHT_BOUND),
+                            GameManager.ENVIRONMENT_TOP_BOUND
+                        );
+                    break;
+                case MovementMode.Horizontal:
+                    spawnLocation = new Vector3(
+                        GameManager.LEFT_BOUND,
+                        UnityEngine.Random.Range(GameManager.ENVIRONMENT_TOP_BOUND * .5f, GameManager.ENVIRONMENT_TOP_BOUND * .8f)
+                        );
+                    break;
+                case MovementMode.Circular:
+                    spawnLocation =
+                        new Vector3(
+                            isMirrored ? GameManager.RIGHT_BOUND : GameManager.LEFT_BOUND,
+                            GameManager.ENVIRONMENT_TOP_BOUND
+                            );
+                    break;
+            }
+
+
+            GameObject enemy = Instantiate(
                 _enemyPrefab,
                 spawnLocation,
                 Quaternion.AngleAxis(180, Vector3.forward),
-                _enemyContainer.transform));
+                _enemyContainer.transform);
+
+            if (enemy != null)
+            {
+                enemy.GetComponent<Enemy>().SetMovementMode(mode, isMirrored);
+                _enemies.Add(enemy);
+            }
 
 
-            yield return new WaitForSeconds(Random.Range(_minSpawnTime, _maxSpawnTime + 1));
+
+
+            yield return new WaitForSeconds(UnityEngine.Random.Range(_minSpawnTime, _maxSpawnTime + 1));
         }
 
     }
@@ -67,15 +110,15 @@ public class SpawnManager : MonoBehaviour
             if (_powerupSpawnCount % _turnsBeforeSpawningAmmo == 0)
                 powerupIndex = 3;
             else
-                powerupIndex = Random.Range(0, 3);
+                powerupIndex = UnityEngine.Random.Range(0, 3);
 
 
-            yield return new WaitForSeconds(Random.Range(3.0f, 7.0f));
+            yield return new WaitForSeconds(UnityEngine.Random.Range(3.0f, 7.0f));
             
             
             Vector3 spawnLocation = 
                 new Vector3(
-                    Random.Range(GameManager.LEFT_BOUND, GameManager.RIGHT_BOUND), 
+                    UnityEngine.Random.Range(GameManager.LEFT_BOUND, GameManager.RIGHT_BOUND), 
                     GameManager.ENVIRONMENT_TOP_BOUND
                     );
 
@@ -94,7 +137,7 @@ public class SpawnManager : MonoBehaviour
         {
             yield return new WaitForSeconds(_homingMissileSpawnInterval);
 
-            Vector3 spawnLocation = new Vector3(Random.Range(GameManager.LEFT_BOUND, GameManager.RIGHT_BOUND), GameManager.ENVIRONMENT_TOP_BOUND);
+            Vector3 spawnLocation = new Vector3(UnityEngine.Random.Range(GameManager.LEFT_BOUND, GameManager.RIGHT_BOUND), GameManager.ENVIRONMENT_TOP_BOUND);
             Instantiate(
                 _powerups[5],
                 spawnLocation,

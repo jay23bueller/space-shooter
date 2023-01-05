@@ -1,6 +1,13 @@
 using System.Collections;
 using UnityEngine;
 
+public enum MovementMode
+{
+    Horizontal,
+    Vertical,
+    ZigZag,
+    Circular
+}
 
 public class Enemy : MonoBehaviour
 {
@@ -26,6 +33,36 @@ public class Enemy : MonoBehaviour
     private GameObject _laserPrefab;
     private SpawnManager _spawnManager;
     private bool _wasKilled;
+    private delegate void Movement();
+    private Movement _currentMovement;
+    private bool _canMove;
+
+    //Circular Movement
+    private Vector3 _slantedStartPosition;
+    private Vector3 _slantedEndPosition;
+    [SerializeField]
+    private float _radius;
+    private Vector3 _slantedDirection;
+    private bool _initializedCircularSlant;
+    private bool _initializedDistanceAwayFromCenter;
+    private Vector3 _radiusEndPosition;
+    private float _circularRadian;
+    [SerializeField]
+    private float _circularRotationSpeed = 40f;
+    [SerializeField]
+    private float _leftSlant = -30f;
+    [SerializeField]
+    private float _rightSlant = -150f;
+    [SerializeField]
+    private float _distanceFromSlant = 10f;
+
+    //ZigZag Movement
+    private float _zigZagX;
+    private float _zigZagCounter;
+    [SerializeField]
+    private float _zigZagMaxDistance = 3f;
+
+    private float _moveDirection;
     #endregion
 
     #region UnityMethods
@@ -40,15 +77,15 @@ public class Enemy : MonoBehaviour
         _audioSource = GetComponent<AudioSource>();
         _spawnManager = GameObject.FindGameObjectWithTag(SPAWNMANAGER_TAG).GetComponent<SpawnManager>();
         StartCoroutine(FireLaser());
-        _rigidbody.velocity = Vector2.down * _speed;
 
     }
 
 
 
-    private void FixedUpdate()
+    private void Update()
     {
-        Teleport();
+        if(_canMove)
+            Move();
     }
 
     void OnTriggerEnter2D(Collider2D other)
@@ -80,6 +117,11 @@ public class Enemy : MonoBehaviour
         }
     }
 
+    private void OnDrawGizmos()
+    {
+        if (_canMove)
+            Gizmos.DrawSphere(_slantedStartPosition, .4f);
+    }
 
     #endregion
 
@@ -87,15 +129,114 @@ public class Enemy : MonoBehaviour
 
     //Move the character to the bottom and if it is out of the viewport, teleport it to the top
     //at a random x location
-    private void Teleport()
+    private void Move()
     {
-        if (_rigidbody.position.y < GameManager.ENVIRONMENT_BOTTOM_BOUND)
+        
+
+        if (transform.position.y < GameManager.ENVIRONMENT_BOTTOM_BOUND)
         {
-            _rigidbody.position = new Vector2(
+            transform.position = new Vector2(
                 Random.Range(GameManager.LEFT_BOUND, GameManager.RIGHT_BOUND),
                 GameManager.ENVIRONMENT_TOP_BOUND);
+            _zigZagX = transform.position.x;
         }
+
+        if(transform.position.x < GameManager.LEFT_BOUND)
+            transform.position = new Vector2(GameManager.RIGHT_BOUND, _rigidbody.position.y);
+        if (transform.position.x > GameManager.RIGHT_BOUND)
+            transform.position = new Vector2(GameManager.LEFT_BOUND, _rigidbody.position.y);
+
+        _currentMovement();
     }
+
+    public void SetMovementMode(MovementMode mode, bool isMirrored)
+    {
+        switch(mode)
+        {
+            case MovementMode.Horizontal:
+                _currentMovement = MoveHorizontally;
+                break;
+            case MovementMode.Circular:
+                _slantedStartPosition = new Vector2(isMirrored ? GameManager.RIGHT_BOUND : GameManager.LEFT_BOUND, GameManager.ENVIRONMENT_TOP_BOUND);
+                _slantedEndPosition = (Quaternion.AngleAxis(isMirrored ? _rightSlant : _leftSlant, Vector3.forward) * Vector3.right * _distanceFromSlant) + _slantedStartPosition;
+                _slantedDirection = (_slantedEndPosition - _slantedStartPosition).normalized;
+                _radiusEndPosition = _slantedEndPosition + ((isMirrored ? Vector3.left : Vector3.right) * _radius);
+                _circularRotationSpeed *= isMirrored ? -1f : 1f;
+                _circularRadian = isMirrored ? 180f * Mathf.Deg2Rad : 0f;
+                _currentMovement = MoveCircular;
+                break;
+            case MovementMode.Vertical:
+                _currentMovement = MoveVertically;
+                break;
+            case MovementMode.ZigZag:
+                _zigZagX = transform.position.x;
+                _currentMovement = MoveZigZag;
+                break;
+
+                
+        }
+        
+        if(mode == MovementMode.ZigZag || mode == MovementMode.Horizontal)
+            _moveDirection = isMirrored ? -1 : 1;
+
+        _canMove = true;
+    }
+
+    private void MoveHorizontally()
+    {
+        transform.position += _moveDirection * Vector3.right * _speed * Time.deltaTime;
+    }
+
+    private void MoveVertically()
+    {
+        transform.position += Vector3.down * _speed * Time.deltaTime;
+    }
+
+    private void MoveZigZag()
+    {
+        _zigZagCounter += _speed * Time.deltaTime;
+        transform.position = 
+            new Vector3(Mathf.PingPong(_zigZagCounter, _zigZagMaxDistance)*_moveDirection + _zigZagX,
+            -_speed * Time.deltaTime + transform.position.y) ;
+    }
+
+    //First moves into the game world at an angle
+    //Then moves away from the target position
+    //and starts rotating around the target position
+    //a specific distance away
+    private void MoveCircular()
+    {
+        if(!_initializedCircularSlant)
+        {
+            if (Vector3.Distance(transform.position, _slantedEndPosition) > .15f)
+            {
+                transform.position += _slantedDirection * _speed * Time.deltaTime;
+            }
+            else
+                _initializedCircularSlant = true;
+        } 
+        else if(!_initializedDistanceAwayFromCenter)
+        {
+            if (Vector3.Distance(transform.position, _radiusEndPosition) > .15f)
+            {
+                transform.position += (_radiusEndPosition - transform.position).normalized * _speed * Time.deltaTime;
+            }
+            else
+            {
+                _initializedDistanceAwayFromCenter = true;
+                
+            }
+                
+        }
+        else
+        {
+            _circularRadian = (_circularRadian + ((Mathf.Deg2Rad * _circularRotationSpeed)*Time.deltaTime)) % (Mathf.Deg2Rad * 360f);
+          
+            transform.position = (_radius * new Vector3(Mathf.Cos(_circularRadian), Mathf.Sin(_circularRadian))) + _slantedEndPosition;
+        }
+
+    }
+
 
     private IEnumerator FireLaser()
     {
