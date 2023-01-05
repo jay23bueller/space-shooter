@@ -24,6 +24,7 @@ public class UIManager : MonoBehaviour
     private Slider _thrusterSlider;
     [SerializeField]
     private GameObject _thrusterFillGO;
+    private int _maxAmmoCount = 15;
     #endregion
     #region UnityMethods
     // Start is called before the first frame update
@@ -35,9 +36,14 @@ public class UIManager : MonoBehaviour
         _scoreText.text = $"<b>SCORE: {score}</b>";
     }
 
+    public void SetAmmoMaxCount(int maxAmmoCount)
+    {
+        _maxAmmoCount = maxAmmoCount;
+    }
+
     public void UpdateAmmoText(int ammoCount)
     {
-        _ammoText.text = $"<b>AMMO: {ammoCount}</b>";
+        _ammoText.text = $"<b>AMMO: {ammoCount}/{_maxAmmoCount}</b>";
     }
 
     public void UpdateLivesImage(int livesRemaining)

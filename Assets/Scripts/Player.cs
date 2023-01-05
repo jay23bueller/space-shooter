@@ -136,7 +136,7 @@ public class Player : MonoBehaviour
         _ammoCurrentCount = _ammoMaxCount;
         _uiManager.UpdateScoreText(_score);
         _uiManager.UpdateAmmoText(_ammoCurrentCount);
-
+        _uiManager.SetAmmoMaxCount(_ammoMaxCount);
         if (_spawnManager == null)
             Debug.LogError("The Spawn Manager is NULL");
 
