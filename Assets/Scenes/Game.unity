@@ -2324,6 +2324,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2130232753, guid: acf95df6e14323a45a79d9cdf4ac4806, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 148897459a772ca46840c64f2d01e89b, type: 2}
     - target: {fileID: 5545497930555065297, guid: acf95df6e14323a45a79d9cdf4ac4806, type: 3}
       propertyPath: m_Name
       value: Player
@@ -2332,6 +2336,10 @@ PrefabInstance:
       propertyPath: _uiManager
       value: 
       objectReference: {fileID: 163892733}
+    - target: {fileID: 5545497930555065300, guid: acf95df6e14323a45a79d9cdf4ac4806, type: 3}
+      propertyPath: _thrusterBoostClip
+      value: 
+      objectReference: {fileID: 8300000, guid: 4883176048af26041a8eb14e8a086a1a, type: 3}
     - target: {fileID: 5545497930555065301, guid: acf95df6e14323a45a79d9cdf4ac4806, type: 3}
       propertyPath: m_RootOrder
       value: 2

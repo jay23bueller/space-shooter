@@ -265,9 +265,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _speed: 3.5
   _speedMultiplier: 1
-  _thrusterBoostMultiplier: 1.3
+  _thrusterBoostMultiplier: 8
   _thrusterGO: {fileID: 5134041638373190953}
-  _thrusterDrainRate: -60
+  _thrusterDrainRate: -500
   _thrusterGainRate: 20
   _thrusterCurrentEnergy: 0
   _thrusterRecoveryMultiplier: 2

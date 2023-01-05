@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public enum FiringMode
@@ -17,6 +18,8 @@ public class Player : MonoBehaviour
     #endregion
 
     #region Variables
+
+    private Animator _anim;
 
     //Movement
     [SerializeField]
@@ -51,6 +54,7 @@ public class Player : MonoBehaviour
     private float _delayThrusterDisabledSoundTimer;
     [SerializeField]
     private float _thrusterDisabledSoundInterval = .3f;
+    private bool _playBoostSound = true;
 
     //SpeedBoost
     private Coroutine _resetSpeedBoostCoroutine;
@@ -114,6 +118,8 @@ public class Player : MonoBehaviour
     [SerializeField]
     private GameObject[] _engines;
     private AudioSource _audioSource;
+    [SerializeField]
+    private AudioClip _thrusterBoostClip;
 
     [SerializeField]
     private GameObject _explosionGO;
@@ -137,6 +143,7 @@ public class Player : MonoBehaviour
         _uiManager.UpdateScoreText(_score);
         _uiManager.UpdateAmmoText(_ammoCurrentCount);
         _uiManager.SetAmmoMaxCount(_ammoMaxCount);
+        _anim = GetComponent<Animator>();
         if (_spawnManager == null)
             Debug.LogError("The Spawn Manager is NULL");
 
@@ -172,7 +179,15 @@ public class Player : MonoBehaviour
         if (Input.GetKey(KeyCode.LeftShift))
         {
             if (!_punishPlayer)
+            {
                 _engagingThrusters = true;
+
+                if(_playBoostSound)
+                {
+                    _playBoostSound = false;
+                    _audioSource.PlayOneShot(_thrusterBoostClip);
+                }
+            }             
             else if(Time.time > _delayThrusterDisabledSoundTimer)
             {
                 _delayThrusterDisabledSoundTimer = _thrusterDisabledSoundInterval + Time.time;
@@ -184,6 +199,8 @@ public class Player : MonoBehaviour
         if (Input.GetKeyUp(KeyCode.LeftShift))
         {
             _engagingThrusters = false;
+            _playBoostSound = true;
+            
         }
             
 
@@ -230,15 +247,17 @@ public class Player : MonoBehaviour
         {
             _speedMultiplier = _speedBoostMultipler;
         }
-        else if (_engagingThrusters && !_justPunished)
-        {
-            _speedMultiplier = _thrusterBoostMultiplier;
-            _thrusterCurrentEnergy = Mathf.Clamp(_thrusterCurrentEnergy +(_thrusterDrainRate * Time.deltaTime), _thrusterMinEnergy, _thrusterMaxEnergy);
-            _fullyCharged = false;
-        }
         else
         {
             _speedMultiplier = _defaultSpeedMultiplier;
+        }
+
+
+        if (_engagingThrusters && !_justPunished)
+        {
+            _speedMultiplier = _thrusterBoostMultiplier;
+            _thrusterCurrentEnergy = Mathf.Clamp(_thrusterCurrentEnergy + (_thrusterDrainRate * Time.deltaTime), _thrusterMinEnergy, _thrusterMaxEnergy);
+            _fullyCharged = false;
         }
     }
 
@@ -252,7 +271,7 @@ public class Player : MonoBehaviour
 
         Vector3 verticalDirection = Vector3.up * Input.GetAxis(VERTICAL_AXIS) * _speed * _speedMultiplier * Time.deltaTime;
         Vector3 horizontalDirection = Vector3.right * Input.GetAxis(HORIZONTAL_AXIS) * _speed * _speedMultiplier * Time.deltaTime;
-
+        _anim.SetFloat("Direction", Input.GetAxis(HORIZONTAL_AXIS));
         Vector2 nextVerticalViewportPosition = transform.position + verticalDirection;
         Vector2 nextHorizontalViewportPosition = transform.position + horizontalDirection;
 
