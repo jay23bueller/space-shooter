@@ -25,6 +25,8 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private GameObject _thrusterFillGO;
     private int _maxAmmoCount = 15;
+    [SerializeField]
+    private TMP_Text _waveText;
     #endregion
     #region UnityMethods
     // Start is called before the first frame update
@@ -34,6 +36,23 @@ public class UIManager : MonoBehaviour
     public void UpdateScoreText(int score)
     {
         _scoreText.text = $"<b>SCORE: {score}</b>";
+    }
+
+    public void UpdateWaveText(int wave)
+    {
+        _waveText.text = $"WAVE: {wave}";
+    }
+
+    public void DisplayWinText()
+    {
+        _waveText.text = "YOU WIN";
+        StartCoroutine(FlickerTextRoutine(_waveText.gameObject));
+        StartCoroutine(EnableRestartRoutine());
+    }
+
+    public void DisplayWaveText(bool display)
+    {
+        _waveText.gameObject.SetActive(display);
     }
 
     public void SetAmmoMaxCount(int maxAmmoCount)
@@ -63,15 +82,15 @@ public class UIManager : MonoBehaviour
 
     public void DisplayGameOver()
     {
-        StartCoroutine(FlickerGameOverTextRoutine());
+        StartCoroutine(FlickerTextRoutine(_gameOverGO));
     }
 
-    private IEnumerator FlickerGameOverTextRoutine()
+    private IEnumerator FlickerTextRoutine(GameObject objectToFlicker)
     {
         for(int i = 0; i < 5; i++)
         {
             yield return new WaitForSeconds(.3f);
-            _gameOverGO.SetActive(!_gameOverGO.activeSelf);
+            objectToFlicker.SetActive(!objectToFlicker.activeSelf);
         }
 
         StartCoroutine(EnableRestartRoutine());

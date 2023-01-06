@@ -22,7 +22,8 @@ public class SpawnManager : MonoBehaviour
     [SerializeField]
     private GameObject[] _powerups;
     private int _powerupSpawnCount = 1;
-    private int _enemiesDestroyedCount;
+    private int _waveEnemiesDestroyedCount;
+    private int _enemiesKilled;
     [SerializeField]
     private int _turnsBeforeSpawningAmmo = 4;
     [SerializeField]
@@ -32,11 +33,20 @@ public class SpawnManager : MonoBehaviour
     [SerializeField]
     private int _homingMissileSpawnInterval = 10;
     private int _numOfMovementModes;
+    [SerializeField]
+    private WaveInfo[] _waves;
+    private int _currentWaveIndex;
+    private int _currentEnemyIndex;
+    [SerializeField]
+    private float _delayInBetweenWaves = 2.5f;
+    [SerializeField]
+    private UIManager _uiManager;
     #endregion
     #region UnityMethods
     private void Start()
     {
         _numOfMovementModes = Enum.GetNames(typeof(MovementMode)).Length;
+        _player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
     }
     #endregion
 
@@ -44,19 +54,12 @@ public class SpawnManager : MonoBehaviour
 
     private IEnumerator SpawnEnemy()
     {
-        while (_canSpawn)
+        while (_currentEnemyIndex < _waves[_currentWaveIndex].waveItems.Length)
         {
-
-            MovementMode mode = (MovementMode)UnityEngine.Random.Range(0, _numOfMovementModes);
-            bool isMirrored = false;
             Vector3 spawnLocation = Vector3.zero;
+            WaveInfo.WaveItem waveItem = _waves[_currentWaveIndex].waveItems[_currentEnemyIndex];
 
-            if(mode == MovementMode.Circular || mode == MovementMode.ZigZag)
-            {
-                isMirrored = UnityEngine.Random.Range(-1, 2) < 0 ? true : false;
-            }
-
-            switch (mode)
+            switch (waveItem.enemy.movementType)
             {
                 case MovementMode.ZigZag:
                 case MovementMode.Vertical:
@@ -68,14 +71,14 @@ public class SpawnManager : MonoBehaviour
                     break;
                 case MovementMode.Horizontal:
                     spawnLocation = new Vector3(
-                        GameManager.LEFT_BOUND,
+                        waveItem.mirroredMovement ? GameManager.RIGHT_BOUND : GameManager.LEFT_BOUND,
                         UnityEngine.Random.Range(GameManager.ENVIRONMENT_TOP_BOUND * .5f, GameManager.ENVIRONMENT_TOP_BOUND * .8f)
                         );
                     break;
                 case MovementMode.Circular:
                     spawnLocation =
                         new Vector3(
-                            isMirrored ? GameManager.RIGHT_BOUND : GameManager.LEFT_BOUND,
+                           waveItem.mirroredMovement ? GameManager.RIGHT_BOUND : GameManager.LEFT_BOUND,
                             GameManager.ENVIRONMENT_TOP_BOUND
                             );
                     break;
@@ -90,12 +93,12 @@ public class SpawnManager : MonoBehaviour
 
             if (enemy != null)
             {
-                enemy.GetComponent<Enemy>().SetMovementMode(mode, isMirrored);
+                enemy.GetComponent<Enemy>().SetMovementMode(waveItem.enemy.movementType, waveItem.mirroredMovement);
                 _enemies.Add(enemy);
             }
 
 
-
+            _currentEnemyIndex++;
 
             yield return new WaitForSeconds(UnityEngine.Random.Range(_minSpawnTime, _maxSpawnTime + 1));
         }
@@ -171,22 +174,43 @@ public class SpawnManager : MonoBehaviour
 
     }
 
-    public void StartWave()
+    public void StartWave(float delay)
     {
-        _player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
-        StartCoroutine(StartWaveRoutine());
+        _uiManager.UpdateWaveText(_currentWaveIndex + 1);
+        _uiManager.DisplayWaveText(true);
+        StartCoroutine(StartWaveRoutine(delay));
     }
 
-    public void EnemyDestroyed(GameObject enemy, float powerupSpawnDelayDuration)
+    public void EnemyDestroyed(GameObject enemy, float powerupSpawnDelayDuration, bool wasKilled)
     {
         if(_canSpawn)
         {
             _enemies.Remove(enemy);
             Vector3 position = enemy.transform.position;
-            _enemiesDestroyedCount++;
-            if(_enemiesDestroyedCount % _enemySpawnsBeforeAmmoDrop == 0)
+            _waveEnemiesDestroyedCount++;
+
+            if (wasKilled)
+                _enemiesKilled++;
+
+            if(_enemiesKilled % _enemySpawnsBeforeAmmoDrop == 0)
             {
                 StartCoroutine(SpawnPowerupAtEnemyPosition(position, powerupSpawnDelayDuration));
+            }
+
+            if (_waveEnemiesDestroyedCount == _waves[_currentWaveIndex].waveItems.Length)
+            {
+                StopAllCoroutines();
+                _currentEnemyIndex = 0;
+                _waveEnemiesDestroyedCount = 0;
+                _currentWaveIndex++;
+                if (_currentWaveIndex < _waves.Length)
+                {
+                    StartWave(_delayInBetweenWaves);
+                }
+                else
+                {
+                    _uiManager.DisplayWinText();
+                }
             }
         }
         
@@ -202,9 +226,10 @@ public class SpawnManager : MonoBehaviour
             );
     }
 
-    private IEnumerator StartWaveRoutine()
+    private IEnumerator StartWaveRoutine(float delay)
     {
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(delay);
+        _uiManager.DisplayWaveText(false);
         StartCoroutine(SpawnEnemy());
         StartCoroutine(SpawnPowerup());
         StartCoroutine(SpawnHomingMissile());

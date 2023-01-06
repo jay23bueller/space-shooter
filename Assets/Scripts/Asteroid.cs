@@ -29,7 +29,7 @@ public class Asteroid : MonoBehaviour
                 Destroy(collision.gameObject);
                 GetComponent<CircleCollider2D>().enabled = false;
                 Destroy(Instantiate(_explosionGO, transform.position, Quaternion.identity),2.2f);
-                _spawnManager.StartWave();
+                _spawnManager.StartWave(2f);
                 Destroy(gameObject, .1f);
             }
         }

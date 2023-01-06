@@ -252,8 +252,7 @@ public class Enemy : MonoBehaviour
 
     public void InformSpawnManager(float powerupSpawnDelayDuration)
     {
-        if(_wasKilled)
-        _spawnManager.EnemyDestroyed(gameObject, powerupSpawnDelayDuration);
+        _spawnManager.EnemyDestroyed(gameObject, powerupSpawnDelayDuration,_wasKilled);
     }
 
     public void Die()
