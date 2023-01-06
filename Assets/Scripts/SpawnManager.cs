@@ -32,7 +32,6 @@ public class SpawnManager : MonoBehaviour
     private AudioClip _healthDropClip;
     [SerializeField]
     private int _homingMissileSpawnInterval = 10;
-    private int _numOfMovementModes;
     [SerializeField]
     private WaveInfo[] _waves;
     private int _currentWaveIndex;
@@ -45,7 +44,6 @@ public class SpawnManager : MonoBehaviour
     #region UnityMethods
     private void Start()
     {
-        _numOfMovementModes = Enum.GetNames(typeof(MovementMode)).Length;
         _player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
     }
     #endregion
@@ -85,20 +83,24 @@ public class SpawnManager : MonoBehaviour
             }
 
 
-            GameObject enemy = Instantiate(
+            if(_enemyContainer != null)
+            {
+
+                GameObject enemy = Instantiate(
                 _enemyPrefab,
                 spawnLocation,
                 Quaternion.AngleAxis(180, Vector3.forward),
                 _enemyContainer.transform);
 
-            if (enemy != null)
-            {
-                enemy.GetComponent<Enemy>().SetMovementMode(waveItem.enemy.movementType, waveItem.mirroredMovement);
-                _enemies.Add(enemy);
+                if (enemy != null)
+                {
+                    enemy.GetComponent<Enemy>().SetMovementMode(waveItem.enemy.movementType, waveItem.mirroredMovement);
+                    _enemies.Add(enemy);
+                }
+
+
+                _currentEnemyIndex++;
             }
-
-
-            _currentEnemyIndex++;
 
             yield return new WaitForSeconds(UnityEngine.Random.Range(_minSpawnTime, _maxSpawnTime + 1));
         }
@@ -168,7 +170,7 @@ public class SpawnManager : MonoBehaviour
 
     public void Stop()
     {
-        _canSpawn = false;
+        StopAllCoroutines();
         _enemies.Clear();
         Destroy(_enemyContainer);
 

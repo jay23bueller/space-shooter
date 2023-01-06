@@ -22,6 +22,7 @@ public class Player : MonoBehaviour
     private Animator _anim;
 
     //Movement
+    [Header("Movement")]
     [SerializeField]
     private float _speed = 3.5f;
     [SerializeField]
@@ -30,54 +31,61 @@ public class Player : MonoBehaviour
 
 
     //Thruster
-    [AddComponentMenu("Thrusters")]
+    [Header("Thrusters")]
     [SerializeField]
     private float _thrusterBoostMultiplier = 1.3f;
-    private bool _engagingThrusters;
     [SerializeField]
     private GameObject _thrusterGO;
     [SerializeField]
     private float _thrusterDrainRate = -2.5f;
     [SerializeField]
     private float _thrusterGainRate = 2.5f;
-    private float _thrusterMaxEnergy = 100f;
-    private float _thrusterMinEnergy = 0f;
     [SerializeField]
     private float _thrusterCurrentEnergy;
-    private bool _punishPlayer;
-    private bool _fullyCharged;
-    private bool _justPunished;
     [SerializeField]
     private float _thrusterRecoveryMultiplier = 2.0f;
     [SerializeField]
     private AudioClip _outOfThrusterEnergyClip;
-    private float _delayThrusterDisabledSoundTimer;
     [SerializeField]
     private float _thrusterDisabledSoundInterval = .3f;
+    [SerializeField]
+    private AudioClip _thrusterBoostClip;
+    private bool _punishPlayer;
+    private bool _fullyCharged;
+    private bool _justPunished;
     private bool _playBoostSound = true;
+    private bool _engagingThrusters;
+    private float _delayThrusterDisabledSoundTimer;
+    private float _thrusterMaxEnergy = 100f;
+    private float _thrusterMinEnergy = 0f;
 
     //SpeedBoost
-    private Coroutine _resetSpeedBoostCoroutine;
-    private bool _isSpeedBoostEnabled;
+    [Header("Speed Boost")]
     [SerializeField]
     private float _speedBoostMultipler = 2.0f;
+    private Coroutine _resetSpeedBoostCoroutine;
+    private bool _isSpeedBoostEnabled;
+
 
     //TripleShot
+    [Header("Triple Shot")]
     [SerializeField]
     private GameObject _tripleShotPrefab;
     private Coroutine _resetWeaponRountine;
 
 
     //Current Weapon
-    private bool _canFire = true;
+    [Header("Weapon")]
     [SerializeField]
     private int _ammoMaxCount = 15;
-    private int _ammoCurrentCount = 15;
     [SerializeField]
     private AudioClip _outOfAmmoClip;
     private FiringMode _firingMode;
+    private int _ammoCurrentCount = 15;
+    private bool _canFire = true;
 
     //Laser
+    [Header("Weapon/Laser")]
     [SerializeField]
     private GameObject _laserPrefab;
     [SerializeField]
@@ -88,48 +96,54 @@ public class Player : MonoBehaviour
     private AudioClip _laserAudioClip;
 
     //Missile
+    [Header("Weapon/Laser")]
     [SerializeField]
     private GameObject _missilePrefab;
-    private float _weaponCooldownDuration;
     [SerializeField]
     private AudioClip _missileAudioClip;
     [SerializeField]
     private float _missileCooldownDuration = 1f;
+    private float _weaponCooldownDuration;
 
 
     //Shield
-    private bool _isShieldEnabled;
+    [Header("Shield")]
     [SerializeField]
     private GameObject _shieldGO;
     private int _shieldMaxHealth = 3;
     private int _shieldCurrentHealth;
+    private bool _isShieldEnabled;
 
     //Managers
-    private SpawnManager _spawnManager;
+    [Header("Manager Info")]
     [SerializeField]
     private UIManager _uiManager;
+    private SpawnManager _spawnManager;
+
 
     //Score
+    [Header("Score")]
     [SerializeField]
     private int _healthDropScoreDivisor = 200;
     private int _score;
 
     //Effects
+    [Header("Effects")]
     [SerializeField]
     private GameObject[] _engines;
-    private AudioSource _audioSource;
-    [SerializeField]
-    private AudioClip _thrusterBoostClip;
-
     [SerializeField]
     private GameObject _explosionGO;
+    private AudioSource _audioSource;
+
 
     //Lives
+    [Header("Lives")]
     [SerializeField]
     private int _lives = 3;
-    private int _maxLives = 3;
     [SerializeField]
     private AudioClip _playerLostLifeClip;
+    private int _maxLives = 3;
+
     #endregion
 
     #region UnityMethods
