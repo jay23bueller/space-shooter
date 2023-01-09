@@ -20,19 +20,13 @@ public class Asteroid : MonoBehaviour
         _rigidbody.angularVelocity = -20f;
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+
+    public void InitiateGame()
     {
-        if(collision != null)
-        {
-            if(collision.CompareTag("Laser"))
-            {
-                Destroy(collision.gameObject);
-                GetComponent<CircleCollider2D>().enabled = false;
-                Destroy(Instantiate(_explosionGO, transform.position, Quaternion.identity),2.2f);
-                _spawnManager.StartWave(2f);
-                Destroy(gameObject, .1f);
-            }
-        }
+        GetComponent<CircleCollider2D>().enabled = false;
+        Destroy(Instantiate(_explosionGO, transform.position, Quaternion.identity), 2.2f);
+        _spawnManager.StartWave(2f);
+        Destroy(gameObject, .1f);
     }
     #endregion
 }

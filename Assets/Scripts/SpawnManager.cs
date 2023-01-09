@@ -40,6 +40,12 @@ public class SpawnManager : MonoBehaviour
     private float _delayInBetweenWaves = 2.5f;
     [SerializeField]
     private UIManager _uiManager;
+    [SerializeField]
+    private int _homingMissileIndex;
+    [SerializeField]
+    private int _healthCollectibleIndex;
+    [SerializeField]
+    private int _ammoCollectibleIndex;
     #endregion
     #region UnityMethods
     private void Start()
@@ -113,9 +119,9 @@ public class SpawnManager : MonoBehaviour
         {
             int powerupIndex;
             if (_powerupSpawnCount % _turnsBeforeSpawningAmmo == 0)
-                powerupIndex = 3;
+                powerupIndex = _ammoCollectibleIndex;
             else
-                powerupIndex = UnityEngine.Random.Range(0, 3);
+                powerupIndex = UnityEngine.Random.Range(0,_ammoCollectibleIndex);
 
 
             yield return new WaitForSeconds(UnityEngine.Random.Range(3.0f, 7.0f));
@@ -144,7 +150,7 @@ public class SpawnManager : MonoBehaviour
 
             Vector3 spawnLocation = new Vector3(UnityEngine.Random.Range(GameManager.LEFT_BOUND, GameManager.RIGHT_BOUND), GameManager.ENVIRONMENT_TOP_BOUND);
             Instantiate(
-                _powerups[5],
+                _powerups[_homingMissileIndex],
                 spawnLocation,
                 Quaternion.identity
                 );
@@ -160,7 +166,7 @@ public class SpawnManager : MonoBehaviour
                 );
             
         Instantiate(
-            _powerups[4],
+            _powerups[_healthCollectibleIndex],
             spawnLocation,
             Quaternion.identity
             );
@@ -222,7 +228,7 @@ public class SpawnManager : MonoBehaviour
     {
         yield return new WaitForSeconds(delay);
         Instantiate(
-            _powerups[3],
+            _powerups[_ammoCollectibleIndex],
             position,
             Quaternion.identity
             );

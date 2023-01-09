@@ -87,7 +87,7 @@ SpriteRenderer:
   m_SpriteSortPoint: 0
 --- !u!95 &2702474329199393815
 Animator:
-  serializedVersion: 4
+  serializedVersion: 5
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -104,7 +104,7 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
+  m_KeepAnimatorStateOnDisable: 0
 --- !u!1 &2702474329413516593
 GameObject:
   m_ObjectHideFlags: 0
@@ -221,6 +221,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _speed: 6
+  _weaponHitPrefab: {fileID: 1612011279188751942, guid: b1accfe0bff651f47a8e26ea13be43ae, type: 3}
+  _disruptedShotClip: {fileID: 8300000, guid: 4da23f5597d283247945e37f27bfcdb8, type: 3}
+  _originalHitColor: {r: 1, g: 0.8194992, b: 0.23018867, a: 1}
+  _disruptedHitColor: {r: 0, g: 1, b: 0.8968117, a: 1}
   _explosionPrefab: {fileID: 8978835077582414172, guid: 62eac0f433665e349bd09acf6fe53bd5, type: 3}
   _maxDegreesDelta: 3
   _movementDelay: 0.7

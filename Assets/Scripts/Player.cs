@@ -144,6 +144,8 @@ public class Player : MonoBehaviour
     private AudioClip _playerLostLifeClip;
     private int _maxLives = 3;
 
+    private bool _disruptWeapon;
+
     #endregion
 
     #region UnityMethods
@@ -218,6 +220,24 @@ public class Player : MonoBehaviour
         }
             
 
+    }
+
+    public void EnableWeaponDistruption()
+    {
+        if(!_disruptWeapon)
+        {
+            _disruptWeapon = true;
+            _uiManager.UpdateDisruptionText(true);
+            StartCoroutine(WeaponDisruptionResetRoutine());
+        }
+            
+    }
+
+    private IEnumerator WeaponDisruptionResetRoutine()
+    {
+        yield return new WaitForSeconds(5);
+        _uiManager.UpdateDisruptionText(false);
+        _disruptWeapon = false;
     }
 
     private void UpdateThrusterUI()
@@ -328,14 +348,14 @@ public class Player : MonoBehaviour
                             lasers.AddRange(Instantiate(_tripleShotPrefab, _laserSpawnTransform.position, _laserSpawnTransform.rotation).GetComponentsInChildren<Laser>());
                         
                         foreach (Laser laser in lasers)
-                            laser.InitializeFiring(1);
+                            laser.InitializeFiring(1, _disruptWeapon);
                         
                         _audioSource.PlayOneShot(_laserAudioClip);
                         break;
 
                     case FiringMode.HomingMissile:
                         Missile missile = Instantiate(_missilePrefab, _laserSpawnTransform.position, _laserSpawnTransform.rotation).GetComponent<Missile>();
-                        missile.InitializeFiring(1);
+                        missile.InitializeFiring(1, _disruptWeapon);
                         _audioSource.PlayOneShot(_missileAudioClip);
                         break;
                 }

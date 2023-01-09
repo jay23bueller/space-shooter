@@ -9,6 +9,7 @@ TagManager:
   - SpawnManager
   - Powerup
   - EnemyLaser
+  - Asteroid
   layers:
   - Default
   - TransparentFX

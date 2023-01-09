@@ -7,7 +7,8 @@ public enum PowerupType
     HealthCollectible,
     AmmoCollectible,
     Shield,
-    SpeedBoost
+    SpeedBoost,
+    WeaponDisruption
 }
 public class Powerup : MonoBehaviour
 {
@@ -51,6 +52,9 @@ public class Powerup : MonoBehaviour
                         break;
                     case PowerupType.HealthCollectible:
                         collision.GetComponent<Player>().UpdateLives(1);
+                        break;
+                    case PowerupType.WeaponDisruption:
+                        collision.GetComponent<Player>().EnableWeaponDistruption();
                         break;
                     default:
                         Debug.LogError("Didn't assign correct powerupID!");

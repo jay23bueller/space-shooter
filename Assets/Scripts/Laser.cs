@@ -9,6 +9,15 @@ public class Laser : MonoBehaviour
     protected float _speed = 8.0f;
     protected bool _canMove;
     protected bool _isEnemyWeapon;
+    [SerializeField]
+    private GameObject _weaponHitPrefab;
+    [SerializeField]
+    private AudioClip _disruptedShotClip;
+    [SerializeField]
+    private Color _originalHitColor;
+    [SerializeField]
+    private Color _disruptedHitColor;
+    
     #endregion
 
     #region UnityMethods
@@ -23,6 +32,7 @@ public class Laser : MonoBehaviour
         //TripleShot
         if (transform.parent != null)
             Destroy(transform.parent.gameObject);
+ 
     }
 
     void OnTriggerEnter2D(Collider2D collision)
@@ -36,13 +46,42 @@ public class Laser : MonoBehaviour
     {
         if (collision != null)
         {
+            bool destroySelf = false;
             if (collision.CompareTag("Player") && _isEnemyWeapon)
             {
                 collision.GetComponent<Player>().UpdateLives(-1);
-                Destroy(gameObject);
+                destroySelf = true;
             }
+
+            if(collision.CompareTag("Enemy") && !_isEnemyWeapon)
+            {
+                collision.GetComponent<Enemy>().GetDestroyed(true);
+                destroySelf = true;
+            }
+
+            if (collision.CompareTag("Asteroid"))
+            {
+                collision.GetComponent<Asteroid>().InitiateGame();
+                destroySelf = true;
+            }
+
+            if (destroySelf)
+            {
+                GetComponent<Collider2D>().enabled = false;
+                OnHit();
+            }
+                
+
+            
         }
     }
+
+    private void OnHit()
+    {
+        Instantiate(_weaponHitPrefab, transform.position, transform.rotation);
+        Destroy(gameObject);
+    }
+
 
     // Move laser till it's out of the viewport
     // at the moment, it is assumed to be moving to the top
@@ -59,7 +98,7 @@ public class Laser : MonoBehaviour
 
     }
 
-    public virtual void InitializeFiring(int owner)
+    public virtual void InitializeFiring(int owner, bool disrupted)
     {
         switch(owner)
         {
@@ -75,7 +114,28 @@ public class Laser : MonoBehaviour
                 break;
         }
 
+        ParticleSystem.MainModule main = _weaponHitPrefab.GetComponent<ParticleSystem>().main;
+        main.startColor = disrupted ? _disruptedHitColor : _originalHitColor;
+
+        if (disrupted)
+        {
+            StartCoroutine(SelfDestructRoutine());
+        }
+
+
         _canMove = true;
+    }
+
+    private IEnumerator SelfDestructRoutine()
+    {
+        GetComponent<SpriteRenderer>().color = Color.HSVToRGB(.48f,1f,1f);
+        yield return new WaitForSeconds(Random.Range(.1f, 1f));
+        if(GetComponent<Collider2D>().enabled)
+        {
+            AudioSource.PlayClipAtPoint(_disruptedShotClip,Camera.main.transform.position);
+            OnHit();
+        }
+            
     }
     #endregion
 }

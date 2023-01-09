@@ -27,6 +27,9 @@ public class UIManager : MonoBehaviour
     private int _maxAmmoCount = 15;
     [SerializeField]
     private TMP_Text _waveText;
+    [SerializeField]
+    private TMP_Text _disruptedText;
+    private Coroutine _disruptedTextRoutine;
     #endregion
     #region UnityMethods
     // Start is called before the first frame update
@@ -43,10 +46,23 @@ public class UIManager : MonoBehaviour
         _waveText.text = $"WAVE: {wave}";
     }
 
+    public void UpdateDisruptionText(bool show)
+    {
+        if (show)
+        {
+            _disruptedTextRoutine = StartCoroutine(FlickerTextRoutine(_disruptedText.gameObject, false));
+        } else
+        {
+            if (_disruptedTextRoutine != null)
+                StopCoroutine(_disruptedTextRoutine);
+            _disruptedText.gameObject.SetActive(false);
+        }
+    }
+
     public void DisplayWinText()
     {
         _waveText.text = "YOU WIN";
-        StartCoroutine(FlickerTextRoutine(_waveText.gameObject));
+        StartCoroutine(FlickerTextRoutine(_waveText.gameObject, true));
         StartCoroutine(EnableRestartRoutine());
     }
 
@@ -82,10 +98,14 @@ public class UIManager : MonoBehaviour
 
     public void DisplayGameOver()
     {
-        StartCoroutine(FlickerTextRoutine(_gameOverGO));
+        StopAllCoroutines();
+        _disruptedText.gameObject.SetActive(false);
+        _ammoText.gameObject.SetActive(false);
+        _thrusterSlider.gameObject.SetActive(false);
+        StartCoroutine(FlickerTextRoutine(_gameOverGO, true));
     }
 
-    private IEnumerator FlickerTextRoutine(GameObject objectToFlicker)
+    private IEnumerator FlickerTextRoutine(GameObject objectToFlicker, bool restart)
     {
         for(int i = 0; i < 5; i++)
         {
@@ -93,7 +113,8 @@ public class UIManager : MonoBehaviour
             objectToFlicker.SetActive(!objectToFlicker.activeSelf);
         }
 
-        StartCoroutine(EnableRestartRoutine());
+        if(restart)
+            StartCoroutine(EnableRestartRoutine());
     }
 
 

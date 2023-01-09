@@ -91,26 +91,11 @@ public class Enemy : MonoBehaviour
         if (other != null)
         {
             if (other.CompareTag(PLAYER_TAG))
-                other.GetComponent<Player>().UpdateLives(-1);
-
-
-            if (other.CompareTag(LASER_TAG))
             {
-                if(_player != null)
-                    _player.AddScore(10);
-                _wasKilled = true;
-                Destroy(other.gameObject);
+                other.GetComponent<Player>().UpdateLives(-1);
+                GetDestroyed(false);
             }
                 
-
-            if (!other.CompareTag(ENEMY_TAG) && !other.CompareTag(POWERUP_TAG) && !other.CompareTag(ENEMYLASER_TAG))
-            {
-                GetComponent<Collider2D>().enabled = false;
-                _canMove = false;
-                StopAllCoroutines();
-                _speed = 0f;
-                _anim.SetTrigger("OnEnemyDeath");
-            }
                 
         }
     }
@@ -119,6 +104,21 @@ public class Enemy : MonoBehaviour
     #endregion
 
     #region Methods
+
+    public void GetDestroyed(bool playerScored)
+    {
+        if (playerScored)
+        {
+            _player.AddScore(10);
+            _wasKilled = true;
+        }
+            
+        GetComponent<Collider2D>().enabled = false;
+        _canMove = false;
+        StopAllCoroutines();
+        _speed = 0f;
+        _anim.SetTrigger("OnEnemyDeath");
+    }
 
     //Move the character to the bottom and if it is out of the viewport, teleport it to the top
     //at a random x location
@@ -241,7 +241,7 @@ public class Enemy : MonoBehaviour
             GameObject laserGO = Instantiate(_laserPrefab, transform.position, transform.rotation);
             foreach(Laser laser in laserGO.GetComponentsInChildren<Laser>())
             {
-                laser.InitializeFiring(0);
+                laser.InitializeFiring(0, false);
             };
 
             

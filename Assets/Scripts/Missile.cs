@@ -57,9 +57,9 @@ public class Missile : Laser
         Destroy(gameObject);
     }
 
-    public override void InitializeFiring(int owner)
+    public override void InitializeFiring(int owner, bool disrupted)
     {
-        base.InitializeFiring(owner);
+        base.InitializeFiring(owner, disrupted);
         _movementDelayTimer = Time.time + _movementDelay;
         StartCoroutine(StartRotationRoutine());
         StartCoroutine(DespawnRoutine());
