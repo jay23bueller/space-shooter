@@ -228,17 +228,11 @@ public class Player : MonoBehaviour
         {
             _disruptWeapon = true;
             _uiManager.UpdateDisruptionText(true);
-            StartCoroutine(WeaponDisruptionResetRoutine());
+            StartCoroutine(ResetPowerup(PowerupType.WeaponDisruption));
         }
             
     }
 
-    private IEnumerator WeaponDisruptionResetRoutine()
-    {
-        yield return new WaitForSeconds(5);
-        _uiManager.UpdateDisruptionText(false);
-        _disruptWeapon = false;
-    }
 
     private void UpdateThrusterUI()
     {
@@ -468,6 +462,10 @@ public class Player : MonoBehaviour
             case PowerupType.HomingMissile: 
                 _firingMode = FiringMode.Default;
                 _weaponCooldownDuration = _laserCooldownDuration;
+                break;
+            case PowerupType.WeaponDisruption:
+                _uiManager.UpdateDisruptionText(false);
+                _disruptWeapon = false;
                 break;
             case PowerupType.SpeedBoost:
                 _isSpeedBoostEnabled = false;
