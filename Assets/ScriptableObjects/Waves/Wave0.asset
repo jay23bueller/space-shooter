@@ -13,13 +13,13 @@ MonoBehaviour:
   m_Name: Wave0
   m_EditorClassIdentifier: 
   waveItems:
-  - enemy: {fileID: 11400000, guid: de3f625cd501cbe4c99e09524d4d4d02, type: 2}
-    mirroredMovement: 0
+  - enemy: {fileID: 11400000, guid: 76f672ef7c7aabf4fabea6c16c94e063, type: 2}
+    mirroredMovement: 1
   - enemy: {fileID: 11400000, guid: de3f625cd501cbe4c99e09524d4d4d02, type: 2}
     mirroredMovement: 0
   - enemy: {fileID: 11400000, guid: de3f625cd501cbe4c99e09524d4d4d02, type: 2}
     mirroredMovement: 0
   - enemy: {fileID: 11400000, guid: 3aae999703ff0e8458f11971bc29c298, type: 2}
     mirroredMovement: 1
-  - enemy: {fileID: 11400000, guid: 3aae999703ff0e8458f11971bc29c298, type: 2}
+  - enemy: {fileID: 11400000, guid: d13a3fdc3adaf3547bb0f0c2e92e6dc1, type: 2}
     mirroredMovement: 0

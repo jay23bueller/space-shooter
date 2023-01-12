@@ -1,12 +1,18 @@
+using System;
 using System.Collections;
+using Random = UnityEngine.Random;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public enum MovementMode
 {
+    WaypointVPath = 0,
+    WaypointDiamondPath = 1,
     Horizontal,
     Vertical,
     ZigZag,
-    Circular
+    Circular,
+
 }
 
 public class Enemy : MonoBehaviour
@@ -22,19 +28,23 @@ public class Enemy : MonoBehaviour
 
     #region Variables
     [SerializeField]
-    private float _speed = 4.0f;
-    private Player _player;
-    private Animator _anim;
-    private AudioSource _audioSource;
+    protected float _speed = 4.0f;
     [SerializeField]
-    private AudioClip _laserAudioClip;
+    protected float _minFiringDelay;
     [SerializeField]
-    private GameObject _laserPrefab;
-    private SpawnManager _spawnManager;
-    private bool _wasKilled;
-    private delegate void Movement();
-    private Movement _currentMovement;
-    private bool _canMove;
+    protected float _maxFiringDelay;
+    protected Player _player;
+    protected Animator _anim;
+    protected AudioSource _audioSource;
+    [SerializeField]
+    protected AudioClip _laserAudioClip;
+    [SerializeField]
+    protected GameObject _laserPrefab;
+    protected SpawnManager _spawnManager;
+    protected bool _wasKilled;
+    protected delegate void Movement();
+    protected Movement _currentMovement;
+    protected bool _canMove;
 
     //Circular Movement
     private Vector3 _diagonalStartPosition;
@@ -62,13 +72,19 @@ public class Enemy : MonoBehaviour
     private float _zigZagMaxDistance = 3f;
 
     private float _moveDirection;
+
+    //Waypoint Movement
+    private int _currentWaypointIndex;
+    [SerializeField]
+    private WaypointPathInfo[] _waypointPaths;
+    private int _waypointPathIndex;
     #endregion
 
     #region UnityMethods
 
 
 
-    void Start()
+    protected virtual void Start()
     {
         _player = GameObject.FindGameObjectWithTag(PLAYER_TAG).GetComponent<Player>();
         _anim = GetComponent<Animator>();
@@ -80,7 +96,7 @@ public class Enemy : MonoBehaviour
 
 
 
-    private void Update()
+    protected virtual void Update()
     {
         if(_canMove)
             Move();
@@ -105,18 +121,20 @@ public class Enemy : MonoBehaviour
 
     #region Methods
 
-    public void GetDestroyed(bool playerScored)
+    public virtual void GetDestroyed(bool playerScored)
     {
         if (playerScored)
         {
             _player.AddScore(10);
             _wasKilled = true;
         }
-            
+
+        StopAllCoroutines();
         GetComponent<Collider2D>().enabled = false;
         _canMove = false;
-        StopAllCoroutines();
+        
         _speed = 0f;
+        _anim.speed = 1f;
         _anim.SetTrigger("OnEnemyDeath");
     }
 
@@ -142,8 +160,10 @@ public class Enemy : MonoBehaviour
         _currentMovement();
     }
 
-    public void SetMovementMode(MovementMode mode, bool isMirrored)
+    public void SetMovementModeAndFiringDelays(MovementMode mode, bool isMirrored, float minFiringDelay, float maxFiringDelay)
     {
+        _minFiringDelay = minFiringDelay;
+        _maxFiringDelay = maxFiringDelay;
         switch(mode)
         {
             case MovementMode.Horizontal:
@@ -165,12 +185,31 @@ public class Enemy : MonoBehaviour
                 _zigZagX = transform.position.x;
                 _currentMovement = MoveZigZag;
                 break;
+            case MovementMode.WaypointDiamondPath:
+            case MovementMode.WaypointVPath:
+                _currentWaypointIndex = 0;
+                _waypointPathIndex = (int)mode;
+                _currentMovement = MoveWaypointPath;
+                break;
 
                 
         }
         
-        if(mode == MovementMode.ZigZag || mode == MovementMode.Horizontal)
-            _moveDirection = isMirrored ? -1 : 1;
+        switch (mode)
+        {
+            case MovementMode.Horizontal:
+            case MovementMode.ZigZag:
+            case MovementMode.WaypointVPath:
+            case MovementMode.WaypointDiamondPath:
+                _moveDirection = isMirrored ? -1 : 1;
+                if(mode == MovementMode.WaypointVPath || mode == MovementMode.WaypointDiamondPath) 
+                {
+                    _currentWaypointIndex = _waypointPaths[_waypointPathIndex].waypoints.Length - 1;
+                }
+                break;
+        }
+
+            
 
         _canMove = true;
     }
@@ -231,11 +270,11 @@ public class Enemy : MonoBehaviour
     }
 
 
-    private IEnumerator FireLaser()
+    protected virtual IEnumerator FireLaser()
     {
         while(true)
         {
-            yield return new WaitForSeconds(Random.Range(3f, 7f));
+            yield return new WaitForSeconds(Random.Range(_minFiringDelay, _maxFiringDelay));
 
 
             GameObject laserGO = Instantiate(_laserPrefab, transform.position, transform.rotation);
@@ -248,6 +287,20 @@ public class Enemy : MonoBehaviour
             _audioSource.PlayOneShot(_laserAudioClip);
             
         }
+    }
+
+    private void MoveWaypointPath()
+    {
+        if (Vector3.Distance(transform.position, _waypointPaths[_waypointPathIndex].waypoints[_currentWaypointIndex]) < .1f)
+        {
+            int newIndex = (_currentWaypointIndex + (int)_moveDirection);
+            _currentWaypointIndex =  newIndex < 0 ? _waypointPaths[_waypointPathIndex].waypoints.Length - 1 : newIndex % _waypointPaths[_waypointPathIndex].waypoints.Length;
+
+            
+        }
+        Vector3 waypointMoveDirection = (_waypointPaths[_waypointPathIndex].waypoints[_currentWaypointIndex] - transform.position).normalized;
+
+        transform.position += waypointMoveDirection * _speed * Time.deltaTime;
     }
 
     public void InformSpawnManager(float powerupSpawnDelayDuration)

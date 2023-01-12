@@ -7,23 +7,16 @@ public class SpawnManager : MonoBehaviour
 {
     #region Variables
     private bool _canSpawn = true;
-    [SerializeField]
-    private GameObject _enemyPrefab;
+    
+
+
+    [Header("Powerups")]
     [SerializeField]
     private int _minSpawnTime = 2;
     [SerializeField]
     private int _maxSpawnTime = 5;
     [SerializeField]
-    private GameObject _enemyContainer;
-    [SerializeField]
-    private List<GameObject> _enemies = new List<GameObject>();
-    [SerializeField]
-    private Player _player;
-    [SerializeField]
     private GameObject[] _powerups;
-    private int _powerupSpawnCount = 1;
-    private int _waveEnemiesDestroyedCount;
-    private int _enemiesKilled;
     [SerializeField]
     private int _turnsBeforeSpawningAmmo = 4;
     [SerializeField]
@@ -33,19 +26,35 @@ public class SpawnManager : MonoBehaviour
     [SerializeField]
     private int _homingMissileSpawnInterval = 10;
     [SerializeField]
-    private WaveInfo[] _waves;
-    private int _currentWaveIndex;
-    private int _currentEnemyIndex;
-    [SerializeField]
-    private float _delayInBetweenWaves = 2.5f;
-    [SerializeField]
-    private UIManager _uiManager;
-    [SerializeField]
     private int _homingMissileIndex;
     [SerializeField]
     private int _healthCollectibleIndex;
     [SerializeField]
     private int _ammoCollectibleIndex;
+    private int _powerupSpawnCount = 1;
+
+    [Header("Enemies")]
+    [SerializeField]
+    private GameObject _enemyContainer;
+    [SerializeField]
+    private List<GameObject> _enemies = new List<GameObject>();
+
+
+
+    [Header("Waves")]
+    [SerializeField]
+    private WaveInfo[] _waves;
+    [SerializeField]
+    private float _delayInBetweenWaves = 2.5f;
+    private int _waveEnemiesDestroyedCount;
+    private int _enemiesKilled;
+    private int _currentWaveIndex;
+    private int _currentEnemyIndex;
+
+    [SerializeField]
+    private UIManager _uiManager;
+    private Player _player;
+
     #endregion
     #region UnityMethods
     private void Start()
@@ -67,6 +76,8 @@ public class SpawnManager : MonoBehaviour
             {
                 case MovementMode.ZigZag:
                 case MovementMode.Vertical:
+                case MovementMode.WaypointDiamondPath:
+                case MovementMode.WaypointVPath:
                     spawnLocation =
                         new Vector3(
                             UnityEngine.Random.Range(GameManager.LEFT_BOUND, GameManager.RIGHT_BOUND),
@@ -93,14 +104,14 @@ public class SpawnManager : MonoBehaviour
             {
 
                 GameObject enemy = Instantiate(
-                _enemyPrefab,
+                waveItem.enemy.enemyType,
                 spawnLocation,
                 Quaternion.AngleAxis(180, Vector3.forward),
                 _enemyContainer.transform);
 
                 if (enemy != null)
                 {
-                    enemy.GetComponent<Enemy>().SetMovementMode(waveItem.enemy.movementType, waveItem.mirroredMovement);
+                    enemy.GetComponent<Enemy>().SetMovementModeAndFiringDelays(waveItem.enemy.movementType, waveItem.mirroredMovement, waveItem.enemy.delaysPerWave[_currentWaveIndex].weaponFireRateDelays.minFireRateDelay, waveItem.enemy.delaysPerWave[_currentWaveIndex].weaponFireRateDelays.maxFireRateDelay);
                     _enemies.Add(enemy);
                 }
 

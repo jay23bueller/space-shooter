@@ -1,10 +1,13 @@
 using System;
 using UnityEngine;
 
+
+
 [CreateAssetMenu(fileName = "enemyInfo.asset",menuName = "SpawnInformation/EnemyInfo")]
 public class EnemyInfo : ScriptableObject
 {
     public MovementMode movementType;
+    public GameObject enemyType;
     public Delays[] delaysPerWave = new Delays[3];
     [Serializable]
     public struct WeaponFireRateDelays

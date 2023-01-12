@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10d647df247172449b0a64b147c567c8, type: 3}
   m_Name: CircularEnemy
   m_EditorClassIdentifier: 
-  movementType: 3
+  movementType: 5
+  enemyType: {fileID: 1347617643270974644, guid: dd5220da8a8aebb4ea929d4e62964dfc, type: 3}
   delaysPerWave:
   - spawnDelays:
       _maxSpawnDelay: 5

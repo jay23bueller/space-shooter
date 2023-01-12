@@ -178,7 +178,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -156874623
   m_SortingLayer: 2
-  m_SortingOrder: 1
+  m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: a45d21c30e0154a9ca1a5d6fb2bf3cfa, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -224,7 +224,7 @@ GameObject:
   - component: {fileID: 5545497930555065298}
   - component: {fileID: 2130232753}
   - component: {fileID: 1408624831}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -273,6 +273,7 @@ MonoBehaviour:
   _thrusterRecoveryMultiplier: 2
   _outOfThrusterEnergyClip: {fileID: 8300000, guid: 921b419f394f4fa46a91f1116280ce6a, type: 3}
   _thrusterDisabledSoundInterval: 0.3
+  _thrusterBoostClip: {fileID: 8300000, guid: 4883176048af26041a8eb14e8a086a1a, type: 3}
   _speedBoostMultipler: 2.2
   _tripleShotPrefab: {fileID: 4438895529425976725, guid: fe5e825ae27098c4f86cfac3a3740061, type: 3}
   _ammoMaxCount: 15
@@ -381,7 +382,7 @@ Animator:
   m_GameObject: {fileID: 5545497930555065297}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: c75ddd65917a8624ab8a5e0fbddb31a2, type: 2}
+  m_Controller: {fileID: 9100000, guid: 148897459a772ca46840c64f2d01e89b, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0

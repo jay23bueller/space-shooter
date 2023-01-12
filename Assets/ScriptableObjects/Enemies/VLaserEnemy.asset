@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10d647df247172449b0a64b147c567c8, type: 3}
+  m_Name: VLaserEnemy
+  m_EditorClassIdentifier: 
+  movementType: 0
+  enemyType: {fileID: 1347617643270974644, guid: cae02a80662f6a647a8d6369c271e902, type: 3}
+  delaysPerWave:
+  - spawnDelays:
+      _maxSpawnDelay: 3
+      _minSpawnDelay: 5
+    weaponFireRateDelays:
+      _maxFireRateDelay: 3
+      _minFireRateDelay: 5
+  - spawnDelays:
+      _maxSpawnDelay: 2
+      _minSpawnDelay: 4
+    weaponFireRateDelays:
+      _maxFireRateDelay: 2
+      _minFireRateDelay: 4
+  - spawnDelays:
+      _maxSpawnDelay: 2
+      _minSpawnDelay: 4
+    weaponFireRateDelays:
+      _maxFireRateDelay: 1.5
+      _minFireRateDelay: 2.5
