@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 
 [CreateAssetMenu(fileName ="waypointPath.asset", menuName = "SpawnInformation/WaypointPath")]
 public class WaypointPathInfo : ScriptableObject

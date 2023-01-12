@@ -29,33 +29,33 @@ public class Enemy : MonoBehaviour
     #region Variables
     [SerializeField]
     protected float _speed = 4.0f;
+
+    protected delegate void Movement();
+    protected Movement _currentMovement;
+    protected bool _canMove;
+    private float _moveDirection;
+
+    [Header("Firing")]
     [SerializeField]
     protected float _minFiringDelay;
     [SerializeField]
     protected float _maxFiringDelay;
-    protected Player _player;
-    protected Animator _anim;
-    protected AudioSource _audioSource;
-    [SerializeField]
-    protected AudioClip _laserAudioClip;
     [SerializeField]
     protected GameObject _laserPrefab;
+    [SerializeField]
+    protected AudioClip _laserAudioClip;
+
     protected SpawnManager _spawnManager;
+    protected AudioSource _audioSource;
     protected bool _wasKilled;
-    protected delegate void Movement();
-    protected Movement _currentMovement;
-    protected bool _canMove;
+    protected Player _player;
+    protected Animator _anim;
+
 
     //Circular Movement
-    private Vector3 _diagonalStartPosition;
-    private Vector3 _diagonalEndPosition;
+    [Header("Circular Movement")]
     [SerializeField]
     private float _radius;
-    private Vector3 _slantedDirection;
-    private bool _initializedCircularSlant;
-    private bool _initializedDistanceAwayFromCenter;
-    private Vector3 _radiusEndPosition;
-    private float _circularRadian;
     [SerializeField]
     private float _circularRotationSpeed = 40f;
     [SerializeField]
@@ -64,19 +64,29 @@ public class Enemy : MonoBehaviour
     private float _rightSlant = -150f;
     [SerializeField]
     private float _distanceFromSlant = 10f;
+    private Vector3 _diagonalStartPosition;
+    private Vector3 _diagonalEndPosition;
+    private Vector3 _slantedDirection;
+    private bool _initializedCircularSlant;
+    private bool _initializedDistanceAwayFromCenter;
+    private Vector3 _radiusEndPosition;
+    private float _circularRadian;
 
     //ZigZag Movement
-    private float _zigZagX;
-    private float _zigZagCounter;
+    [Header("ZigZag Movement")]
     [SerializeField]
     private float _zigZagMaxDistance = 3f;
+    private float _zigZagX;
+    private float _zigZagCounter;
 
-    private float _moveDirection;
+
+
 
     //Waypoint Movement
-    private int _currentWaypointIndex;
+    [Header("Waypoint Movement")]
     [SerializeField]
     private WaypointPathInfo[] _waypointPaths;
+    private int _currentWaypointIndex;
     private int _waypointPathIndex;
     #endregion
 

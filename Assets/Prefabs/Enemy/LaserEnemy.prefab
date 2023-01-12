@@ -53,8 +53,8 @@ MonoBehaviour:
   _speed: 4
   _minFiringDelay: 0
   _maxFiringDelay: 0
-  _laserAudioClip: {fileID: 8300000, guid: 75676f361bdfeaf41a46623e95df3dbc, type: 3}
   _laserPrefab: {fileID: 7891439289125116962, guid: a2e8a6a3dffeff346ad42fc577a26758, type: 3}
+  _laserAudioClip: {fileID: 8300000, guid: 75676f361bdfeaf41a46623e95df3dbc, type: 3}
   _radius: 0
   _circularRotationSpeed: 40
   _leftSlant: -30
@@ -66,8 +66,13 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 6516d64e5b516bc4b8bbf2b2260a0e5e, type: 2}
   _chargingShotPrefab: {fileID: 72968116251033869, guid: 44a954815df011c4bb201df1a209a927, type: 3}
   _laserBeamChargingClip: {fileID: 8300000, guid: c7837417a860c5e40a51248409439676, type: 3}
+  _lineRendererZOffset: -0.05
+  _segmentSize: 2
+  _additionalSegmentPieces: 2
   _lineRendererPositionOffset: 1.03
+  _screenPositionDelta: 1.5
   _weaponHitPrefab: {fileID: 72968116251033869, guid: 1cbb9ca60eb710643a7cff413cb8bc51, type: 3}
+  _attemptToHurtDelay: 2
 --- !u!212 &3070172606087240925
 SpriteRenderer:
   m_ObjectHideFlags: 0
