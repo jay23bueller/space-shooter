@@ -50,6 +50,21 @@ TagManager:
   - name: Background
     uniqueID: 2214836565
     locked: 0
-  - name: Foreground
+  - name: Player
     uniqueID: 4138092673
+    locked: 0
+  - name: Powerup
+    uniqueID: 2193276857
+    locked: 0
+  - name: Enemy
+    uniqueID: 117438329
+    locked: 0
+  - name: Asteroid
+    uniqueID: 2874707467
+    locked: 0
+  - name: Weapon
+    uniqueID: 3431490771
+    locked: 0
+  - name: Explosion
+    uniqueID: 9684183
     locked: 0

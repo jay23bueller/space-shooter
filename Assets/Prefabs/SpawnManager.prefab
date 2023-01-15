@@ -45,23 +45,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8991ab792aac8dd4c8f95ef0ae1b8fb4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _enemyPrefab: {fileID: 1347617643270974644, guid: 1453059216668fe45a95e5997196cafc, type: 3}
-  _minSpawnTime: 1
-  _maxSpawnTime: 5
-  _enemyContainer: {fileID: 7683424367433563454}
-  _enemies: []
-  _player: {fileID: 0}
   _powerups:
   - {fileID: 935228819368299148, guid: 107a0784677ef7248bb2b29ced462add, type: 3}
   - {fileID: 6798021054927502858, guid: e0ef36cb2060e0a439a83437f1198c06, type: 3}
   - {fileID: 795033785503102533, guid: 07f9176aef8eecd4a9c6cbedd6ba93e4, type: 3}
+  - {fileID: 8280209617936306660, guid: 718a6e8ea795c3a40b5e0b1fdf87c015, type: 3}
   - {fileID: 795033785503102533, guid: 17a61f7fb80b17443951a15e643eeed3, type: 3}
   - {fileID: 795033785503102533, guid: ee76fc9e484386b4485eaaff5568a6a4, type: 3}
   - {fileID: 8280209617936306660, guid: a0208e748cf29174faf9d9c0bfd81660, type: 3}
   _turnsBeforeSpawningAmmo: 5
   _enemySpawnsBeforeAmmoDrop: 5
   _healthDropClip: {fileID: 8300000, guid: 334f936dbdf682a4bad3969822bb9c71, type: 3}
-  _homingMissileSpawnInterval: 21
+  _homingMissileSpawnInterval: 20
+  _homingMissileIndex: 6
+  _healthCollectibleIndex: 5
+  _ammoCollectibleIndex: 4
+  _enemyContainer: {fileID: 7683424367433563454}
+  _enemies: []
+  _waves:
+  - {fileID: 11400000, guid: 5d8815acc4d70d041aea2a0732d46eef, type: 2}
+  - {fileID: 11400000, guid: 300f6624dff12db4d8aad4283c228137, type: 2}
+  - {fileID: 11400000, guid: a18f4ddbd4fe00d4dbed9cf785d681fb, type: 2}
+  _delayInBetweenWaves: 2.5
+  _uiManager: {fileID: 0}
 --- !u!1 &7683424367433563454
 GameObject:
   m_ObjectHideFlags: 0

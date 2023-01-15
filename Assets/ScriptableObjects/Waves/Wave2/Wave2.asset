@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1d421dbd6b7eda469ba640f89f8ed26, type: 3}
+  m_Name: Wave2
+  m_EditorClassIdentifier: 
+  waveItems:
+  - enemyWaveInfo: {fileID: 11400000, guid: d8bca841060eed64a87b3daa877eed7f, type: 2}
+    waveItemMovementMode: 2
+  - enemyWaveInfo: {fileID: 11400000, guid: c62ed5b0db11b1a4984040e4576b54c6, type: 2}
+    waveItemMovementMode: 1
+  - enemyWaveInfo: {fileID: 11400000, guid: cfefba6072181444aaddc74bd75993f1, type: 2}
+    waveItemMovementMode: 2
+  - enemyWaveInfo: {fileID: 11400000, guid: 8d978adc638a6ad44928cb8045a398ba, type: 2}
+    waveItemMovementMode: 0
+  - enemyWaveInfo: {fileID: 11400000, guid: 778b09416f97ea647b92875bea8aebcf, type: 2}
+    waveItemMovementMode: 2
+  - enemyWaveInfo: {fileID: 11400000, guid: 01d315ab7659d8a45ae520f589cf5033, type: 2}
+    waveItemMovementMode: 1
+  - enemyWaveInfo: {fileID: 11400000, guid: 8ce05f953c4f29445b6644c301dfe018, type: 2}
+    waveItemMovementMode: 0
+  - enemyWaveInfo: {fileID: 11400000, guid: 8211bc09459a1a94a838465472678eb5, type: 2}
+    waveItemMovementMode: 2

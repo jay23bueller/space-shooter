@@ -5,6 +5,12 @@ using TMPro;
 
 public class UIManager : MonoBehaviour
 {
+    public enum WeaponIconName
+    {
+        Laser = 0,
+        TripleShot = 1,
+        HomingMissile = 2
+    }
     #region Variables
     [SerializeField]
     private TMP_Text _scoreText;
@@ -28,18 +34,36 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private TMP_Text _waveText;
     [SerializeField]
-    private TMP_Text _disruptedText;
+    private Image _disrupted;
     private Coroutine _disruptedTextRoutine;
+    [SerializeField]
+    private Sprite[] _weaponIcons;
+    [SerializeField]
+    private Image _ammoImage;
+    [SerializeField]
+    private Image _ammoFillImage;
+    private float _weaponCooldownTimer;
+    private float _weaponCooldownDuration = 5f;
     #endregion
     #region UnityMethods
     // Start is called before the first frame update
 
+    private void Update()
+    {
+        if(Time.time < _weaponCooldownTimer)
+        {
+            Vector2 previousLocalScale = _ammoFillImage.rectTransform.localScale;
+            _ammoFillImage.rectTransform.localScale = new Vector2(previousLocalScale.x, Mathf.Clamp(previousLocalScale.y - (1 / _weaponCooldownDuration * Time.deltaTime),0f,1f));
+
+        }
+    }
     #endregion
     #region Methods
     public void UpdateScoreText(int score)
     {
         _scoreText.text = $"<b>SCORE: {score}</b>";
     }
+
 
     public void UpdateWaveText(int wave)
     {
@@ -50,12 +74,25 @@ public class UIManager : MonoBehaviour
     {
         if (show)
         {
-            _disruptedTextRoutine = StartCoroutine(FlickerTextRoutine(_disruptedText.gameObject, false));
+            _disruptedTextRoutine = StartCoroutine(FlickerTextRoutine(_disrupted.gameObject, false));
         } else
         {
             if (_disruptedTextRoutine != null)
                 StopCoroutine(_disruptedTextRoutine);
-            _disruptedText.gameObject.SetActive(false);
+            _disrupted.gameObject.SetActive(false);
+        }
+    }
+
+    public void UpdateAmmoImage(WeaponIconName name)
+    {
+        _ammoImage.sprite = _weaponIcons[(int)name];
+        switch(name)
+        {
+            case WeaponIconName.TripleShot:
+            case WeaponIconName.HomingMissile:
+                _ammoFillImage.rectTransform.localScale = new Vector2(1f, 1f);
+                _weaponCooldownTimer = Time.time + _weaponCooldownDuration;
+            break;
         }
     }
 
@@ -99,7 +136,7 @@ public class UIManager : MonoBehaviour
     public void DisplayGameOver()
     {
         StopAllCoroutines();
-        _disruptedText.gameObject.SetActive(false);
+        _disrupted.gameObject.SetActive(false);
         _ammoText.gameObject.SetActive(false);
         _thrusterSlider.gameObject.SetActive(false);
         StartCoroutine(FlickerTextRoutine(_gameOverGO, true));

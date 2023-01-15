@@ -10,7 +10,15 @@ public class WaveInfo : ScriptableObject
     [Serializable]
     public struct WaveItem
     {
-        public EnemyInfo enemy;
-        public bool mirroredMovement;
+        public EnemyWaveInfo enemyWaveInfo;
+        public WaveItemMovementMode waveItemMovementMode;
     };
+
+    public enum WaveItemMovementMode
+    {
+        normal,
+        mirrored,
+        random
+    }
+
 }

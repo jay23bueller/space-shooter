@@ -287,11 +287,13 @@ MonoBehaviour:
   _missileCooldownDuration: 0.5
   _shieldGO: {fileID: 2486407404339729726}
   _uiManager: {fileID: 0}
+  _audioManager: {fileID: 0}
   _healthDropScoreDivisor: 200
   _engines:
   - {fileID: 660491569113670107}
   - {fileID: 7216556702876315167}
   _explosionGO: {fileID: 8978835077582414172, guid: 62eac0f433665e349bd09acf6fe53bd5, type: 3}
+  _weaponCooldownOverSound: {fileID: 8300000, guid: 7401b5bf961c09344a661d96c49e5eda, type: 3}
   _lives: 3
   _playerLostLifeClip: {fileID: 8300000, guid: 47b55571dcb226a40859697b71750682, type: 3}
 --- !u!212 &5545497930555065299
@@ -334,7 +336,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -156874623
   m_SortingLayer: 2
-  m_SortingOrder: 2
+  m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: 1b4a8fdd39d3a45d0a9ee484ad6800ec, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0

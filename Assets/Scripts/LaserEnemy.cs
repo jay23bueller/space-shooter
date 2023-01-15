@@ -15,13 +15,17 @@ public class LaserEnemy : Enemy
     [SerializeField]
     private AudioClip _laserBeamChargingClip;
     private float _laserBeamChargingPositionOffset;
-    private WaitForSeconds _laserBeamChargingWFS;
 
     //Laser Beam
+    [Header("Shooting Laser Beam")]
     [SerializeField]
     private float _lineRendererZOffset = -.05f;
     [SerializeField]
     private float _segmentSize = 2f;
+    [SerializeField]
+    private float _audioDelay;
+    [SerializeField]
+    private float _laserPitch;
     [SerializeField]
     private float _additionalSegmentPieces = 2f;
     [SerializeField]
@@ -30,24 +34,34 @@ public class LaserEnemy : Enemy
     private float _screenPositionDelta = 1.5f;
     [SerializeField]
     private GameObject _weaponHitPrefab;
-    private WaitForSeconds _laserFireDelay = new WaitForSeconds(.03f);
+    [SerializeField]
+    private float _laserFireDelay;
+    private WaitForSeconds _laserFireDelayWFS;
     private LineRenderer _lineRenderer;
 
     //Attempt to damage the player
+    [Header("After Beam is shot")]
     [SerializeField]
     private float _attemptToHurtDelay = .05f;
+    [SerializeField]
+    private float _playerHitDelay;
+    [SerializeField]
+    private float _playerNoHitDelay;
+    private WaitForSeconds _playerHitWFS;
+    private WaitForSeconds _playerNotHitWFS;
     bool _hurtPlayer;
     private float _attemptToHurtTimer;
-    private WaitForSeconds _playerHitWFS = new WaitForSeconds(1f);
-    private WaitForSeconds _playerNotHitWFS = new WaitForSeconds(2.5f);
 
     #endregion
 
     #region UnityMethods
     protected override void Start()
     {
+        _playerHitWFS = new WaitForSeconds(_playerHitDelay);
+        _playerNotHitWFS = new WaitForSeconds(_playerNoHitDelay);
+        _laserFireDelayWFS = new WaitForSeconds(_laserFireDelay);
         _lineRenderer = GetComponent<LineRenderer>();
-        _laserBeamChargingWFS = new WaitForSeconds(_laserBeamChargingClip.length - .1f);
+   
         _laserBeamChargingPositionOffset = GetComponent<CircleCollider2D>().radius;
         base.Start();
     }
@@ -64,11 +78,13 @@ public class LaserEnemy : Enemy
     public override void GetDestroyed(bool playerScored)
     {
         _lineRenderer.positionCount = 0;
+        _audioSource.pitch = 0;
         _audioSource.Stop();
-        if(chargingEffectGO != null)
-        {
-            Destroy(chargingEffectGO);
+
+        if(chargingEffectGO != null) {
+            chargingEffectGO.GetComponent<ParticleSystem>().Stop();      
         }
+        
         base.GetDestroyed(playerScored);
     }
 
@@ -96,14 +112,21 @@ public class LaserEnemy : Enemy
                 //stop moving
                 _canMove = false;
                 // instantiate the charging particle
-                chargingEffectGO = Instantiate(_chargingShotPrefab, transform.position + direction * _laserBeamChargingPositionOffset, Quaternion.identity);
-                
+                chargingEffectGO = Instantiate(_chargingShotPrefab, transform.position + direction * _laserBeamChargingPositionOffset, Quaternion.identity, transform);
+                _audioSource.pitch = _laserPitch;
                 _audioSource.PlayOneShot(_laserBeamChargingClip);
                 // wait for it to be over
-                yield return _laserBeamChargingWFS;
+                while (_audioSource.isPlaying)
+                    yield return null;
                 
+                if(chargingEffectGO != null) 
+                { 
+                    chargingEffectGO.GetComponent<ParticleSystem>().Stop();
+                    Destroy(chargingEffectGO);
+                }
+                _audioSource.pitch = 0;
                 // then draw the line
-                for(int i = 0; i < segments; i++)
+                for (int i = 0; i < segments; i++)
                 {
                     _lineRenderer.positionCount = i + 1;
                     direction.z = _lineRendererZOffset;
@@ -111,7 +134,7 @@ public class LaserEnemy : Enemy
 
                     AttemptToDamage(ref direction, i);
 
-                    yield return _laserFireDelay;
+                    yield return _laserFireDelayWFS;
                 }
 
                 _attemptToHurtTimer = Time.time + _attemptToHurtDelay;

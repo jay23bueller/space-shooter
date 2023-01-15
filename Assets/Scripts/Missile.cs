@@ -82,7 +82,7 @@ public class Missile : Laser
                 else
                     transform.Translate(Vector3.up * _speed * .6f * Time.deltaTime);
 
-                if(_canRotate)
+                if(_canRotate && _targetTransform != null)
                 {
                     Quaternion targetRotation = Quaternion.LookRotation(transform.forward, moveDirection);
 
@@ -92,7 +92,7 @@ public class Missile : Laser
             }
             else
             {
-                transform.Translate(transform.up * _speed * .6f * Time.deltaTime);
+                transform.Translate(transform.up * _speed * .6f * Time.deltaTime, Space.World);
                 FindTarget();
             }
         }

@@ -6,8 +6,9 @@ using UnityEngine;
 public enum FiringMode
 {
     Default,
-    HomingMissile,
-    TripleShot
+    TripleShot,
+    HomingMissile
+    
 }
 public class Player : MonoBehaviour
 {
@@ -85,7 +86,7 @@ public class Player : MonoBehaviour
     private bool _canFire = true;
 
     //Laser
-    [Header("Weapon/Laser")]
+    [Header("Laser")]
     [SerializeField]
     private GameObject _laserPrefab;
     [SerializeField]
@@ -96,7 +97,7 @@ public class Player : MonoBehaviour
     private AudioClip _laserAudioClip;
 
     //Missile
-    [Header("Weapon/Laser")]
+    [Header("Missile")]
     [SerializeField]
     private GameObject _missilePrefab;
     [SerializeField]
@@ -118,6 +119,8 @@ public class Player : MonoBehaviour
     [Header("Manager Info")]
     [SerializeField]
     private UIManager _uiManager;
+    [SerializeField]
+    private AudioManager _audioManager;
     private SpawnManager _spawnManager;
 
 
@@ -133,7 +136,10 @@ public class Player : MonoBehaviour
     private GameObject[] _engines;
     [SerializeField]
     private GameObject _explosionGO;
+    [SerializeField]
+    private AudioClip _weaponCooldownOverSound;
     private AudioSource _audioSource;
+
 
 
     //Lives
@@ -177,11 +183,15 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        CheckThrusterPower();
-        CheckForThrusterInput();
-        MoveCharacter();
-        UpdateThrusterUI();
-        FireWeapon();
+        if(_lives != 0)
+        {
+            CheckThrusterPower();
+            CheckForThrusterInput();
+            MoveCharacter();
+            UpdateThrusterUI();
+            FireWeapon();
+        }
+
 
     }
 
@@ -192,12 +202,13 @@ public class Player : MonoBehaviour
 
     private void CheckForThrusterInput()
     {
-        if (Input.GetKey(KeyCode.LeftShift))
+        if (Input.GetKey(KeyCode.J))
         {
             if (!_punishPlayer)
             {
                 _engagingThrusters = true;
-
+                GetComponent<Collider2D>().enabled = false;
+                
                 if(_playBoostSound)
                 {
                     _playBoostSound = false;
@@ -212,9 +223,10 @@ public class Player : MonoBehaviour
                 
         }
             
-        if (Input.GetKeyUp(KeyCode.LeftShift))
+        if (Input.GetKeyUp(KeyCode.J))
         {
             _engagingThrusters = false;
+            GetComponent<Collider2D>().enabled = true;
             _playBoostSound = true;
             
         }
@@ -252,6 +264,7 @@ public class Player : MonoBehaviour
         if(_thrusterCurrentEnergy == _thrusterMinEnergy && !_punishPlayer && !_justPunished)
         {
             _justPunished = true;
+            GetComponent<Collider2D>().enabled = true;
             StartCoroutine(PunishPlayerRoutine());
         }
         if(!_fullyCharged && !_punishPlayer)
@@ -324,7 +337,7 @@ public class Player : MonoBehaviour
     //Attempt to fire weapon
     private void FireWeapon()
     {
-        if(_canFire && Input.GetKeyDown(KeyCode.Space))
+        if(_canFire && Input.GetKeyDown(KeyCode.I))
         {
             if(_ammoCurrentCount > 0)
             {
@@ -396,6 +409,7 @@ public class Player : MonoBehaviour
         {
             GetComponent<BoxCollider2D>().enabled = false;
             _spawnManager.Stop();
+            _audioManager.GameOverAudio();
             _uiManager.DisplayGameOver();
             Instantiate(_explosionGO, transform.position, Quaternion.identity);
             Destroy(gameObject);
@@ -449,6 +463,7 @@ public class Player : MonoBehaviour
             StopCoroutine(_resetWeaponRountine);
         PowerupType powerup = _firingMode == FiringMode.TripleShot ? PowerupType.TripleShot : PowerupType.HomingMissile;
         _weaponCooldownDuration = mode == FiringMode.HomingMissile ? _missileCooldownDuration : _laserCooldownDuration;
+        _uiManager.UpdateAmmoImage((UIManager.WeaponIconName)mode);
         _resetWeaponRountine = StartCoroutine(ResetPowerup(powerup));
     }
 
@@ -462,6 +477,8 @@ public class Player : MonoBehaviour
             case PowerupType.HomingMissile: 
                 _firingMode = FiringMode.Default;
                 _weaponCooldownDuration = _laserCooldownDuration;
+                _uiManager.UpdateAmmoImage(UIManager.WeaponIconName.Laser);
+                _audioSource.PlayOneShot(_weaponCooldownOverSound);
                 break;
             case PowerupType.WeaponDisruption:
                 _uiManager.UpdateDisruptionText(false);
@@ -469,6 +486,7 @@ public class Player : MonoBehaviour
                 break;
             case PowerupType.SpeedBoost:
                 _isSpeedBoostEnabled = false;
+                _thrusterGO.GetComponent<SpriteRenderer>().color = Color.white;
                 break;
         }
     }
@@ -482,6 +500,7 @@ public class Player : MonoBehaviour
     public void EnableSpeedBoost()
     {
         _isSpeedBoostEnabled = true;
+        _thrusterGO.GetComponent<SpriteRenderer>().color = Color.HSVToRGB(.15f,1f,1f);
         if (_resetSpeedBoostCoroutine != null)
             StopCoroutine(_resetSpeedBoostCoroutine);
         _resetSpeedBoostCoroutine = StartCoroutine(ResetPowerup(PowerupType.SpeedBoost));

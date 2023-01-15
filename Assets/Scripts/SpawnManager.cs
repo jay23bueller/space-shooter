@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class SpawnManager : MonoBehaviour
@@ -11,10 +12,6 @@ public class SpawnManager : MonoBehaviour
 
 
     [Header("Powerups")]
-    [SerializeField]
-    private int _minSpawnTime = 2;
-    [SerializeField]
-    private int _maxSpawnTime = 5;
     [SerializeField]
     private GameObject[] _powerups;
     [SerializeField]
@@ -32,6 +29,8 @@ public class SpawnManager : MonoBehaviour
     [SerializeField]
     private int _ammoCollectibleIndex;
     private int _powerupSpawnCount = 1;
+    [SerializeField]
+    private WeightedIndex[] _weightedIndices;
 
     [Header("Enemies")]
     [SerializeField]
@@ -46,10 +45,10 @@ public class SpawnManager : MonoBehaviour
     private WaveInfo[] _waves;
     [SerializeField]
     private float _delayInBetweenWaves = 2.5f;
-    private int _waveEnemiesDestroyedCount;
     private int _enemiesKilled;
     private int _currentWaveIndex;
-    private int _currentEnemyIndex;
+    private int _currentWaveEnemyIndex;
+    private bool _spawnedAllEnemiesInWave;
 
     [SerializeField]
     private UIManager _uiManager;
@@ -67,61 +66,89 @@ public class SpawnManager : MonoBehaviour
 
     private IEnumerator SpawnEnemy()
     {
-        while (_currentEnemyIndex < _waves[_currentWaveIndex].waveItems.Length)
+        while (_currentWaveEnemyIndex < _waves[_currentWaveIndex].waveItems.Length)
         {
             Vector3 spawnLocation = Vector3.zero;
-            WaveInfo.WaveItem waveItem = _waves[_currentWaveIndex].waveItems[_currentEnemyIndex];
+            WaveInfo.WaveItem waveItem = _waves[_currentWaveIndex].waveItems[_currentWaveEnemyIndex];
 
-            switch (waveItem.enemy.movementType)
+            //First enemy wave won't be delayed
+            if (_currentWaveEnemyIndex != 0)
+                yield return new WaitForSeconds(UnityEngine.Random.Range(waveItem.enemyWaveInfo.enemy.delaysPerWave[_currentWaveIndex].spawnDelays.minSpawnDelay, waveItem.enemyWaveInfo.enemy.delaysPerWave[_currentWaveIndex].spawnDelays.maxSpawnDelay));
+
+
+            
+                //Spawning number of enemies specified by the WaveInfo
+                //Use the delayInBetween to delay spawning instances of current enemy
+            for(int i = 0; i < waveItem.enemyWaveInfo.numberOfEnemies; i++)
             {
-                case MovementMode.ZigZag:
-                case MovementMode.Vertical:
-                case MovementMode.WaypointDiamondPath:
-                case MovementMode.WaypointVPath:
-                    spawnLocation =
-                        new Vector3(
-                            UnityEngine.Random.Range(GameManager.LEFT_BOUND, GameManager.RIGHT_BOUND),
-                            GameManager.ENVIRONMENT_TOP_BOUND
-                        );
-                    break;
-                case MovementMode.Horizontal:
-                    spawnLocation = new Vector3(
-                        waveItem.mirroredMovement ? GameManager.RIGHT_BOUND : GameManager.LEFT_BOUND,
-                        UnityEngine.Random.Range(GameManager.ENVIRONMENT_TOP_BOUND * .5f, GameManager.ENVIRONMENT_TOP_BOUND * .8f)
-                        );
-                    break;
-                case MovementMode.Circular:
-                    spawnLocation =
-                        new Vector3(
-                           waveItem.mirroredMovement ? GameManager.RIGHT_BOUND : GameManager.LEFT_BOUND,
-                            GameManager.ENVIRONMENT_TOP_BOUND
-                            );
-                    break;
-            }
-
-
-            if(_enemyContainer != null)
-            {
-
-                GameObject enemy = Instantiate(
-                waveItem.enemy.enemyType,
-                spawnLocation,
-                Quaternion.AngleAxis(180, Vector3.forward),
-                _enemyContainer.transform);
-
-                if (enemy != null)
+                bool isMirrored = false;
+                switch (waveItem.waveItemMovementMode)
                 {
-                    enemy.GetComponent<Enemy>().SetMovementModeAndFiringDelays(waveItem.enemy.movementType, waveItem.mirroredMovement, waveItem.enemy.delaysPerWave[_currentWaveIndex].weaponFireRateDelays.minFireRateDelay, waveItem.enemy.delaysPerWave[_currentWaveIndex].weaponFireRateDelays.maxFireRateDelay);
-                    _enemies.Add(enemy);
+                    case WaveInfo.WaveItemMovementMode.random:
+                        isMirrored = UnityEngine.Random.value > 0.5f ? true : false;
+                        break;
+                    case WaveInfo.WaveItemMovementMode.mirrored:
+                        isMirrored = true;
+                        break;
+                }
+                switch (waveItem.enemyWaveInfo.enemy.movementType)
+                {
+                    case MovementMode.ZigZag:
+                    case MovementMode.Vertical:
+                    case MovementMode.WaypointDiamondPath:
+                    case MovementMode.WaypointVPath:
+                        spawnLocation =
+                            new Vector3(
+                                UnityEngine.Random.Range(GameManager.LEFT_BOUND, GameManager.RIGHT_BOUND),
+                                GameManager.ENVIRONMENT_TOP_BOUND
+                            );
+                        break;
+                    case MovementMode.Horizontal:
+                        spawnLocation = new Vector3(
+                            isMirrored ? GameManager.RIGHT_BOUND : GameManager.LEFT_BOUND,
+                            UnityEngine.Random.Range(GameManager.ENVIRONMENT_TOP_BOUND * .5f, GameManager.ENVIRONMENT_TOP_BOUND * .8f)
+                            );
+                        break;
+                    case MovementMode.Circular:
+                        spawnLocation =
+                            new Vector3(
+                                isMirrored ? GameManager.RIGHT_BOUND : GameManager.LEFT_BOUND,
+                                GameManager.ENVIRONMENT_TOP_BOUND
+                                );
+                        break;
                 }
 
 
-                _currentEnemyIndex++;
+                if (_enemyContainer != null)
+                {
+
+                    GameObject enemy = Instantiate(
+                    waveItem.enemyWaveInfo.enemy.enemyType,
+                    spawnLocation,
+                    Quaternion.AngleAxis(180, Vector3.forward),
+                    _enemyContainer.transform);
+
+                    if (enemy != null)
+                    {
+                        
+                        enemy.GetComponent<Enemy>().SetMovementModeAndFiringDelays(waveItem.enemyWaveInfo.enemy.movementType, isMirrored, waveItem.enemyWaveInfo.enemy.delaysPerWave[_currentWaveIndex].weaponFireRateDelays.minFireRateDelay, waveItem.enemyWaveInfo.enemy.delaysPerWave[_currentWaveIndex].weaponFireRateDelays.maxFireRateDelay);
+                        _enemies.Add(enemy);
+                    }
+                    
+
+
+
+                }
+
+                yield return new WaitForSeconds(waveItem.enemyWaveInfo.delayInbetween);
+                    
             }
 
-            yield return new WaitForSeconds(UnityEngine.Random.Range(_minSpawnTime, _maxSpawnTime + 1));
-        }
+            _currentWaveEnemyIndex++;
 
+            
+        }
+        _spawnedAllEnemiesInWave = true;
     }
 
     private IEnumerator SpawnPowerup()
@@ -132,7 +159,7 @@ public class SpawnManager : MonoBehaviour
             if (_powerupSpawnCount % _turnsBeforeSpawningAmmo == 0)
                 powerupIndex = _ammoCollectibleIndex;
             else
-                powerupIndex = UnityEngine.Random.Range(0,_ammoCollectibleIndex);
+                powerupIndex = GetWeightedRandomIndex();
 
 
             yield return new WaitForSeconds(UnityEngine.Random.Range(3.0f, 7.0f));
@@ -172,7 +199,7 @@ public class SpawnManager : MonoBehaviour
     {
         Vector3 spawnLocation = 
             new Vector3(
-                GameManager.RIGHT_BOUND * .5f,
+                GameManager.RIGHT_BOUND - ((GameManager.RIGHT_BOUND - GameManager.LEFT_BOUND) * .5f),
                 GameManager.ENVIRONMENT_TOP_BOUND
                 );
             
@@ -206,7 +233,6 @@ public class SpawnManager : MonoBehaviour
         {
             _enemies.Remove(enemy);
             Vector3 position = enemy.transform.position;
-            _waveEnemiesDestroyedCount++;
 
             if (wasKilled)
                 _enemiesKilled++;
@@ -216,11 +242,11 @@ public class SpawnManager : MonoBehaviour
                 StartCoroutine(SpawnPowerupAtEnemyPosition(position, powerupSpawnDelayDuration));
             }
 
-            if (_waveEnemiesDestroyedCount == _waves[_currentWaveIndex].waveItems.Length)
+            if (_spawnedAllEnemiesInWave && _enemies.Count == 0)
             {
                 StopAllCoroutines();
-                _currentEnemyIndex = 0;
-                _waveEnemiesDestroyedCount = 0;
+                _currentWaveEnemyIndex = 0;
+                _spawnedAllEnemiesInWave = false;
                 _currentWaveIndex++;
                 if (_currentWaveIndex < _waves.Length)
                 {
@@ -257,6 +283,7 @@ public class SpawnManager : MonoBehaviour
     public Transform FindNearestEnemyToPlayer()
     {
         Transform closestEnemyTransform = null;
+        
         float distance = -1f;
         foreach (GameObject enemy in _enemies)
         {
@@ -284,6 +311,31 @@ public class SpawnManager : MonoBehaviour
 
         return closestEnemyTransform;
 
+    }
+
+    private int GetWeightedRandomIndex()
+    {
+        float totalWeight = _weightedIndices.Sum(currentWeightedIndex => currentWeightedIndex.weight);
+
+        float scaledRandomValue = UnityEngine.Random.value * totalWeight;
+        float currentTotal = 0f;
+
+        for(int i = 0; i < _weightedIndices.Length; i++)
+        {
+            currentTotal += _weightedIndices[i].weight / totalWeight;
+
+            if (currentTotal >= scaledRandomValue)
+                return i;
+        }
+
+        return -1;
+    }
+
+    [Serializable]
+    private struct WeightedIndex
+    {
+        public float weight;
+        public int index;
     }
     #endregion
 }

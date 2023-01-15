@@ -19,17 +19,17 @@ MonoBehaviour:
       _maxSpawnDelay: 5
       _minSpawnDelay: 2
     weaponFireRateDelays:
-      _maxFireRateDelay: 5
+      _maxFireRateDelay: 3
       _minFireRateDelay: 2
   - spawnDelays:
-      _maxSpawnDelay: 3.5
-      _minSpawnDelay: 2.5
+      _maxSpawnDelay: 4
+      _minSpawnDelay: 3
     weaponFireRateDelays:
-      _maxFireRateDelay: 3.5
-      _minFireRateDelay: 2.5
+      _maxFireRateDelay: 1.5
+      _minFireRateDelay: 0.7
   - spawnDelays:
       _maxSpawnDelay: 3
       _minSpawnDelay: 2.5
     weaponFireRateDelays:
-      _maxFireRateDelay: 2
-      _minFireRateDelay: 1
+      _maxFireRateDelay: 1
+      _minFireRateDelay: 0.7
