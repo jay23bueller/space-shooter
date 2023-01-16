@@ -53,13 +53,24 @@ MonoBehaviour:
   - {fileID: 795033785503102533, guid: 17a61f7fb80b17443951a15e643eeed3, type: 3}
   - {fileID: 795033785503102533, guid: ee76fc9e484386b4485eaaff5568a6a4, type: 3}
   - {fileID: 8280209617936306660, guid: a0208e748cf29174faf9d9c0bfd81660, type: 3}
+  - {fileID: 795033785503102533, guid: 9669e9f9283c1784781aa52c9c799a14, type: 3}
   _turnsBeforeSpawningAmmo: 5
-  _enemySpawnsBeforeAmmoDrop: 5
+  _enemySpawnsBeforeAmmoDrop: 4
   _healthDropClip: {fileID: 8300000, guid: 334f936dbdf682a4bad3969822bb9c71, type: 3}
   _homingMissileSpawnInterval: 20
   _homingMissileIndex: 6
   _healthCollectibleIndex: 5
   _ammoCollectibleIndex: 4
+  _energyCollectibleIndex: 0
+  _weightedIndices:
+  - weight: 0.25
+    index: 0
+  - weight: 0.32
+    index: 1
+  - weight: 0.3
+    index: 2
+  - weight: 0.13
+    index: 3
   _enemyContainer: {fileID: 7683424367433563454}
   _enemies: []
   _waves:
@@ -68,6 +79,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: a18f4ddbd4fe00d4dbed9cf785d681fb, type: 2}
   _delayInBetweenWaves: 2.5
   _uiManager: {fileID: 0}
+  _streakAmountToGetEnergyCollectible: 7
 --- !u!1 &7683424367433563454
 GameObject:
   m_ObjectHideFlags: 0

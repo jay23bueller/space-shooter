@@ -16,6 +16,8 @@ public class Missile : Laser
     [SerializeField]
     private float _rotationDelay;
     private bool _canRotate;
+    private float _findTargetDelay = .6f;
+    private float _findTargetDelayTimer;
     #endregion
 
     #region UnityMethods
@@ -70,14 +72,16 @@ public class Missile : Laser
         if(_canMove)
         {
 
-            if(_targetTransform != null)
+            if(_targetTransform != null && !_targetTransform.GetComponent<Enemy>().isDying)
             {
-                Vector3 moveDirection = (_targetTransform.transform.position - transform.position).normalized;
+                Vector3 targetPosition = _targetTransform.position;
+                Vector3 moveDirection = (targetPosition - transform.position).normalized;
                 if (Time.time > _movementDelayTimer)
                 {
 
                     //transform.position += (moveDirection * _speed * Time.deltaTime);
-                    transform.Translate(moveDirection * _speed * Time.deltaTime, Space.World);
+                    if(Vector3.Distance(transform.position, targetPosition) > .1f)
+                        transform.Translate(moveDirection * _speed * Time.deltaTime, Space.World);
                 }
                 else
                     transform.Translate(Vector3.up * _speed * .6f * Time.deltaTime);
@@ -93,7 +97,12 @@ public class Missile : Laser
             else
             {
                 transform.Translate(transform.up * _speed * .6f * Time.deltaTime, Space.World);
-                FindTarget();
+                if(_findTargetDelayTimer < Time.time)
+                {
+                    _findTargetDelayTimer = Time.time + _findTargetDelay;
+                    FindTarget();
+                }
+                
             }
         }
 

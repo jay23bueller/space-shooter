@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -42,6 +43,10 @@ public class Player : MonoBehaviour
     [SerializeField]
     private float _thrusterGainRate = 2.5f;
     [SerializeField]
+    private float _thrusterAcceleratedGainRate = 6f;
+    [SerializeField]
+    private float _thrusterAcceleratedGainRateDuration = 4f;
+    [SerializeField]
     private float _thrusterCurrentEnergy;
     [SerializeField]
     private float _thrusterRecoveryMultiplier = 2.0f;
@@ -51,6 +56,7 @@ public class Player : MonoBehaviour
     private float _thrusterDisabledSoundInterval = .3f;
     [SerializeField]
     private AudioClip _thrusterBoostClip;
+    private float _currentThrusterGainRate;
     private bool _punishPlayer;
     private bool _fullyCharged;
     private bool _justPunished;
@@ -59,6 +65,9 @@ public class Player : MonoBehaviour
     private float _delayThrusterDisabledSoundTimer;
     private float _thrusterMaxEnergy = 100f;
     private float _thrusterMinEnergy = 0f;
+    private Coroutine _thrusterAcceleratedGainCooldownRoutine;
+    private WaitForSeconds _thrusterAcceleratedGainCooldownWFS;
+    
 
     //SpeedBoost
     [Header("Speed Boost")]
@@ -84,6 +93,9 @@ public class Player : MonoBehaviour
     private FiringMode _firingMode;
     private int _ammoCurrentCount = 15;
     private bool _canFire = true;
+    private float _ammoDelayBeforeSpawningTimer;
+    [SerializeField]
+    private float _ammoDelayBeforeSpawning = 5.0f;
 
     //Laser
     [Header("Laser")]
@@ -162,9 +174,11 @@ public class Player : MonoBehaviour
         transform.position = new Vector3(0f,0f,0f);
         _spawnManager = GameObject.FindGameObjectWithTag(SPAWN_MANAGER_TAG).GetComponent<SpawnManager>();
         _ammoCurrentCount = _ammoMaxCount;
-        _uiManager.UpdateScoreText(_score);
+        _currentThrusterGainRate = _thrusterGainRate;
+        _uiManager.UpdateScoreText(_score, false);
         _uiManager.UpdateAmmoText(_ammoCurrentCount);
         _uiManager.SetAmmoMaxCount(_ammoMaxCount);
+        _thrusterAcceleratedGainCooldownWFS = new WaitForSeconds(_thrusterAcceleratedGainRateDuration);
         _anim = GetComponent<Animator>();
         if (_spawnManager == null)
             Debug.LogError("The Spawn Manager is NULL");
@@ -190,6 +204,7 @@ public class Player : MonoBehaviour
             MoveCharacter();
             UpdateThrusterUI();
             FireWeapon();
+            CheckAmmoCount();
         }
 
 
@@ -270,7 +285,7 @@ public class Player : MonoBehaviour
         if(!_fullyCharged && !_punishPlayer)
         {
 
-            float batteryCharge = Time.deltaTime * _thrusterGainRate * ((_thrusterCurrentEnergy < .5f * _thrusterMaxEnergy) && _justPunished ? _thrusterRecoveryMultiplier : 1f);
+            float batteryCharge = Time.deltaTime * _currentThrusterGainRate * ((_thrusterCurrentEnergy < .5f * _thrusterMaxEnergy) && _justPunished ? _thrusterRecoveryMultiplier : 1f);
 
             _thrusterCurrentEnergy = Mathf.Clamp(batteryCharge + _thrusterCurrentEnergy, _thrusterMinEnergy, _thrusterMaxEnergy);
             if (_thrusterCurrentEnergy >= .5f * _thrusterMaxEnergy)
@@ -332,6 +347,16 @@ public class Player : MonoBehaviour
 
         transform.Translate(horizontalDirection);
 
+    }
+
+    private void CheckAmmoCount()
+    {
+        if(_spawnManager.waveStarted && _ammoCurrentCount == 0 && _ammoDelayBeforeSpawningTimer < Time.time)
+        {
+            _spawnManager.SpawnAmmoCollectible();
+            _ammoDelayBeforeSpawningTimer = Time.time + _ammoDelayBeforeSpawning;
+            Debug.Log("Spawned emergency ammo");
+        }
     }
 
     //Attempt to fire weapon
@@ -399,6 +424,7 @@ public class Player : MonoBehaviour
         if (value < 0)
         {
             Camera.main.GetComponent<CameraBehaviour>().ShakeCamera();
+            _spawnManager.PlayerLostLife();
             _audioSource.PlayOneShot(_playerLostLifeClip);
         }
         
@@ -423,6 +449,25 @@ public class Player : MonoBehaviour
         }
             
             
+    }
+
+    public void EnableAcceleratedEnergyGain()
+    {
+        Debug.Log("Accelerated Energy");
+        _currentThrusterGainRate = _thrusterAcceleratedGainRate;
+        _uiManager.UpdateThrusterText(true);
+
+        if (_thrusterAcceleratedGainCooldownRoutine != null)
+            StopCoroutine(_thrusterAcceleratedGainCooldownRoutine);
+
+        _thrusterAcceleratedGainCooldownRoutine = StartCoroutine(AcceleratedEnergyGainCooldownRoutine());
+    }
+
+    private IEnumerator AcceleratedEnergyGainCooldownRoutine()
+    {
+        yield return _thrusterAcceleratedGainCooldownWFS;
+        _currentThrusterGainRate = _thrusterGainRate;
+        _uiManager.UpdateThrusterText(false);
     }
 
     private void UpdateShield()
@@ -494,6 +539,7 @@ public class Player : MonoBehaviour
     public void AddAmmo()
     {
         _ammoCurrentCount = Mathf.Clamp(_ammoCurrentCount+5, 0, _ammoMaxCount);
+        _ammoDelayBeforeSpawningTimer = Time.time + _ammoDelayBeforeSpawning;
         _uiManager.UpdateAmmoText(_ammoCurrentCount);
     }
 
@@ -509,10 +555,15 @@ public class Player : MonoBehaviour
     public void AddScore(int value)
     {
         _score += value;
-        if (_score % _healthDropScoreDivisor == 0)
+        bool shakeText = false;
+        if (_score != 0 && _score % _healthDropScoreDivisor == 0)
+        {
             _spawnManager.SpawnHealth();
+            shakeText = true;
+        }
+            
 
-        _uiManager.UpdateScoreText(_score);
+        _uiManager.UpdateScoreText(_score, shakeText);
     }
 
 

@@ -34,6 +34,8 @@ public class Enemy : MonoBehaviour
     protected Movement _currentMovement;
     protected bool _canMove;
     private float _moveDirection;
+    protected bool _isDying;
+    public bool isDying { get => _isDying; }
 
     [Header("Firing")]
     [SerializeField]
@@ -145,6 +147,7 @@ public class Enemy : MonoBehaviour
         
         _speed = 0f;
         _anim.speed = 1f;
+        _isDying = true;
         _anim.SetTrigger("OnEnemyDeath");
     }
 
@@ -287,7 +290,7 @@ public class Enemy : MonoBehaviour
             yield return new WaitForSeconds(Random.Range(_minFiringDelay, _maxFiringDelay));
 
 
-            GameObject laserGO = Instantiate(_laserPrefab, transform.position, transform.rotation);
+            GameObject laserGO = Instantiate(_laserPrefab, transform.position + (transform.up * 1f), transform.rotation);
             foreach(Laser laser in laserGO.GetComponentsInChildren<Laser>())
             {
                 laser.InitializeFiring(0, false);

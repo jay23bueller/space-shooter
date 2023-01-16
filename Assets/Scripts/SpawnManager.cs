@@ -19,7 +19,7 @@ public class SpawnManager : MonoBehaviour
     [SerializeField]
     private int _enemySpawnsBeforeAmmoDrop = 4;
     [SerializeField]
-    private AudioClip _healthDropClip;
+    private AudioClip _streakAndHealthClip;
     [SerializeField]
     private int _homingMissileSpawnInterval = 10;
     [SerializeField]
@@ -29,6 +29,8 @@ public class SpawnManager : MonoBehaviour
     [SerializeField]
     private int _ammoCollectibleIndex;
     private int _powerupSpawnCount = 1;
+    [SerializeField]
+    private int _energyCollectibleIndex;
     [SerializeField]
     private WeightedIndex[] _weightedIndices;
 
@@ -54,6 +56,14 @@ public class SpawnManager : MonoBehaviour
     private UIManager _uiManager;
     private Player _player;
 
+    [Header("Energy Colletible Streak")]
+    [SerializeField]
+    private int _streakAmountToGetEnergyCollectible = 6;
+    private int _streak;
+
+    private bool _waveStarted;
+    public bool waveStarted { get => _waveStarted; }
+
     #endregion
     #region UnityMethods
     private void Start()
@@ -63,6 +73,11 @@ public class SpawnManager : MonoBehaviour
     #endregion
 
     #region Methods
+
+    public void PlayerLostLife()
+    {
+        _streak = 0;
+    }
 
     private IEnumerator SpawnEnemy()
     {
@@ -209,7 +224,24 @@ public class SpawnManager : MonoBehaviour
             Quaternion.identity
             );
 
-        AudioSource.PlayClipAtPoint(_healthDropClip, Camera.main.transform.position);
+        AudioSource.PlayClipAtPoint(_streakAndHealthClip, Camera.main.transform.position);
+    }
+
+    public void SpawnAmmoCollectible()
+    {
+        Vector3 spawnLocation =
+            new Vector3(
+                GameManager.RIGHT_BOUND - ((GameManager.RIGHT_BOUND - GameManager.LEFT_BOUND) * .5f),
+                GameManager.ENVIRONMENT_TOP_BOUND
+                );
+
+        Instantiate(
+            _powerups[_ammoCollectibleIndex],
+            spawnLocation,
+            Quaternion.identity
+            );
+
+        AudioSource.PlayClipAtPoint(_streakAndHealthClip, Camera.main.transform.position);
     }
 
     public void Stop()
@@ -232,21 +264,37 @@ public class SpawnManager : MonoBehaviour
         if(_canSpawn)
         {
             _enemies.Remove(enemy);
+            bool shakeStreakText = false;
             Vector3 position = enemy.transform.position;
 
             if (wasKilled)
+            {
+                _streak++;             
                 _enemiesKilled++;
 
-            if(_enemiesKilled % _enemySpawnsBeforeAmmoDrop == 0)
-            {
-                StartCoroutine(SpawnPowerupAtEnemyPosition(position, powerupSpawnDelayDuration));
+                if (_enemiesKilled % _enemySpawnsBeforeAmmoDrop == 0)
+                {
+                    StartCoroutine(SpawnPowerupAtPosition(position, powerupSpawnDelayDuration, PowerupType.AmmoCollectible));
+                }
+
+                if (_streak != 0 && _streak % _streakAmountToGetEnergyCollectible == 0)
+                {
+                    shakeStreakText = true;
+                    StartCoroutine(SpawnPowerupAtPosition(new Vector3(GameManager.RIGHT_BOUND - (GameManager.RIGHT_BOUND - GameManager.LEFT_BOUND) * .5f, GameManager.ENVIRONMENT_TOP_BOUND), powerupSpawnDelayDuration, PowerupType.EnergyCollectible));
+                    AudioSource.PlayClipAtPoint(_streakAndHealthClip, Camera.main.transform.position);
+                }
             }
+                
+
+
+            _uiManager.UpdateStreakText(_streak, shakeStreakText);
 
             if (_spawnedAllEnemiesInWave && _enemies.Count == 0)
             {
                 StopAllCoroutines();
                 _currentWaveEnemyIndex = 0;
                 _spawnedAllEnemiesInWave = false;
+                _waveStarted = false;
                 _currentWaveIndex++;
                 if (_currentWaveIndex < _waves.Length)
                 {
@@ -261,11 +309,24 @@ public class SpawnManager : MonoBehaviour
         
     }
 
-    private IEnumerator SpawnPowerupAtEnemyPosition(Vector3 position, float delay)
+    private IEnumerator SpawnPowerupAtPosition(Vector3 position, float delay, PowerupType powerup)
     {
+        int index = -1;
+
+        switch(powerup)
+        {
+            case PowerupType.AmmoCollectible: index = _ammoCollectibleIndex;
+                break;
+            case PowerupType.EnergyCollectible: index = _energyCollectibleIndex;
+                break;
+        }
+
+        if (index == -1)
+            yield break;
+
         yield return new WaitForSeconds(delay);
         Instantiate(
-            _powerups[_ammoCollectibleIndex],
+            _powerups[index],
             position,
             Quaternion.identity
             );
@@ -274,6 +335,7 @@ public class SpawnManager : MonoBehaviour
     private IEnumerator StartWaveRoutine(float delay)
     {
         yield return new WaitForSeconds(delay);
+        _waveStarted = true;
         _uiManager.DisplayWaveText(false);
         StartCoroutine(SpawnEnemy());
         StartCoroutine(SpawnPowerup());
@@ -292,7 +354,7 @@ public class SpawnManager : MonoBehaviour
 
             if (distance == -1 || closestEnemyTransform == null)
             {
-                closestEnemyTransform = enemy != null ? enemy.transform : null;
+                closestEnemyTransform = enemy != null && !enemy.GetComponent<Enemy>().isDying ? enemy.transform : null;
 
                 if (closestEnemyTransform != null)
                     distance = Vector3.Distance(_player.transform.position, closestEnemyTransform.position);
@@ -302,7 +364,7 @@ public class SpawnManager : MonoBehaviour
                 float newEnemyDistance = Vector3.Distance(_player.transform.position, enemy.transform.position);
                 if (newEnemyDistance < distance)
                 {
-                    closestEnemyTransform = enemy != null ? enemy.transform : closestEnemyTransform;
+                    closestEnemyTransform = enemy != null && !enemy.GetComponent<Enemy>().isDying ? enemy.transform : closestEnemyTransform;
                     if (enemy != null)
                         distance = newEnemyDistance;
                 }

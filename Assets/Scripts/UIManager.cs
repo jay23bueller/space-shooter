@@ -42,11 +42,21 @@ public class UIManager : MonoBehaviour
     private Image _ammoImage;
     [SerializeField]
     private Image _ammoFillImage;
+    [SerializeField]
+    private TMP_Text _streakText;
+    [SerializeField]
+    private TMP_Text _thrustText;
     private float _weaponCooldownTimer;
     private float _weaponCooldownDuration = 5f;
+    private Animator _streakTextAnimator;
+    private Animator _scoreTextAnimator;
     #endregion
     #region UnityMethods
-    // Start is called before the first frame update
+    private void Start()
+    {
+        _streakTextAnimator = _streakText.GetComponent<Animator>();
+        _scoreTextAnimator = _scoreText.GetComponent<Animator>();
+    }
 
     private void Update()
     {
@@ -59,9 +69,32 @@ public class UIManager : MonoBehaviour
     }
     #endregion
     #region Methods
-    public void UpdateScoreText(int score)
+
+    public void UpdateStreakText(int streak, bool shake)
+    {
+        _streakText.text = $"<b>STREAK: {streak}</b>";
+
+        if(shake)
+        {
+            _streakTextAnimator.SetTrigger("triggerAnimation");
+        }
+    }
+
+    public void UpdateThrusterText(bool isAccelerated)
+    {
+        _thrustText.text = isAccelerated ? "BOOSTED ENERGY" : "ENERGY";
+        if (isAccelerated)
+            StartCoroutine(FlickerTextRoutine(_thrustText.gameObject, false, false));
+
+    }
+    public void UpdateScoreText(int score, bool shake)
     {
         _scoreText.text = $"<b>SCORE: {score}</b>";
+
+        if (shake)
+        {
+            _scoreTextAnimator.SetTrigger("triggerAnimation");
+        }
     }
 
 
@@ -74,7 +107,7 @@ public class UIManager : MonoBehaviour
     {
         if (show)
         {
-            _disruptedTextRoutine = StartCoroutine(FlickerTextRoutine(_disrupted.gameObject, false));
+            _disruptedTextRoutine = StartCoroutine(FlickerTextRoutine(_disrupted.gameObject, false, true));
         } else
         {
             if (_disruptedTextRoutine != null)
@@ -99,7 +132,7 @@ public class UIManager : MonoBehaviour
     public void DisplayWinText()
     {
         _waveText.text = "YOU WIN";
-        StartCoroutine(FlickerTextRoutine(_waveText.gameObject, true));
+        StartCoroutine(FlickerTextRoutine(_waveText.gameObject, true, true));
         StartCoroutine(EnableRestartRoutine());
     }
 
@@ -139,12 +172,13 @@ public class UIManager : MonoBehaviour
         _disrupted.gameObject.SetActive(false);
         _ammoText.gameObject.SetActive(false);
         _thrusterSlider.gameObject.SetActive(false);
-        StartCoroutine(FlickerTextRoutine(_gameOverGO, true));
+        StartCoroutine(FlickerTextRoutine(_gameOverGO, true, true));
     }
 
-    private IEnumerator FlickerTextRoutine(GameObject objectToFlicker, bool restart)
+    private IEnumerator FlickerTextRoutine(GameObject objectToFlicker, bool restart, bool odd)
     {
-        for(int i = 0; i < 5; i++)
+        int flickerAmount = odd ? 5 : 6;
+        for(int i = 0; i < flickerAmount; i++)
         {
             yield return new WaitForSeconds(.3f);
             objectToFlicker.SetActive(!objectToFlicker.activeSelf);

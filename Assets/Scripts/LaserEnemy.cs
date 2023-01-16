@@ -80,8 +80,8 @@ public class LaserEnemy : Enemy
         _lineRenderer.positionCount = 0;
         _audioSource.pitch = 0;
         _audioSource.Stop();
-
-        if(chargingEffectGO != null) {
+        _audioSource.pitch = 1;
+        if (chargingEffectGO != null) {
             chargingEffectGO.GetComponent<ParticleSystem>().Stop();      
         }
         
