@@ -77,6 +77,7 @@ public class SpawnManager : MonoBehaviour
     public void PlayerLostLife()
     {
         _streak = 0;
+        _uiManager.UpdateStreakText(_streak, true);
     }
 
     private IEnumerator SpawnEnemy()
