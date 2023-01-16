@@ -355,7 +355,7 @@ public class Player : MonoBehaviour
         {
             _spawnManager.SpawnAmmoCollectible();
             _ammoDelayBeforeSpawningTimer = Time.time + _ammoDelayBeforeSpawning;
-            Debug.Log("Spawned emergency ammo");
+            
         }
     }
 
@@ -453,7 +453,7 @@ public class Player : MonoBehaviour
 
     public void EnableAcceleratedEnergyGain()
     {
-        Debug.Log("Accelerated Energy");
+        
         _currentThrusterGainRate = _thrusterAcceleratedGainRate;
         _uiManager.UpdateThrusterText(true);
 
