@@ -460,14 +460,7 @@ public class Player : MonoBehaviour
         if (_thrusterAcceleratedGainCooldownRoutine != null)
             StopCoroutine(_thrusterAcceleratedGainCooldownRoutine);
 
-        _thrusterAcceleratedGainCooldownRoutine = StartCoroutine(AcceleratedEnergyGainCooldownRoutine());
-    }
-
-    private IEnumerator AcceleratedEnergyGainCooldownRoutine()
-    {
-        yield return _thrusterAcceleratedGainCooldownWFS;
-        _currentThrusterGainRate = _thrusterGainRate;
-        _uiManager.UpdateThrusterText(false);
+        _thrusterAcceleratedGainCooldownRoutine = StartCoroutine(ResetPowerup(PowerupType.EnergyCollectible));
     }
 
     private void UpdateShield()
@@ -514,7 +507,18 @@ public class Player : MonoBehaviour
 
     private IEnumerator ResetPowerup(PowerupType powerup)
     {
-        yield return new WaitForSeconds(5.0f);
+        switch(powerup)
+        {
+            case PowerupType.TripleShot:
+            case PowerupType.HomingMissile:
+            case PowerupType.WeaponDisruption:
+            case PowerupType.SpeedBoost:
+                yield return new WaitForSeconds(5);
+                break;
+            case PowerupType.EnergyCollectible:
+                yield return _thrusterAcceleratedGainCooldownWFS;
+                break;
+        }
 
         switch (powerup)
         {
@@ -532,6 +536,10 @@ public class Player : MonoBehaviour
             case PowerupType.SpeedBoost:
                 _isSpeedBoostEnabled = false;
                 _thrusterGO.GetComponent<SpriteRenderer>().color = Color.white;
+                break;
+            case PowerupType.EnergyCollectible:
+                _currentThrusterGainRate = _thrusterGainRate;
+                _uiManager.UpdateThrusterText(false);
                 break;
         }
     }
