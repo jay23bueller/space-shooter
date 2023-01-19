@@ -53,6 +53,13 @@ public class Enemy : MonoBehaviour
     protected Player _player;
     protected Animator _anim;
 
+    //Shield
+    [Header("Shield")]
+    [SerializeField]
+    private GameObject _shieldGO;
+    protected bool _isShieldEnabled;
+
+
 
     //Circular Movement
     [Header("Circular Movement")]
@@ -111,7 +118,15 @@ public class Enemy : MonoBehaviour
     protected virtual void Update()
     {
         if(_canMove)
+        {
             Move();
+
+            //if(!_isShieldEnabled && Time.time > _shieldDestroyedDelayTimer)
+            //{
+
+            //}
+        }
+            
     }
 
     void OnTriggerEnter2D(Collider2D other)
@@ -135,6 +150,13 @@ public class Enemy : MonoBehaviour
 
     public virtual void GetDestroyed(bool playerScored)
     {
+        if(_isShieldEnabled)
+        {
+          
+            _shieldGO.SetActive(false);
+            _isShieldEnabled = false;
+            return;
+        }
         if (playerScored)
         {
             _player.AddScore(10);
@@ -173,8 +195,13 @@ public class Enemy : MonoBehaviour
         _currentMovement();
     }
 
-    public void SetMovementModeAndFiringDelays(MovementMode mode, bool isMirrored, float minFiringDelay, float maxFiringDelay)
+    public void SetMovementModeAndFiringDelays(MovementMode mode, bool isMirrored, float minFiringDelay, float maxFiringDelay, bool enableShield)
     {
+        if (enableShield)
+        {
+            _shieldGO.SetActive(true);
+            _isShieldEnabled = true;
+        }
         _minFiringDelay = minFiringDelay;
         _maxFiringDelay = maxFiringDelay;
         switch(mode)
@@ -222,7 +249,7 @@ public class Enemy : MonoBehaviour
                 break;
         }
 
-            
+        
 
         _canMove = true;
     }

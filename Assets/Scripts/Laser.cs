@@ -114,6 +114,7 @@ public class Laser : MonoBehaviour
                 break;
         }
 
+        
         ParticleSystem.MainModule main = _weaponHitPrefab.GetComponent<ParticleSystem>().main;
         main.startColor = disrupted ? _disruptedHitColor : _originalHitColor;
 
@@ -121,7 +122,7 @@ public class Laser : MonoBehaviour
         {
             StartCoroutine(SelfDestructRoutine());
         }
-
+        GetComponent<Collider2D>().enabled = true;
 
         _canMove = true;
     }

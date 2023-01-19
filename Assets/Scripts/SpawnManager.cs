@@ -8,8 +8,9 @@ public class SpawnManager : MonoBehaviour
 {
     #region Variables
     private bool _canSpawn = true;
-    
 
+    [Header("Player")]
+    private int _ammoIncrement = 2;
 
     [Header("Powerups")]
     [SerializeField]
@@ -60,6 +61,9 @@ public class SpawnManager : MonoBehaviour
     [SerializeField]
     private int _streakAmountToGetEnergyCollectible = 6;
     private int _streak;
+    private float _chanceToSpawnShieldEnemyPercentage = 0f;
+    [SerializeField]
+    private float _spawnShieldEnemyPercentIncrement = .05f;
 
     private bool _waveStarted;
     public bool waveStarted { get => _waveStarted; }
@@ -76,8 +80,13 @@ public class SpawnManager : MonoBehaviour
 
     public void PlayerLostLife()
     {
-        _streak = 0;
-        _uiManager.UpdateStreakText(_streak, true);
+        if(_streak != 0)
+        {
+            _streak = 0;
+            _chanceToSpawnShieldEnemyPercentage = 0f;
+            _uiManager.UpdateStreakText(_streak, true);
+        }
+
     }
 
     private IEnumerator SpawnEnemy()
@@ -146,8 +155,13 @@ public class SpawnManager : MonoBehaviour
 
                     if (enemy != null)
                     {
-                        
-                        enemy.GetComponent<Enemy>().SetMovementModeAndFiringDelays(waveItem.enemyWaveInfo.enemy.movementType, isMirrored, waveItem.enemyWaveInfo.enemy.delaysPerWave[_currentWaveIndex].weaponFireRateDelays.minFireRateDelay, waveItem.enemyWaveInfo.enemy.delaysPerWave[_currentWaveIndex].weaponFireRateDelays.maxFireRateDelay);
+                        bool enableShield = _chanceToSpawnShieldEnemyPercentage >= UnityEngine.Random.value ? true : false;
+                       
+                        enemy.GetComponent<Enemy>().SetMovementModeAndFiringDelays(
+                            waveItem.enemyWaveInfo.enemy.movementType, isMirrored,
+                            waveItem.enemyWaveInfo.enemy.delaysPerWave[_currentWaveIndex].weaponFireRateDelays.minFireRateDelay,
+                            waveItem.enemyWaveInfo.enemy.delaysPerWave[_currentWaveIndex].weaponFireRateDelays.maxFireRateDelay,
+                            enableShield);
                         _enemies.Add(enemy);
                     }
                     
@@ -255,6 +269,8 @@ public class SpawnManager : MonoBehaviour
 
     public void StartWave(float delay)
     {
+        _player.UpdateAmmoCapacityAndResetCurrentAmmo(_ammoIncrement * _currentWaveIndex);
+        _player.UpdatePowerupDuration(_currentWaveIndex);
         _uiManager.UpdateWaveText(_currentWaveIndex + 1);
         _uiManager.DisplayWaveText(true);
         StartCoroutine(StartWaveRoutine(delay));
@@ -270,7 +286,7 @@ public class SpawnManager : MonoBehaviour
 
             if (wasKilled)
             {
-                _streak++;             
+                _streak++;
                 _enemiesKilled++;
 
                 if (_enemiesKilled % _enemySpawnsBeforeAmmoDrop == 0)
@@ -281,6 +297,13 @@ public class SpawnManager : MonoBehaviour
                 if (_streak != 0 && _streak % _streakAmountToGetEnergyCollectible == 0)
                 {
                     shakeStreakText = true;
+                    int currentStreakLevel = (_streak / _streakAmountToGetEnergyCollectible);
+                    if (_player != null)
+                    {
+                        _player.UpdateThrusterDrainRate(currentStreakLevel);
+                    }
+                  
+                    _chanceToSpawnShieldEnemyPercentage = currentStreakLevel * _spawnShieldEnemyPercentIncrement;
                     StartCoroutine(SpawnPowerupAtPosition(new Vector3(GameManager.RIGHT_BOUND - (GameManager.RIGHT_BOUND - GameManager.LEFT_BOUND) * .5f, GameManager.ENVIRONMENT_TOP_BOUND), powerupSpawnDelayDuration, PowerupType.EnergyCollectible));
                     AudioSource.PlayClipAtPoint(_streakAndHealthClip, Camera.main.transform.position);
                 }

@@ -3688,8 +3688,24 @@ PrefabInstance:
       value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 5545497930555065300, guid: acf95df6e14323a45a79d9cdf4ac4806, type: 3}
+      propertyPath: _currentThrusterDrainRate
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5545497930555065300, guid: acf95df6e14323a45a79d9cdf4ac4806, type: 3}
+      propertyPath: _defaultThrusterDrainRate
+      value: -500
+      objectReference: {fileID: 0}
+    - target: {fileID: 5545497930555065300, guid: acf95df6e14323a45a79d9cdf4ac4806, type: 3}
+      propertyPath: _thrusterDrainRateDecrement
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 5545497930555065300, guid: acf95df6e14323a45a79d9cdf4ac4806, type: 3}
       propertyPath: _thrusterAcceleratedGainRate
       value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 5545497930555065300, guid: acf95df6e14323a45a79d9cdf4ac4806, type: 3}
+      propertyPath: _powerupCooldownDurationIncrement
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 5545497930555065301, guid: acf95df6e14323a45a79d9cdf4ac4806, type: 3}
       propertyPath: m_RootOrder
@@ -3803,6 +3819,10 @@ PrefabInstance:
     - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
       propertyPath: _energyCollectibleIndex
       value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
+      propertyPath: _spawnShieldEnemyPercentIncrement
+      value: 0.04
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}

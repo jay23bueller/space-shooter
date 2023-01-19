@@ -39,7 +39,11 @@ public class Player : MonoBehaviour
     [SerializeField]
     private GameObject _thrusterGO;
     [SerializeField]
-    private float _thrusterDrainRate = -2.5f;
+    private float _defaultThrusterDrainRate = -2.5f;
+    [SerializeField]
+    private float _thrusterDrainRateDecrement = 0f;
+    [SerializeField]
+    private float _currentThrusterDrainRate;
     [SerializeField]
     private float _thrusterGainRate = 2.5f;
     [SerializeField]
@@ -67,7 +71,13 @@ public class Player : MonoBehaviour
     private float _thrusterMinEnergy = 0f;
     private Coroutine _thrusterAcceleratedGainCooldownRoutine;
     private WaitForSeconds _thrusterAcceleratedGainCooldownWFS;
-    
+
+
+    [Header("Powerup")]
+    [SerializeField]
+    private float _powerupCooldownDuration = 5;
+    [SerializeField]
+    private float _powerupCooldownDurationIncrement = .3f;
 
     //SpeedBoost
     [Header("Speed Boost")]
@@ -192,6 +202,7 @@ public class Player : MonoBehaviour
             Debug.LogError("Player missing AudioSource component!");
 
         _thrusterCurrentEnergy = _thrusterMaxEnergy;
+        _currentThrusterDrainRate = _defaultThrusterDrainRate;
     }
 
     // Update is called once per frame
@@ -312,7 +323,7 @@ public class Player : MonoBehaviour
         if (_engagingThrusters && !_justPunished)
         {
             _speedMultiplier = _thrusterBoostMultiplier;
-            _thrusterCurrentEnergy = Mathf.Clamp(_thrusterCurrentEnergy + (_thrusterDrainRate * Time.deltaTime), _thrusterMinEnergy, _thrusterMaxEnergy);
+            _thrusterCurrentEnergy = Mathf.Clamp(_thrusterCurrentEnergy + (_currentThrusterDrainRate * Time.deltaTime), _thrusterMinEnergy, _thrusterMaxEnergy);
             _fullyCharged = false;
         }
     }
@@ -349,6 +360,20 @@ public class Player : MonoBehaviour
 
     }
 
+    public void UpdateAmmoCapacityAndResetCurrentAmmo(int additionalAmmo)
+    {
+        _ammoMaxCount += additionalAmmo;
+        _ammoCurrentCount = _ammoMaxCount;
+        _uiManager.SetAmmoMaxCount(_ammoMaxCount);
+        _uiManager.UpdateAmmoText(_ammoCurrentCount);
+    }
+
+    public void UpdatePowerupDuration(int waveIndex)
+    {
+        _powerupCooldownDuration += _powerupCooldownDurationIncrement * waveIndex;
+        _uiManager.UpdateWeaponCooldownDuration(_powerupCooldownDuration);
+    }
+
     private void CheckAmmoCount()
     {
         if(_spawnManager.waveStarted && _ammoCurrentCount == 0 && _ammoDelayBeforeSpawningTimer < Time.time)
@@ -357,6 +382,11 @@ public class Player : MonoBehaviour
             _ammoDelayBeforeSpawningTimer = Time.time + _ammoDelayBeforeSpawning;
             
         }
+    }
+
+    public void UpdateThrusterDrainRate(int streakLevel)
+    {
+        _currentThrusterDrainRate = _thrusterDrainRateDecrement * streakLevel + _defaultThrusterDrainRate;
     }
 
     //Attempt to fire weapon
@@ -513,7 +543,7 @@ public class Player : MonoBehaviour
             case PowerupType.HomingMissile:
             case PowerupType.WeaponDisruption:
             case PowerupType.SpeedBoost:
-                yield return new WaitForSeconds(5);
+                yield return new WaitForSeconds(_powerupCooldownDuration);
                 break;
             case PowerupType.EnergyCollectible:
                 yield return _thrusterAcceleratedGainCooldownWFS;

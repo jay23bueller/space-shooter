@@ -116,6 +116,11 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    public void UpdateWeaponCooldownDuration(float newWeaponCooldownDuration)
+    {
+        _weaponCooldownDuration = newWeaponCooldownDuration;
+    }
+
     public void UpdateAmmoImage(WeaponIconName name)
     {
         _ammoImage.sprite = _weaponIcons[(int)name];

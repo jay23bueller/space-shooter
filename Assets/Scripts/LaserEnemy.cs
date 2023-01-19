@@ -77,13 +77,18 @@ public class LaserEnemy : Enemy
     #region Methods
     public override void GetDestroyed(bool playerScored)
     {
-        _lineRenderer.positionCount = 0;
-        _audioSource.pitch = 0;
-        _audioSource.Stop();
-        _audioSource.pitch = 1;
-        if (chargingEffectGO != null) {
-            chargingEffectGO.GetComponent<ParticleSystem>().Stop();      
+        if(!_isShieldEnabled)
+        {
+            _lineRenderer.positionCount = 0;
+            _audioSource.pitch = 0;
+            _audioSource.Stop();
+            _audioSource.pitch = 1;
+            if (chargingEffectGO != null)
+            {
+                chargingEffectGO.GetComponent<ParticleSystem>().Stop();
+            }
         }
+
         
         base.GetDestroyed(playerScored);
     }
