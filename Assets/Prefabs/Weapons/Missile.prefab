@@ -226,6 +226,6 @@ MonoBehaviour:
   _originalHitColor: {r: 1, g: 0.8194992, b: 0.23018867, a: 1}
   _disruptedHitColor: {r: 0, g: 1, b: 0.8968117, a: 1}
   _explosionPrefab: {fileID: 8978835077582414172, guid: 62eac0f433665e349bd09acf6fe53bd5, type: 3}
-  _maxDegreesDelta: 3
+  _maxDegreesDelta: 6
   _movementDelay: 0.7
   _rotationDelay: 0.35
