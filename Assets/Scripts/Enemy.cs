@@ -61,6 +61,28 @@ public class Enemy : MonoBehaviour
 
 
 
+    [Header("Charging")]
+    [SerializeField]
+    private float _maxChargeSpeed = 8.0f;
+    [SerializeField]
+    private float _currentChargeSpeed = 3.5f;
+    [SerializeField]
+    private float _currentTime = 0f;
+    [SerializeField]
+    private float _distanceBeforeCharging = 4f;
+    [SerializeField]
+    private float _chargingAccelerationRate = 1.2f;
+    [SerializeField]
+    private GameObject _thrusterGO;
+    [SerializeField]
+    private AudioClip _chargingAudioClip;
+    private bool _isEnraged;
+    protected bool _seekingPlayer;
+    protected bool _chargingAtLastKnownPlayerLocation;
+    private Vector3 _lastKnownDirectionToPlayer;
+
+
+
     //Circular Movement
     [Header("Circular Movement")]
     [SerializeField]
@@ -121,10 +143,6 @@ public class Enemy : MonoBehaviour
         {
             Move();
 
-            //if(!_isShieldEnabled && Time.time > _shieldDestroyedDelayTimer)
-            //{
-
-            //}
         }
             
     }
@@ -148,6 +166,12 @@ public class Enemy : MonoBehaviour
 
     #region Methods
 
+    private void EnragedSelfDestruct()
+    {
+        if(!_isDying)
+            GetDestroyed(false);
+    }
+
     public virtual void GetDestroyed(bool playerScored)
     {
         if(_isShieldEnabled)
@@ -155,6 +179,11 @@ public class Enemy : MonoBehaviour
           
             _shieldGO.SetActive(false);
             _isShieldEnabled = false;
+            _seekingPlayer = true;
+            StopCoroutine(FireLaser());
+            _currentMovement = EnragedMovement;
+            StartCoroutine(EnragedFlashRoutine());
+            Invoke("EnragedSelfDestruct", 3f);
             return;
         }
         if (playerScored)
@@ -168,6 +197,7 @@ public class Enemy : MonoBehaviour
         _canMove = false;
         
         _speed = 0f;
+        _thrusterGO.SetActive(false);
         _anim.speed = 1f;
         _isDying = true;
         _anim.SetTrigger("OnEnemyDeath");
@@ -177,8 +207,6 @@ public class Enemy : MonoBehaviour
     //at a random x location
     private void Move()
     {
-        
-
         if (transform.position.y < GameManager.ENVIRONMENT_BOTTOM_BOUND)
         {
             transform.position = new Vector3(
@@ -192,7 +220,68 @@ public class Enemy : MonoBehaviour
         if (transform.position.x > GameManager.RIGHT_BOUND)
             transform.position = new Vector3(GameManager.LEFT_BOUND, transform.position.y);
 
+
         _currentMovement();
+    }
+
+    protected void EnragedMovement()
+    {
+        if (_player != null)
+        {
+            if (_seekingPlayer && _player != null)
+            {
+
+                Vector3 playerPosition = _player.transform.position;
+                _lastKnownDirectionToPlayer = (playerPosition - transform.position).normalized;
+
+
+                transform.Translate(_lastKnownDirectionToPlayer * Time.deltaTime * _currentChargeSpeed, Space.World);
+
+                if (Vector3.Distance(transform.position, playerPosition) < _distanceBeforeCharging)
+                {
+                    _seekingPlayer = false;
+                    _chargingAtLastKnownPlayerLocation = true;
+                    _audioSource.PlayOneShot(_chargingAudioClip);
+                    _anim.speed = 0f;
+                    _thrusterGO.SetActive(true);
+
+                }
+            }
+
+            if (_chargingAtLastKnownPlayerLocation)
+            {
+                _currentTime += Time.deltaTime * _chargingAccelerationRate;
+                _currentChargeSpeed = Mathf.Clamp(Mathf.Exp(_currentTime) + _currentChargeSpeed, 0f, _maxChargeSpeed);
+
+
+                transform.Translate(_lastKnownDirectionToPlayer * Time.deltaTime * _currentChargeSpeed, Space.World);
+            }
+
+            Quaternion enemyToPlayerRotation = Quaternion.LookRotation(transform.forward, _lastKnownDirectionToPlayer);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, enemyToPlayerRotation, 8f);
+
+        }
+    }
+
+    protected bool isWithinScreenBounds(Vector3 position)
+    {
+        Vector3 screenTopRight = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, 0f));
+        Vector3 screenBottomLeft = Camera.main.ScreenToWorldPoint(new Vector3(0f, 0f));
+
+        return (position.x > screenBottomLeft.x && position.x < screenTopRight.x) && (position.y > screenBottomLeft.y && position.y < screenTopRight.y);
+    }
+
+    protected IEnumerator EnragedFlashRoutine()
+    {
+        Color flashingColor = Color.red;
+        Color normalColor = Color.white;
+        bool isFlashing = false;
+        while(!_isDying)
+        {
+            yield return new WaitForSeconds(.4f);
+            isFlashing = !isFlashing;
+            GetComponent<SpriteRenderer>().color = isFlashing ? flashingColor : normalColor;
+        }
     }
 
     public void SetMovementModeAndFiringDelays(MovementMode mode, bool isMirrored, float minFiringDelay, float maxFiringDelay, bool enableShield)

@@ -66,6 +66,15 @@ public class LaserEnemy : Enemy
         base.Start();
     }
 
+    private void OnAnimatorMove()
+    {
+        if(!_isDying && _seekingPlayer)
+        {
+            if (_anim.GetCurrentAnimatorStateInfo(0).normalizedTime % _anim.GetCurrentAnimatorStateInfo(0).length < 0.05f)
+                _anim.speed = 0f;
+        }
+    }
+
     // Update is called once per frame
     protected override void Update()
     {
@@ -135,7 +144,7 @@ public class LaserEnemy : Enemy
                 {
                     _lineRenderer.positionCount = i + 1;
                     direction.z = _lineRendererZOffset;
-                    _lineRenderer.SetPosition(i, i > 1 ? _lineRenderer.GetPosition(i - 1) + (direction * 2f) : direction * _lineRendererPositionOffset  + transform.position);
+                    _lineRenderer.SetPosition(i, i > 1 ? _lineRenderer.GetPosition(i - 1) + (direction * _segmentSize) : direction * _lineRendererPositionOffset  + transform.position);
 
                     AttemptToDamage(ref direction, i);
 
@@ -184,13 +193,7 @@ public class LaserEnemy : Enemy
         }
     }
 
-    private bool isWithinScreenBounds(Vector3 position)
-    {
-        Vector3 screenTopRight = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, 0f));
-        Vector3 screenBottomLeft = Camera.main.ScreenToWorldPoint(new Vector3(0f, 0f));
 
-        return (position.x > screenBottomLeft.x && position.x < screenTopRight.x) && (position.y > screenBottomLeft.y && position.y < screenTopRight.y);
-    }
 
     private void AttemptToDamage(ref Vector3 direction, int lineRendererPosition)
     {
