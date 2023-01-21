@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -36,6 +37,8 @@ public class LaserEnemy : Enemy
     private GameObject _weaponHitPrefab;
     [SerializeField]
     private float _laserFireDelay;
+    [SerializeField]
+    private float _laserStartDelaySegments;
     private WaitForSeconds _laserFireDelayWFS;
     private LineRenderer _lineRenderer;
 
@@ -46,7 +49,13 @@ public class LaserEnemy : Enemy
     [SerializeField]
     private float _playerHitDelay;
     [SerializeField]
+    private float _playerHitDelaySegments;
+    [SerializeField]
     private float _playerNoHitDelay;
+    [SerializeField]
+    private float _playerNoHitDelaySegments;
+    [SerializeField]
+    private float _widthDelta = .02f;
     private WaitForSeconds _playerHitWFS;
     private WaitForSeconds _playerNotHitWFS;
     bool _hurtPlayer;
@@ -57,8 +66,8 @@ public class LaserEnemy : Enemy
     #region UnityMethods
     protected override void Start()
     {
-        _playerHitWFS = new WaitForSeconds(_playerHitDelay);
-        _playerNotHitWFS = new WaitForSeconds(_playerNoHitDelay);
+        _playerHitWFS = new WaitForSeconds(_playerHitDelay/_playerHitDelaySegments);
+        _playerNotHitWFS = new WaitForSeconds(_playerNoHitDelay/_playerHitDelaySegments);
         _laserFireDelayWFS = new WaitForSeconds(_laserFireDelay);
         _lineRenderer = GetComponent<LineRenderer>();
    
@@ -66,14 +75,6 @@ public class LaserEnemy : Enemy
         base.Start();
     }
 
-    private void OnAnimatorMove()
-    {
-        if(!_isDying && _seekingPlayer)
-        {
-            if (_anim.GetCurrentAnimatorStateInfo(0).normalizedTime % _anim.GetCurrentAnimatorStateInfo(0).length < 0.05f)
-                _anim.speed = 0f;
-        }
-    }
 
     // Update is called once per frame
     protected override void Update()
@@ -95,6 +96,7 @@ public class LaserEnemy : Enemy
             if (chargingEffectGO != null)
             {
                 chargingEffectGO.GetComponent<ParticleSystem>().Stop();
+                Destroy(chargingEffectGO);
             }
         }
 
@@ -106,21 +108,39 @@ public class LaserEnemy : Enemy
     {
         while(true)
         {
-            yield return new WaitForSeconds(Random.Range(_minFiringDelay, _maxFiringDelay));
+            float currentFiringDelay = Random.Range(_minFiringDelay, _maxFiringDelay);
+
+            WaitForSeconds currentFiringDelayWFS = new WaitForSeconds(currentFiringDelay / _laserStartDelaySegments);
+
+            for(int i = 0; i < _laserStartDelaySegments; i++)
+            {
+                if(IsChargingOrSeeking())
+                {
+                    break;
+                }
+
+                yield return currentFiringDelayWFS;
+            }
+            if (IsChargingOrSeeking())
+                break;
             if(_player != null)
             {
                 _hurtPlayer = false;
-                _anim.speed = 0;
+                _anim.enabled = false;
                 Vector3 playerPosition = _player.transform.position;
                 Vector3 direction = (playerPosition - transform.position).normalized;
 
                 Vector3 screenPosition = transform.position + direction * _laserBeamChargingPositionOffset;
 
-                while(isWithinScreenBounds(screenPosition))
+                while(isWithinScreenBounds(screenPosition) && !IsChargingOrSeeking())
                 {
                     screenPosition += direction * _screenPositionDelta;
                     yield return null;
                 }
+
+                if (IsChargingOrSeeking())
+                    break;
+
                 float distance = Mathf.Ceil(Vector3.Distance(transform.position, screenPosition));
                 float segments = Mathf.Ceil(distance / _segmentSize) + _additionalSegmentPieces;
                 //stop moving
@@ -130,10 +150,12 @@ public class LaserEnemy : Enemy
                 _audioSource.pitch = _laserPitch;
                 _audioSource.PlayOneShot(_laserBeamChargingClip);
                 // wait for it to be over
-                while (_audioSource.isPlaying)
+                while (_audioSource.isPlaying && !IsChargingOrSeeking())
                     yield return null;
+
                 
-                if(chargingEffectGO != null) 
+
+                if (chargingEffectGO != null) 
                 { 
                     chargingEffectGO.GetComponent<ParticleSystem>().Stop();
                     Destroy(chargingEffectGO);
@@ -142,6 +164,8 @@ public class LaserEnemy : Enemy
                 // then draw the line
                 for (int i = 0; i < segments; i++)
                 {
+                    if(IsChargingOrSeeking())
+                        break;
                     _lineRenderer.positionCount = i + 1;
                     direction.z = _lineRendererZOffset;
                     _lineRenderer.SetPosition(i, i > 1 ? _lineRenderer.GetPosition(i - 1) + (direction * _segmentSize) : direction * _lineRendererPositionOffset  + transform.position);
@@ -151,33 +175,36 @@ public class LaserEnemy : Enemy
                     yield return _laserFireDelayWFS;
                 }
 
+
                 _attemptToHurtTimer = Time.time + _attemptToHurtDelay;
                 
-                while(!_hurtPlayer && Time.time < _attemptToHurtTimer)
+                while(!_hurtPlayer && Time.time < _attemptToHurtTimer && !IsChargingOrSeeking())
                 {
                     AttemptToDamage(ref direction, _lineRenderer.positionCount - 1);
                     yield return null;
                 }
+
+
+
+
+                _lineRenderer.material.color = !_hurtPlayer ? Color.blue : Color.green;
+                _lineRenderer.material.SetColor("_EmissionColor", _lineRenderer.material.color);
+
+                WaitForSeconds currentWFS = !_hurtPlayer ? _playerNotHitWFS : _playerHitWFS;
+                float currentSegments = !_hurtPlayer ? _playerNoHitDelaySegments : _playerHitDelaySegments;
+                for(int i = 0; i < currentSegments; i++ )
+                {
+                    if (IsChargingOrSeeking())
+                        break;
+
+                    yield return currentWFS;
+                }
                 
 
-                if (!_hurtPlayer)
-                {
-                    _lineRenderer.material.color = Color.blue;
-                    _lineRenderer.material.SetColor("_EmissionColor", Color.blue);
-                    yield return _playerNotHitWFS;
-                }
 
-                else
+                while(_lineRenderer.widthMultiplier > 0 && !IsChargingOrSeeking())
                 {
-                    _lineRenderer.material.color = Color.green;
-                    _lineRenderer.material.SetColor("_EmissionColor", Color.green);
-                    yield return _playerHitWFS;
-                }
-                
-                
-                while(_lineRenderer.widthMultiplier > 0)
-                {
-                    _lineRenderer.widthMultiplier -= .02f;
+                    _lineRenderer.widthMultiplier -= _widthDelta;
                     yield return null;
                 }
 
@@ -185,7 +212,7 @@ public class LaserEnemy : Enemy
                 _lineRenderer.widthMultiplier = 1f;
                 _lineRenderer.material.color = Color.red;
                 _lineRenderer.material.SetColor("_EmissionColor", Color.red);
-                _anim.speed = 1f;
+                _anim.enabled = !IsChargingOrSeeking() ? true : false;
                 _canMove = true;
             }
             else
@@ -198,7 +225,7 @@ public class LaserEnemy : Enemy
     private void AttemptToDamage(ref Vector3 direction, int lineRendererPosition)
     {
 
-        if (!_hurtPlayer)
+        if (!_hurtPlayer && !(_chargingAtLastKnownPlayerLocation || _seekingPlayer))
         {
             Vector3 currentPosition = _lineRenderer.GetPosition(lineRendererPosition);
             currentPosition.z = 0f;

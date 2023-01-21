@@ -451,11 +451,12 @@ public class Player : MonoBehaviour
             UpdateShield();
             return;
         }
-        if (value < 0)
+        if (value < 0 && _lives > 0)
         {
             Camera.main.GetComponent<CameraBehaviour>().ShakeCamera();
-            _spawnManager.PlayerLostLife();
             _audioSource.PlayOneShot(_playerLostLifeClip);
+            _spawnManager.PlayerLostLife();
+            
         }
         
         _lives = Mathf.Clamp(_lives+value, 0, _maxLives);

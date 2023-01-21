@@ -3822,11 +3822,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
       propertyPath: _spawnShieldEnemyPercentIncrement
-      value: 0.04
+      value: 0.05
       objectReference: {fileID: 0}
     - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
       propertyPath: _streakAmountToGetEnergyCollectible
-      value: 7
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}

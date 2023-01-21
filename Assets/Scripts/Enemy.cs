@@ -37,6 +37,12 @@ public class Enemy : MonoBehaviour
     protected bool _isDying;
     public bool isDying { get => _isDying; }
 
+    [Header("Score")]
+    [SerializeField]
+    private int _normalScore = 10;
+    [SerializeField]
+    private int _shieldedScore = 50;
+
     [Header("Firing")]
     [SerializeField]
     protected float _minFiringDelay;
@@ -76,7 +82,19 @@ public class Enemy : MonoBehaviour
     private GameObject _thrusterGO;
     [SerializeField]
     private AudioClip _chargingAudioClip;
-    private bool _isEnraged;
+    [SerializeField]
+    private AudioSource _beepingAudioSource;
+    [SerializeField]
+    private float _chargeDelay;
+    [SerializeField]
+    private float _pitchIncrementDelay;
+    [SerializeField]
+    private float _pitchDelta = .02f;
+    private float _pitchIncrementTimer;
+    private float _chargeDelayTimer;
+    protected bool _isEnraged;
+    protected bool _initializeCharge;
+    public bool isEnraged { get { return _isEnraged; } }
     protected bool _seekingPlayer;
     protected bool _chargingAtLastKnownPlayerLocation;
     private Vector3 _lastKnownDirectionToPlayer;
@@ -149,7 +167,7 @@ public class Enemy : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other != null)
+        if (other != null && !_isDying)
         {
             if (other.CompareTag(PLAYER_TAG))
             {
@@ -158,6 +176,20 @@ public class Enemy : MonoBehaviour
             }
                 
                 
+        }
+    }
+
+    private void OnTriggerStay2D(Collider2D other)
+    {
+        if (other != null && !_isDying)
+        {
+            if (other.CompareTag(PLAYER_TAG))
+            {
+                other.GetComponent<Player>().UpdateLives(-1);
+                GetDestroyed(false);
+            }
+
+
         }
     }
 
@@ -176,19 +208,21 @@ public class Enemy : MonoBehaviour
     {
         if(_isShieldEnabled)
         {
-          
+            StopCoroutine(FireLaser());
             _shieldGO.SetActive(false);
             _isShieldEnabled = false;
             _seekingPlayer = true;
-            StopCoroutine(FireLaser());
-            _currentMovement = EnragedMovement;
+            _anim.enabled = false;
+            _isEnraged = true;
+            //_canMove = true;
+            _currentMovement = MoveEnraged;
             StartCoroutine(EnragedFlashRoutine());
             Invoke("EnragedSelfDestruct", 3f);
             return;
         }
         if (playerScored)
         {
-            _player.AddScore(10);
+            _player.AddScore(_isEnraged ? _shieldedScore : _normalScore);
             _wasKilled = true;
         }
 
@@ -198,8 +232,9 @@ public class Enemy : MonoBehaviour
         
         _speed = 0f;
         _thrusterGO.SetActive(false);
-        _anim.speed = 1f;
+        _anim.enabled = true;
         _isDying = true;
+        _beepingAudioSource.Stop();
         _anim.SetTrigger("OnEnemyDeath");
     }
 
@@ -224,28 +259,52 @@ public class Enemy : MonoBehaviour
         _currentMovement();
     }
 
-    protected void EnragedMovement()
+    protected void MoveEnraged()
     {
         if (_player != null)
         {
             if (_seekingPlayer && _player != null)
             {
+                if(_initializeCharge)
+                {
+                    
+                    if (_pitchIncrementTimer < Time.time)
+                    {
+                        
+                        _beepingAudioSource.pitch += _pitchDelta;
+                        _pitchIncrementTimer = Time.time + _pitchIncrementDelay;
+                    }
+                }
 
-                Vector3 playerPosition = _player.transform.position;
-                _lastKnownDirectionToPlayer = (playerPosition - transform.position).normalized;
-
-
-                transform.Translate(_lastKnownDirectionToPlayer * Time.deltaTime * _currentChargeSpeed, Space.World);
-
-                if (Vector3.Distance(transform.position, playerPosition) < _distanceBeforeCharging)
+                if (_initializeCharge && _chargeDelayTimer < Time.time)
                 {
                     _seekingPlayer = false;
+                        
                     _chargingAtLastKnownPlayerLocation = true;
+                    _beepingAudioSource.Stop();
                     _audioSource.PlayOneShot(_chargingAudioClip);
-                    _anim.speed = 0f;
+                    
                     _thrusterGO.SetActive(true);
-
                 }
+                else
+                {
+                    Vector3 playerPosition = _player.transform.position;
+                    _lastKnownDirectionToPlayer = (playerPosition - transform.position).normalized;
+
+
+                    transform.Translate(_lastKnownDirectionToPlayer * Time.deltaTime * _currentChargeSpeed, Space.World);
+
+                    if (!_initializeCharge && Vector3.Distance(transform.position, playerPosition) < _distanceBeforeCharging)
+                    {
+                        _initializeCharge = true;
+                        _beepingAudioSource.Play();
+                        _chargeDelayTimer = Time.time + _chargeDelay;
+
+                    }
+                }
+
+
+                
             }
 
             if (_chargingAtLastKnownPlayerLocation)
@@ -263,6 +322,11 @@ public class Enemy : MonoBehaviour
         }
     }
 
+    protected bool IsChargingOrSeeking()
+    {
+        return _chargingAtLastKnownPlayerLocation || _seekingPlayer;
+    }
+
     protected bool isWithinScreenBounds(Vector3 position)
     {
         Vector3 screenTopRight = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, 0f));
@@ -275,12 +339,21 @@ public class Enemy : MonoBehaviour
     {
         Color flashingColor = Color.red;
         Color normalColor = Color.white;
+        float frequency = .4f;
         bool isFlashing = false;
-        while(!_isDying)
+        
+        while(!_isDying && !_chargingAtLastKnownPlayerLocation)
         {
-            yield return new WaitForSeconds(.4f);
+            yield return new WaitForSeconds(frequency);
+            frequency = Mathf.Clamp(frequency - .2f, 0f,.4f);
             isFlashing = !isFlashing;
             GetComponent<SpriteRenderer>().color = isFlashing ? flashingColor : normalColor;
+        }
+
+        if(!_isDying && _chargingAtLastKnownPlayerLocation)
+        {
+            GetComponent<SpriteRenderer>().color = flashingColor;
+            
         }
     }
 
