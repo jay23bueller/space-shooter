@@ -15,6 +15,8 @@ MonoBehaviour:
   waveItems:
   - enemyWaveInfo: {fileID: 11400000, guid: 41f6afbac641a014b8739eb707f56a32, type: 2}
     waveItemMovementMode: 0
+  - enemyWaveInfo: {fileID: 11400000, guid: 4c1002ff09da4bd48b7ceca3ccb09da3, type: 2}
+    waveItemMovementMode: 0
   - enemyWaveInfo: {fileID: 11400000, guid: 7fb9940bb3e240543ba4e083a18bfcd1, type: 2}
     waveItemMovementMode: 2
   - enemyWaveInfo: {fileID: 11400000, guid: 3e8b052df99cbde45906baacb7488ac8, type: 2}

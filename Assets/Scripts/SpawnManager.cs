@@ -10,11 +10,18 @@ public class SpawnManager : MonoBehaviour
     private bool _canSpawn = true;
 
     [Header("Player")]
+    [SerializeField]
     private int _ammoIncrement = 2;
 
     [Header("Powerups")]
     [SerializeField]
     private GameObject[] _powerups;
+    [SerializeField]
+    private float _minPowerupSpawnDelay = 3.0f;
+    [SerializeField]
+    private float _maxPowerupSpawnDelay = 7.0f;
+    [SerializeField]
+    private float _powerupSpawnDelayDecrement = .5f;
     [SerializeField]
     private int _turnsBeforeSpawningAmmo = 4;
     [SerializeField]
@@ -122,6 +129,7 @@ public class SpawnManager : MonoBehaviour
                     case MovementMode.Vertical:
                     case MovementMode.WaypointDiamondPath:
                     case MovementMode.WaypointVPath:
+                    case MovementMode.PlayerTargeted:
                         spawnLocation =
                             new Vector3(
                                 UnityEngine.Random.Range(GameManager.LEFT_BOUND, GameManager.RIGHT_BOUND),
@@ -192,7 +200,7 @@ public class SpawnManager : MonoBehaviour
                 powerupIndex = GetWeightedRandomIndex();
 
 
-            yield return new WaitForSeconds(UnityEngine.Random.Range(3.0f, 7.0f));
+            yield return new WaitForSeconds(UnityEngine.Random.Range(_minPowerupSpawnDelay, _maxPowerupSpawnDelay));
             
             
             Vector3 spawnLocation = 
@@ -270,6 +278,11 @@ public class SpawnManager : MonoBehaviour
     public void StartWave(float delay)
     {
         _player.UpdateAmmoCapacityAndResetCurrentAmmo(_ammoIncrement * _currentWaveIndex);
+        if(_currentWaveIndex > 0)
+        {
+            _minPowerupSpawnDelay -= _powerupSpawnDelayDecrement;
+            _maxPowerupSpawnDelay -= _powerupSpawnDelayDecrement;
+        }
         _player.UpdatePowerupDuration(_currentWaveIndex);
         _uiManager.UpdateWaveText(_currentWaveIndex + 1);
         _uiManager.DisplayWaveText(true);

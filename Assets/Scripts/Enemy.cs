@@ -1,8 +1,6 @@
-using System;
 using System.Collections;
 using Random = UnityEngine.Random;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public enum MovementMode
 {
@@ -12,7 +10,7 @@ public enum MovementMode
     Vertical,
     ZigZag,
     Circular,
-
+    PlayerTargeted
 }
 
 public class Enemy : MonoBehaviour
@@ -137,6 +135,27 @@ public class Enemy : MonoBehaviour
     private WaypointPathInfo[] _waypointPaths;
     private int _currentWaypointIndex;
     private int _waypointPathIndex;
+
+    //Player Targeted Movement
+    private bool _playerTargetedMovement;
+    private Vector3 _enemyToPlayerTargetedDirection;
+
+    //Dodging
+    [Header("Dodging")]
+    [SerializeField]
+    private float _dodgingSpeed = 10.0f;
+    [SerializeField]
+    private float _detectedLaserDelay;
+    [SerializeField]
+    private float _minDodgingDistance = 2.0f;
+    [SerializeField]
+    private float _maxDodgingDistance = 4.0f;
+    private float _detectedLaserDelayTimer;
+    private bool _isDodging;
+    private Vector3 _dodgingDirection;
+    private float _dodgingDistance;
+    private bool _dodgingEnabled;
+
     #endregion
 
     #region UnityMethods
@@ -145,11 +164,10 @@ public class Enemy : MonoBehaviour
 
     protected virtual void Start()
     {
-        _player = GameObject.FindGameObjectWithTag(PLAYER_TAG).GetComponent<Player>();
+        
         _anim = GetComponent<Animator>();
         _audioSource = GetComponent<AudioSource>();
         _spawnManager = GameObject.FindGameObjectWithTag(SPAWNMANAGER_TAG).GetComponent<SpawnManager>();
-        StartCoroutine(FireLaser());
 
     }
 
@@ -160,7 +178,8 @@ public class Enemy : MonoBehaviour
         if(_canMove)
         {
             Move();
-
+            if(_dodgingEnabled && !_isEnraged)
+                DetectLaser();
         }
             
     }
@@ -214,7 +233,6 @@ public class Enemy : MonoBehaviour
             _seekingPlayer = true;
             _anim.enabled = false;
             _isEnraged = true;
-            //_canMove = true;
             _currentMovement = MoveEnraged;
             StartCoroutine(EnragedFlashRoutine());
             Invoke("EnragedSelfDestruct", 3f);
@@ -242,21 +260,89 @@ public class Enemy : MonoBehaviour
     //at a random x location
     private void Move()
     {
+
+        Teleport();
+
+        if(_isDodging)
+        {
+            Dodge();
+        }
+        else
+            _currentMovement();
+    }
+
+    private void DetectLaser()
+    {
+        
+        if (!_isDodging && _detectedLaserDelayTimer < Time.time)
+        {
+            RaycastHit2D hit = Physics2D.CircleCast(transform.position, 2f, transform.up, 8f, LayerMask.GetMask("Laser"));
+
+            if(hit.collider != null)
+            {
+                Debug.Log("Detecting Laser!?");
+                _dodgingDirection = Vector3.right * (Random.value > .5f ? 1f : -1f);
+                _dodgingDistance = Random.Range(_minDodgingDistance, _maxDodgingDistance);
+                _isDodging = true;
+                _thrusterGO.SetActive(true);
+                _audioSource.PlayOneShot(_chargingAudioClip);
+
+            }
+
+            _detectedLaserDelayTimer = _detectedLaserDelay + Time.time;
+        }
+    }
+
+    private void Dodge()
+    {
+
+        if(_dodgingDistance < 0f)
+        {
+            _isDodging = false;
+            _thrusterGO.SetActive(false);
+            _zigZagX = transform.position.x;
+            _initializedDistanceAwayFromCenter = false;
+            _circularRadian = 0f;
+            return;
+        }
+        Debug.Log(_dodgingDistance);
+        _dodgingDistance -= _dodgingSpeed * Time.deltaTime;
+        transform.Translate(_dodgingDirection * _dodgingSpeed * Time.deltaTime, Space.World);
+
+    }
+
+    private void MovePlayerTargeted()
+    {
+        transform.Translate(_enemyToPlayerTargetedDirection * _speed * Time.deltaTime, Space.World);
+
+    }
+
+    protected void Teleport()
+    {
         if (transform.position.y < GameManager.ENVIRONMENT_BOTTOM_BOUND)
         {
             transform.position = new Vector3(
                 Random.Range(GameManager.LEFT_BOUND, GameManager.RIGHT_BOUND),
                 GameManager.ENVIRONMENT_TOP_BOUND);
+            
             _zigZagX = transform.position.x;
+
+            InitializeTargetedMovement();
         }
 
-        if(transform.position.x < GameManager.LEFT_BOUND)
+        if (transform.position.x < GameManager.LEFT_BOUND)
             transform.position = new Vector3(GameManager.RIGHT_BOUND, transform.position.y);
         if (transform.position.x > GameManager.RIGHT_BOUND)
             transform.position = new Vector3(GameManager.LEFT_BOUND, transform.position.y);
+    }
 
-
-        _currentMovement();
+    protected void InitializeTargetedMovement()
+    {
+        if (_playerTargetedMovement && _player != null)
+        {
+            _enemyToPlayerTargetedDirection = (_player.transform.position - transform.position).normalized;
+            transform.rotation = Quaternion.LookRotation(transform.forward, _enemyToPlayerTargetedDirection);
+        }
     }
 
     protected void MoveEnraged()
@@ -359,6 +445,10 @@ public class Enemy : MonoBehaviour
 
     public void SetMovementModeAndFiringDelays(MovementMode mode, bool isMirrored, float minFiringDelay, float maxFiringDelay, bool enableShield)
     {
+
+        _player = GameObject.FindGameObjectWithTag(PLAYER_TAG).GetComponent<Player>();
+        if (_player == null) { Destroy(gameObject); return; }
+
         if (enableShield)
         {
             _shieldGO.SetActive(true);
@@ -393,6 +483,11 @@ public class Enemy : MonoBehaviour
                 _waypointPathIndex = (int)mode;
                 _currentMovement = MoveWaypointPath;
                 break;
+            case MovementMode.PlayerTargeted:
+                _playerTargetedMovement = true;
+                InitializeTargetedMovement();
+                _currentMovement = MovePlayerTargeted;
+                break;
 
                 
         }
@@ -401,20 +496,31 @@ public class Enemy : MonoBehaviour
         {
             case MovementMode.Horizontal:
             case MovementMode.ZigZag:
+            case MovementMode.Vertical:
             case MovementMode.WaypointVPath:
             case MovementMode.WaypointDiamondPath:
-                _moveDirection = isMirrored ? -1 : 1;
-                if(mode == MovementMode.WaypointVPath || mode == MovementMode.WaypointDiamondPath) 
+            case MovementMode.Circular:
+                if(mode != MovementMode.Vertical || mode != MovementMode.Circular)
+                    _moveDirection = isMirrored ? -1 : 1;
+                
+                if (mode == MovementMode.WaypointVPath || mode == MovementMode.WaypointDiamondPath)
                 {
                     _currentWaypointIndex = _waypointPaths[_waypointPathIndex].waypoints.Length - 1;
+                }
+                else
+                {
+                    StartCoroutine(FireLaserPowerupRoutine());
+                    _detectedLaserDelayTimer = _detectedLaserDelay + Time.time;
+                    _dodgingEnabled = true;
                 }
                 break;
         }
 
-        
 
+        StartCoroutine(FireLaser());
         _canMove = true;
     }
+
 
     private void MoveHorizontally()
     {
@@ -471,15 +577,56 @@ public class Enemy : MonoBehaviour
 
     }
 
+    private IEnumerator FireLaserPowerupRoutine()
+    {
+        while(true)
+        {
+            yield return new WaitForSeconds(Random.Range(.9f,1.9f));
+
+            RaycastHit2D hit  = Physics2D.CircleCast(transform.position, .05f, transform.up, 20f, LayerMask.GetMask("Powerup"));
+
+            if (hit.collider != null)
+            {
+               GameObject laser = Instantiate(_laserPrefab, transform.position + transform.up * 1f, transform.rotation);
+
+                if(laser != null)
+                {
+                    laser.GetComponent<Laser>().InitializeFiring(0, false);
+                }
+            }
+                
+        }
+    }
+
 
     protected virtual IEnumerator FireLaser()
     {
         while(true)
         {
             yield return new WaitForSeconds(Random.Range(_minFiringDelay, _maxFiringDelay));
+            bool targetedShot = false;
+            Vector3 directionToShoot = transform.up;
+            if (_playerTargetedMovement && _player != null)
+            {
+                directionToShoot = (_player.transform.position - transform.position).normalized;
+                float dotProduct = Vector3.Dot(-transform.up, directionToShoot);
+               
+                //At the moment hard-coded to be less than 45 degrees
+                if (Mathf.Acos(dotProduct) < .78f)
+                {
+                    targetedShot = true;
+                }
+                else
+                    continue;
+            }
 
 
-            GameObject laserGO = Instantiate(_laserPrefab, transform.position + (transform.up * 1f), transform.rotation);
+            GameObject laserGO = Instantiate(
+                _laserPrefab, 
+                transform.position + (targetedShot?(-transform.up * 1.2f) : (transform.up * 1f)), 
+                  Quaternion.LookRotation(transform.forward, _playerTargetedMovement ? -transform.up : transform.up) 
+                );
+            
             foreach(Laser laser in laserGO.GetComponentsInChildren<Laser>())
             {
                 laser.InitializeFiring(0, false);

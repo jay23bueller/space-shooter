@@ -231,13 +231,21 @@ public class LaserEnemy : Enemy
             currentPosition.z = 0f;
             float raycastDistance = (_lineRenderer.GetPosition(lineRendererPosition) - transform.position).magnitude;
             direction.z = 0f;
-            RaycastHit2D hit = Physics2D.CircleCast(transform.position, .05f, direction, raycastDistance, LayerMask.GetMask("Player"));
+            RaycastHit2D hit = Physics2D.CircleCast(transform.position, .05f, direction, raycastDistance, LayerMask.GetMask(new string[] { "Player", "Powerup"}));
 
             if (hit.collider != null)
             {
-                _player.UpdateLives(-1);
-                Instantiate(_weaponHitPrefab, hit.transform.position, Quaternion.identity);
-                _hurtPlayer = true;
+                if(hit.collider.gameObject.CompareTag("Player"))
+                {
+                    _player.UpdateLives(-1);
+                    Instantiate(_weaponHitPrefab, hit.transform.position, Quaternion.identity);
+                    _hurtPlayer = true;
+                }
+                else
+                {
+                    hit.collider.gameObject.GetComponent<Powerup>().GetDestroyed();
+                }
+                
             }
 
 

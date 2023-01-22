@@ -19,6 +19,8 @@ public class Powerup : MonoBehaviour
     private PowerupType _powerup;
     [SerializeField]
     private AudioClip _powerupAudioClip;
+    [SerializeField]
+    private GameObject _explosionPrefab;
     #endregion
 
     #region UnityMethods
@@ -80,6 +82,13 @@ public class Powerup : MonoBehaviour
             Destroy(gameObject);
         else
             transform.Translate(Vector2.down * _speed * Time.deltaTime);
+    }
+
+    public void GetDestroyed()
+    {
+        GetComponent<Collider2D>().enabled = false;
+        Instantiate(_explosionPrefab, transform.position, transform.rotation);
+        Destroy(gameObject);
     }
     #endregion
 }

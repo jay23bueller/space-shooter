@@ -3680,12 +3680,16 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 163892733}
     - target: {fileID: 5545497930555065300, guid: acf95df6e14323a45a79d9cdf4ac4806, type: 3}
+      propertyPath: _ammoMaxCount
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 5545497930555065300, guid: acf95df6e14323a45a79d9cdf4ac4806, type: 3}
       propertyPath: _audioManager
       value: 
       objectReference: {fileID: 379907735}
     - target: {fileID: 5545497930555065300, guid: acf95df6e14323a45a79d9cdf4ac4806, type: 3}
       propertyPath: _ammoDelayBeforeSpawning
-      value: 10
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 5545497930555065300, guid: acf95df6e14323a45a79d9cdf4ac4806, type: 3}
       propertyPath: _currentThrusterDrainRate
@@ -3813,12 +3817,24 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 163892733}
     - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
+      propertyPath: _ammoIncrement
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
       propertyPath: _streakAndHealthClip
       value: 
       objectReference: {fileID: 8300000, guid: 334f936dbdf682a4bad3969822bb9c71, type: 3}
     - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
       propertyPath: _energyCollectibleIndex
       value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
+      propertyPath: _turnsBeforeSpawningAmmo
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
+      propertyPath: _powerupSpawnDelayDecrement
+      value: 0.7
       objectReference: {fileID: 0}
     - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
       propertyPath: _spawnShieldEnemyPercentIncrement

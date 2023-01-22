@@ -16,6 +16,7 @@ public class ScreenCap : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.B))
         {
             ScreenCapture.CaptureScreenshot("Assets/Screenshots/Missile.png");
+            Debug.Log("Caputred?");
         }
     }
 }

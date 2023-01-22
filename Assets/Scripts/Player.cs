@@ -186,8 +186,9 @@ public class Player : MonoBehaviour
         _ammoCurrentCount = _ammoMaxCount;
         _currentThrusterGainRate = _thrusterGainRate;
         _uiManager.UpdateScoreText(_score, false);
-        _uiManager.UpdateAmmoText(_ammoCurrentCount);
         _uiManager.SetAmmoMaxCount(_ammoMaxCount);
+        _uiManager.UpdateAmmoText(_ammoCurrentCount);
+        
         _thrusterAcceleratedGainCooldownWFS = new WaitForSeconds(_thrusterAcceleratedGainRateDuration);
         _anim = GetComponent<Animator>();
         if (_spawnManager == null)

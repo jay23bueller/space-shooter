@@ -65,6 +65,12 @@ public class Laser : MonoBehaviour
                 destroySelf = true;
             }
 
+            if(collision.CompareTag("Powerup") && _isEnemyWeapon)
+            {
+                collision.GetComponent<Powerup>().GetDestroyed();
+                destroySelf = true;
+            }
+
             if (destroySelf)
             {
                 GetComponent<Collider2D>().enabled = false;
@@ -108,6 +114,7 @@ public class Laser : MonoBehaviour
                 break;
             case 1:
                 tag = "Laser";
+                gameObject.layer = LayerMask.NameToLayer("Laser");
                 break;
             default:
                 Debug.LogError("Incorrect value for InitializingFire!");

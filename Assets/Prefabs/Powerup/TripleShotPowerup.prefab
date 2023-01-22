@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 1089882136512374934}
   - component: {fileID: 3120649806814688746}
   - component: {fileID: -5199103053590701418}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: TripleShotPowerup
   m_TagString: Powerup
   m_Icon: {fileID: 0}
@@ -159,3 +159,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _powerup: 0
   _powerupAudioClip: {fileID: 8300000, guid: 5ee343246919d2b4bba63ae629e95494, type: 3}
+  _explosionPrefab: {fileID: 8978835077582414172, guid: 62eac0f433665e349bd09acf6fe53bd5, type: 3}

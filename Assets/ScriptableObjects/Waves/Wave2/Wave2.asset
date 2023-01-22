@@ -17,11 +17,15 @@ MonoBehaviour:
     waveItemMovementMode: 2
   - enemyWaveInfo: {fileID: 11400000, guid: c62ed5b0db11b1a4984040e4576b54c6, type: 2}
     waveItemMovementMode: 1
+  - enemyWaveInfo: {fileID: 11400000, guid: f80ea83b282c44a4791aefcf8e19c2a9, type: 2}
+    waveItemMovementMode: 2
   - enemyWaveInfo: {fileID: 11400000, guid: cfefba6072181444aaddc74bd75993f1, type: 2}
     waveItemMovementMode: 2
   - enemyWaveInfo: {fileID: 11400000, guid: 8d978adc638a6ad44928cb8045a398ba, type: 2}
     waveItemMovementMode: 0
   - enemyWaveInfo: {fileID: 11400000, guid: 778b09416f97ea647b92875bea8aebcf, type: 2}
+    waveItemMovementMode: 2
+  - enemyWaveInfo: {fileID: 11400000, guid: 876fc1da0c2764840bb9ca4f589d3766, type: 2}
     waveItemMovementMode: 2
   - enemyWaveInfo: {fileID: 11400000, guid: 01d315ab7659d8a45ae520f589cf5033, type: 2}
     waveItemMovementMode: 1
