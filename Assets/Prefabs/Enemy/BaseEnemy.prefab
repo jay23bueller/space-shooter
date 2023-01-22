@@ -115,6 +115,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 6516d64e5b516bc4b8bbf2b2260a0e5e, type: 2}
   _dodgingSpeed: 12
   _detectedLaserDelay: 1
+  _minDodgingDistance: 2
+  _maxDodgingDistance: 4
+  _dodgedLaserDelay: 3
 --- !u!61 &4394001658417918074
 BoxCollider2D:
   m_ObjectHideFlags: 0

@@ -150,6 +150,8 @@ public class Enemy : MonoBehaviour
     private float _minDodgingDistance = 2.0f;
     [SerializeField]
     private float _maxDodgingDistance = 4.0f;
+    [SerializeField]
+    private float _dodgedLaserDelay = 1.5f;
     private float _detectedLaserDelayTimer;
     private bool _isDodging;
     private Vector3 _dodgingDirection;
@@ -280,7 +282,6 @@ public class Enemy : MonoBehaviour
 
             if(hit.collider != null)
             {
-                Debug.Log("Detecting Laser!?");
                 _dodgingDirection = Vector3.right * (Random.value > .5f ? 1f : -1f);
                 _dodgingDistance = Random.Range(_minDodgingDistance, _maxDodgingDistance);
                 _isDodging = true;
@@ -298,6 +299,7 @@ public class Enemy : MonoBehaviour
 
         if(_dodgingDistance < 0f)
         {
+            _detectedLaserDelayTimer = _dodgedLaserDelay + Time.time;
             _isDodging = false;
             _thrusterGO.SetActive(false);
             _zigZagX = transform.position.x;
@@ -305,7 +307,6 @@ public class Enemy : MonoBehaviour
             _circularRadian = 0f;
             return;
         }
-        Debug.Log(_dodgingDistance);
         _dodgingDistance -= _dodgingSpeed * Time.deltaTime;
         transform.Translate(_dodgingDirection * _dodgingSpeed * Time.deltaTime, Space.World);
 
