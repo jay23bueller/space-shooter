@@ -3692,6 +3692,10 @@ PrefabInstance:
       value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 5545497930555065300, guid: acf95df6e14323a45a79d9cdf4ac4806, type: 3}
+      propertyPath: _missileCooldownDuration
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 5545497930555065300, guid: acf95df6e14323a45a79d9cdf4ac4806, type: 3}
       propertyPath: _currentThrusterDrainRate
       value: 0
       objectReference: {fileID: 0}
@@ -3838,7 +3842,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
       propertyPath: _spawnShieldEnemyPercentIncrement
-      value: 0.05
+      value: 0.095
       objectReference: {fileID: 0}
     - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
       propertyPath: _streakAmountToGetEnergyCollectible

@@ -104,7 +104,7 @@ public class LaserEnemy : Enemy
         base.GetDestroyed(playerScored);
     }
 
-    protected override IEnumerator FireLaser()
+    protected override IEnumerator FireLaserRoutine()
     {
         while(true)
         {

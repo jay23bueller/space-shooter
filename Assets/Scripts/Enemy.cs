@@ -229,7 +229,7 @@ public class Enemy : MonoBehaviour
     {
         if(_isShieldEnabled)
         {
-            StopCoroutine(FireLaser());
+            StopCoroutine(FireLaserRoutine());
             _shieldGO.SetActive(false);
             _isShieldEnabled = false;
             _seekingPlayer = true;
@@ -518,7 +518,7 @@ public class Enemy : MonoBehaviour
         }
 
 
-        StartCoroutine(FireLaser());
+        StartCoroutine(FireLaserRoutine());
         _canMove = true;
     }
 
@@ -600,11 +600,14 @@ public class Enemy : MonoBehaviour
     }
 
 
-    protected virtual IEnumerator FireLaser()
+    protected virtual IEnumerator FireLaserRoutine()
     {
         while(true)
         {
             yield return new WaitForSeconds(Random.Range(_minFiringDelay, _maxFiringDelay));
+            
+            if (isEnraged) break;
+
             bool targetedShot = false;
             Vector3 directionToShoot = transform.up;
             if (_playerTargetedMovement && _player != null)
