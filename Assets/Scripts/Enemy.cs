@@ -30,6 +30,7 @@ public class Enemy : MonoBehaviour
 
     protected delegate void Movement();
     protected Movement _currentMovement;
+    private MovementMode _currentMovementMode;
     protected bool _canMove;
     private float _moveDirection;
     protected bool _isDying;
@@ -302,9 +303,19 @@ public class Enemy : MonoBehaviour
             _detectedLaserDelayTimer = _dodgedLaserDelay + Time.time;
             _isDodging = false;
             _thrusterGO.SetActive(false);
-            _zigZagX = transform.position.x;
-            _initializedDistanceAwayFromCenter = false;
-            _circularRadian = 0f;
+            if (_currentMovementMode == MovementMode.ZigZag)
+            {
+                _zigZagX = transform.position.x;
+                _zigZagCounter = 0;
+            }
+            if(_currentMovementMode == MovementMode.Circular)
+            {
+                _initializedDistanceAwayFromCenter = false;
+                _initializedCircularSlant = true;
+                _circularRadian = 0f;
+            }
+            
+            
             return;
         }
         _dodgingDistance -= _dodgingSpeed * Time.deltaTime;
@@ -323,10 +334,11 @@ public class Enemy : MonoBehaviour
         if (transform.position.y < GameManager.ENVIRONMENT_BOTTOM_BOUND)
         {
             transform.position = new Vector3(
-                Random.Range(GameManager.LEFT_BOUND, GameManager.RIGHT_BOUND),
+                Random.Range(GameManager.LEFT_BOUND - GameManager.SPAWN_LEFTRIGHT_OFFSET, GameManager.RIGHT_BOUND + GameManager.SPAWN_LEFTRIGHT_OFFSET),
                 GameManager.ENVIRONMENT_TOP_BOUND);
             
-            _zigZagX = transform.position.x;
+            if(_currentMovementMode == MovementMode.ZigZag)
+                _zigZagX = transform.position.x;
 
             InitializeTargetedMovement();
         }
@@ -446,7 +458,7 @@ public class Enemy : MonoBehaviour
 
     public void SetMovementModeAndFiringDelays(MovementMode mode, bool isMirrored, float minFiringDelay, float maxFiringDelay, bool enableShield)
     {
-
+        _currentMovementMode = mode;
         _player = GameObject.FindGameObjectWithTag(PLAYER_TAG).GetComponent<Player>();
         if (_player == null) { Destroy(gameObject); return; }
 

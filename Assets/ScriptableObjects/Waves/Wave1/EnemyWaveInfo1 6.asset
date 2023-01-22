@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemy: {fileID: 11400000, guid: 7b657d86c72714942b244f3a2d4d7d66, type: 2}
   delayInbetween: 0.2
-  numberOfEnemies: 7
+  numberOfEnemies: 3

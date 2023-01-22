@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
     public static readonly float ENVIRONMENT_BOTTOM_BOUND = -6f;
     public static readonly float PLAYER_BOTTOM_BOUND = -4.84f;
     public static readonly float PLAYER_TOP_BOUND = 0f;
+    public static readonly float SPAWN_LEFTRIGHT_OFFSET = .7f;
     #endregion
     #region UnityMethods
 

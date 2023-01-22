@@ -17,6 +17,8 @@ MonoBehaviour:
     waveItemMovementMode: 0
   - enemyWaveInfo: {fileID: 11400000, guid: 4784832095e4fab41883799ed4b012ff, type: 2}
     waveItemMovementMode: 2
+  - enemyWaveInfo: {fileID: 11400000, guid: 70574d35f1885d148a0ba3b2ee856e42, type: 2}
+    waveItemMovementMode: 1
   - enemyWaveInfo: {fileID: 11400000, guid: a63ce92cb50fd014db7a516610d3da5a, type: 2}
     waveItemMovementMode: 1
   - enemyWaveInfo: {fileID: 11400000, guid: c6dd33155aa06c9459114fa10a399cc9, type: 2}
@@ -25,5 +27,7 @@ MonoBehaviour:
     waveItemMovementMode: 0
   - enemyWaveInfo: {fileID: 11400000, guid: e09133e171600864c87d238e0ce313c5, type: 2}
     waveItemMovementMode: 1
+  - enemyWaveInfo: {fileID: 11400000, guid: 5a2f566117c1bde4d9d60a5bb1a68235, type: 2}
+    waveItemMovementMode: 0
   - enemyWaveInfo: {fileID: 11400000, guid: b42708cb8b624344e86bc81912aa8147, type: 2}
     waveItemMovementMode: 2

@@ -60,6 +60,7 @@ public class LaserEnemy : Enemy
     private WaitForSeconds _playerNotHitWFS;
     bool _hurtPlayer;
     private float _attemptToHurtTimer;
+    private string[] _layerMaskNames = new string[] { "Player", "Powerup" };
 
     #endregion
 
@@ -231,7 +232,7 @@ public class LaserEnemy : Enemy
             currentPosition.z = 0f;
             float raycastDistance = (_lineRenderer.GetPosition(lineRendererPosition) - transform.position).magnitude;
             direction.z = 0f;
-            RaycastHit2D hit = Physics2D.CircleCast(transform.position, .05f, direction, raycastDistance, LayerMask.GetMask(new string[] { "Player", "Powerup"}));
+            RaycastHit2D hit = Physics2D.CircleCast(transform.position, .05f, direction, raycastDistance, LayerMask.GetMask(_layerMaskNames));
 
             if (hit.collider != null)
             {

@@ -50,6 +50,7 @@ public class SpawnManager : MonoBehaviour
 
 
 
+
     [Header("Waves")]
     [SerializeField]
     private WaveInfo[] _waves;
@@ -132,8 +133,8 @@ public class SpawnManager : MonoBehaviour
                     case MovementMode.PlayerTargeted:
                         spawnLocation =
                             new Vector3(
-                                UnityEngine.Random.Range(GameManager.LEFT_BOUND, GameManager.RIGHT_BOUND),
-                                GameManager.ENVIRONMENT_TOP_BOUND
+                            UnityEngine.Random.Range(GameManager.LEFT_BOUND + GameManager.SPAWN_LEFTRIGHT_OFFSET, GameManager.RIGHT_BOUND - GameManager.SPAWN_LEFTRIGHT_OFFSET),
+                            GameManager.ENVIRONMENT_TOP_BOUND
                             );
                         break;
                     case MovementMode.Horizontal:
@@ -205,7 +206,7 @@ public class SpawnManager : MonoBehaviour
             
             Vector3 spawnLocation = 
                 new Vector3(
-                    UnityEngine.Random.Range(GameManager.LEFT_BOUND, GameManager.RIGHT_BOUND), 
+                    UnityEngine.Random.Range(GameManager.LEFT_BOUND + GameManager.SPAWN_LEFTRIGHT_OFFSET, GameManager.RIGHT_BOUND - GameManager.SPAWN_LEFTRIGHT_OFFSET), 
                     GameManager.ENVIRONMENT_TOP_BOUND
                     );
 
@@ -224,7 +225,11 @@ public class SpawnManager : MonoBehaviour
         {
             yield return new WaitForSeconds(_homingMissileSpawnInterval);
 
-            Vector3 spawnLocation = new Vector3(UnityEngine.Random.Range(GameManager.LEFT_BOUND, GameManager.RIGHT_BOUND), GameManager.ENVIRONMENT_TOP_BOUND);
+            Vector3 spawnLocation =
+                new Vector3(
+                    UnityEngine.Random.Range(GameManager.LEFT_BOUND + GameManager.SPAWN_LEFTRIGHT_OFFSET, GameManager.RIGHT_BOUND - GameManager.SPAWN_LEFTRIGHT_OFFSET),
+                    GameManager.ENVIRONMENT_TOP_BOUND
+                    );
             Instantiate(
                 _powerups[_homingMissileIndex],
                 spawnLocation,
