@@ -31,6 +31,7 @@ public class Enemy : MonoBehaviour
     protected delegate void Movement();
     protected Movement _currentMovement;
     private MovementMode _currentMovementMode;
+    private bool _isMirrored;
     protected bool _canMove;
     private float _moveDirection;
     protected bool _isDying;
@@ -312,7 +313,8 @@ public class Enemy : MonoBehaviour
             {
                 _initializedDistanceAwayFromCenter = false;
                 _initializedCircularSlant = true;
-                _circularRadian = 0f;
+                _circularRadian = _isMirrored ? 180f * Mathf.Deg2Rad : 0f;
+                
             }
             
             
@@ -459,6 +461,7 @@ public class Enemy : MonoBehaviour
     public void SetMovementModeAndFiringDelays(MovementMode mode, bool isMirrored, float minFiringDelay, float maxFiringDelay, bool enableShield)
     {
         _currentMovementMode = mode;
+        _isMirrored = isMirrored;
         _player = GameObject.FindGameObjectWithTag(PLAYER_TAG).GetComponent<Player>();
         if (_player == null) { Destroy(gameObject); return; }
 
@@ -475,12 +478,15 @@ public class Enemy : MonoBehaviour
                 _currentMovement = MoveHorizontally;
                 break;
             case MovementMode.Circular:
-                _diagonalStartPosition = new Vector3(isMirrored ? GameManager.RIGHT_BOUND : GameManager.LEFT_BOUND, GameManager.ENVIRONMENT_TOP_BOUND);
-                _diagonalEndPosition = (Quaternion.AngleAxis(isMirrored ? _rightSlant : _leftSlant, Vector3.forward) * Vector3.right * _distanceFromSlant) + _diagonalStartPosition;
+                _diagonalStartPosition = new Vector3(_isMirrored ? GameManager.RIGHT_BOUND : GameManager.LEFT_BOUND, GameManager.ENVIRONMENT_TOP_BOUND);
+
+                _diagonalEndPosition = (Quaternion.AngleAxis(_isMirrored ? _rightSlant : _leftSlant, Vector3.forward) * Vector3.right * _distanceFromSlant) + _diagonalStartPosition;
+
                 _slantedDirection = (_diagonalEndPosition - _diagonalStartPosition).normalized;
-                _radiusEndPosition = _diagonalEndPosition + ((isMirrored ? Vector3.left : Vector3.right) * _radius);
-                _circularRotationSpeed *= isMirrored ? -1f : 1f;
-                _circularRadian = isMirrored ? 180f * Mathf.Deg2Rad : 0f;
+                _radiusEndPosition = _diagonalEndPosition + ((_isMirrored ? Vector3.left : Vector3.right) * _radius);
+
+                _circularRotationSpeed *= _isMirrored ? -1f : 1f;
+                _circularRadian = _isMirrored ? 180f * Mathf.Deg2Rad : 0f;
                 _currentMovement = MoveCircular;
                 break;
             case MovementMode.Vertical:
@@ -514,7 +520,7 @@ public class Enemy : MonoBehaviour
             case MovementMode.WaypointDiamondPath:
             case MovementMode.Circular:
                 if(mode != MovementMode.Vertical || mode != MovementMode.Circular)
-                    _moveDirection = isMirrored ? -1 : 1;
+                    _moveDirection = _isMirrored ? -1 : 1;
                 
                 if (mode == MovementMode.WaypointVPath || mode == MovementMode.WaypointDiamondPath)
                 {
