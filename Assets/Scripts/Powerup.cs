@@ -21,6 +21,7 @@ public class Powerup : MonoBehaviour
     private AudioClip _powerupAudioClip;
     [SerializeField]
     private GameObject _explosionPrefab;
+    private bool _beingDestroyed;
     #endregion
 
     #region UnityMethods
@@ -35,9 +36,10 @@ public class Powerup : MonoBehaviour
     {
         if(collision != null)
         {
-            if(collision.CompareTag("Player"))
+            if(collision.CompareTag("Player") && !_beingDestroyed)
             {
-                switch(_powerup)
+                _beingDestroyed = true;
+                switch (_powerup)
                 {
                     case PowerupType.TripleShot:
                     case PowerupType.HomingMissile:
@@ -86,6 +88,7 @@ public class Powerup : MonoBehaviour
 
     public void GetDestroyed()
     {
+        _beingDestroyed = true;
         GetComponent<Collider2D>().enabled = false;
         Instantiate(_explosionPrefab, transform.position, transform.rotation);
         Destroy(gameObject);
