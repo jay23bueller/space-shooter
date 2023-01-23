@@ -88,10 +88,14 @@ public class Powerup : MonoBehaviour
 
     public void GetDestroyed()
     {
-        _beingDestroyed = true;
-        GetComponent<Collider2D>().enabled = false;
-        Instantiate(_explosionPrefab, transform.position, transform.rotation);
-        Destroy(gameObject);
+        if(!_beingDestroyed)
+        {
+            _beingDestroyed = true;
+            GetComponent<Collider2D>().enabled = false;
+            Instantiate(_explosionPrefab, transform.position, transform.rotation);
+            Destroy(gameObject);
+        }
+
     }
     #endregion
 }
