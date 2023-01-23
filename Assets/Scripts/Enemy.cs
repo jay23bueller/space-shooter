@@ -237,7 +237,7 @@ public class Enemy : MonoBehaviour
             _seekingPlayer = true;
             _anim.enabled = false;
             _isEnraged = true;
-            _currentMovement = MoveEnraged;
+            _currentMovement = MoveSelfDestruct;
             StartCoroutine(EnragedFlashRoutine());
             Invoke("EnragedSelfDestruct", 3f);
             return;
@@ -360,7 +360,7 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    protected void MoveEnraged()
+    protected void MoveSelfDestruct()
     {
         if (_player != null)
         {
