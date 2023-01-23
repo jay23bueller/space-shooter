@@ -93,11 +93,11 @@ MonoBehaviour:
   _laserPrefab: {fileID: 7891439289125116962, guid: a2e8a6a3dffeff346ad42fc577a26758, type: 3}
   _laserAudioClip: {fileID: 8300000, guid: 75676f361bdfeaf41a46623e95df3dbc, type: 3}
   _shieldGO: {fileID: 4729023130339664272}
-  _maxChargeSpeed: 8
-  _currentChargeSpeed: 3.5
+  _maxChargeSpeed: 10
+  _defaultChargeSpeed: 3.5
   _currentTime: 0
   _distanceBeforeCharging: 6.3
-  _chargingAccelerationRate: 1.2
+  _chargingAccelerationRate: 7
   _thrusterGO: {fileID: 605835848610291839}
   _chargingAudioClip: {fileID: 8300000, guid: d5fcf17ca2e9a684a9526f401a151375, type: 3}
   _beepingAudioSource: {fileID: -3572019017299655436}

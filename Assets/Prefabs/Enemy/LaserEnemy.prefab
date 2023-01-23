@@ -166,11 +166,11 @@ MonoBehaviour:
   _laserPrefab: {fileID: 7891439289125116962, guid: a2e8a6a3dffeff346ad42fc577a26758, type: 3}
   _laserAudioClip: {fileID: 8300000, guid: 75676f361bdfeaf41a46623e95df3dbc, type: 3}
   _shieldGO: {fileID: 5588488001815219898}
-  _maxChargeSpeed: 8
-  _currentChargeSpeed: 3.5
+  _maxChargeSpeed: 10
+  _defaultChargeSpeed: 3.5
   _currentTime: 0
   _distanceBeforeCharging: 6.3
-  _chargingAccelerationRate: 1.2
+  _chargingAccelerationRate: 7
   _thrusterGO: {fileID: 4951576658931256379}
   _chargingAudioClip: {fileID: 8300000, guid: d5fcf17ca2e9a684a9526f401a151375, type: 3}
   _beepingAudioSource: {fileID: -453252426729794072}
@@ -186,7 +186,11 @@ MonoBehaviour:
   _waypointPaths:
   - {fileID: 11400000, guid: dd18ad5639aea8645ae3a88f14c9f51e, type: 2}
   - {fileID: 11400000, guid: 6516d64e5b516bc4b8bbf2b2260a0e5e, type: 2}
+  _dodgingSpeed: 10
   _detectedLaserDelay: 0.7
+  _minDodgingDistance: 2
+  _maxDodgingDistance: 4
+  _dodgedLaserDelay: 1.5
   _chargingShotPrefab: {fileID: 72968116251033869, guid: 44a954815df011c4bb201df1a209a927, type: 3}
   _laserBeamChargingClip: {fileID: 8300000, guid: c7837417a860c5e40a51248409439676, type: 3}
   _lineRendererZOffset: -0.05

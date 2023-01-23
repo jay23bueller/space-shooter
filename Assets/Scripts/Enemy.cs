@@ -71,7 +71,7 @@ public class Enemy : MonoBehaviour
     [SerializeField]
     private float _maxChargeSpeed = 8.0f;
     [SerializeField]
-    private float _currentChargeSpeed = 3.5f;
+    private float _defaultChargeSpeed = 3.5f;
     [SerializeField]
     private float _currentTime = 0f;
     [SerializeField]
@@ -90,6 +90,7 @@ public class Enemy : MonoBehaviour
     private float _pitchIncrementDelay;
     [SerializeField]
     private float _pitchDelta = .02f;
+    private float _currentChargeSpeed;
     private float _pitchIncrementTimer;
     private float _chargeDelayTimer;
     protected bool _isEnraged;
@@ -393,7 +394,7 @@ public class Enemy : MonoBehaviour
                     _lastKnownDirectionToPlayer = (playerPosition - transform.position).normalized;
 
 
-                    transform.Translate(_lastKnownDirectionToPlayer * Time.deltaTime * _currentChargeSpeed, Space.World);
+                    transform.Translate(_lastKnownDirectionToPlayer * Time.deltaTime * _defaultChargeSpeed, Space.World);
 
                     if (!_initializeCharge && Vector3.Distance(transform.position, playerPosition) < _distanceBeforeCharging)
                     {
@@ -411,8 +412,9 @@ public class Enemy : MonoBehaviour
             if (_chargingAtLastKnownPlayerLocation)
             {
                 _currentTime += Time.deltaTime * _chargingAccelerationRate;
-                _currentChargeSpeed = Mathf.Clamp(Mathf.Exp(_currentTime) + _currentChargeSpeed, 0f, _maxChargeSpeed);
-
+                
+                _currentChargeSpeed = Mathf.Clamp(Mathf.Exp(_currentTime)*.16f + _defaultChargeSpeed, 0f, _maxChargeSpeed);
+                
 
                 transform.Translate(_lastKnownDirectionToPlayer * Time.deltaTime * _currentChargeSpeed, Space.World);
             }
