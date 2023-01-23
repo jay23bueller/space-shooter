@@ -41,6 +41,8 @@ public class Player : MonoBehaviour
     [SerializeField]
     private float _defaultThrusterDrainRate = -2.5f;
     [SerializeField]
+    private float _maxThrusterDrainRate = 300f;
+    [SerializeField]
     private float _thrusterDrainRateDecrement = 0f;
     [SerializeField]
     private float _currentThrusterDrainRate;
@@ -387,7 +389,7 @@ public class Player : MonoBehaviour
 
     public void UpdateThrusterDrainRate(int streakLevel)
     {
-        _currentThrusterDrainRate = _thrusterDrainRateDecrement * streakLevel + _defaultThrusterDrainRate;
+        _currentThrusterDrainRate = Mathf.Clamp(_thrusterDrainRateDecrement * streakLevel + _defaultThrusterDrainRate,_defaultThrusterDrainRate, _maxThrusterDrainRate);
     }
 
     //Attempt to fire weapon

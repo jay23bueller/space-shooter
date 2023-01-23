@@ -92,6 +92,7 @@ public class SpawnManager : MonoBehaviour
         {
             _streak = 0;
             _chanceToSpawnShieldEnemyPercentage = 0f;
+            _player.UpdateThrusterDrainRate(_streak);
             _uiManager.UpdateStreakText(_streak, true);
         }
 

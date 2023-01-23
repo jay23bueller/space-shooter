@@ -93,9 +93,9 @@ public class Enemy : MonoBehaviour
     private float _currentChargeSpeed;
     private float _pitchIncrementTimer;
     private float _chargeDelayTimer;
-    protected bool _isEnraged;
+    protected bool _isStartingToSelfDestruct;
     protected bool _initializeCharge;
-    public bool isEnraged { get { return _isEnraged; } }
+    public bool isStartingToSelfDestruct { get { return _isStartingToSelfDestruct; } }
     protected bool _seekingPlayer;
     protected bool _chargingAtLastKnownPlayerLocation;
     private Vector3 _lastKnownDirectionToPlayer;
@@ -183,7 +183,7 @@ public class Enemy : MonoBehaviour
         if(_canMove)
         {
             Move();
-            if(_dodgingEnabled && !_isEnraged)
+            if(_dodgingEnabled && !_isStartingToSelfDestruct)
                 DetectLaser();
         }
             
@@ -222,7 +222,7 @@ public class Enemy : MonoBehaviour
 
     #region Methods
 
-    private void EnragedSelfDestruct()
+    private void SelfDestruct()
     {
         if(!_isDying)
             GetDestroyed(false);
@@ -237,15 +237,15 @@ public class Enemy : MonoBehaviour
             _isShieldEnabled = false;
             _seekingPlayer = true;
             _anim.enabled = false;
-            _isEnraged = true;
+            _isStartingToSelfDestruct = true;
             _currentMovement = MoveSelfDestruct;
-            StartCoroutine(EnragedFlashRoutine());
-            Invoke("EnragedSelfDestruct", 3f);
+            StartCoroutine(SelfDestructFlashRoutine());
+            Invoke("SelfDestruct", 3f);
             return;
         }
         if (playerScored)
         {
-            _player.AddScore(_isEnraged ? _shieldedScore : _normalScore);
+            _player.AddScore(_isStartingToSelfDestruct ? _shieldedScore : _normalScore);
             _wasKilled = true;
         }
 
@@ -438,7 +438,7 @@ public class Enemy : MonoBehaviour
         return (position.x > screenBottomLeft.x && position.x < screenTopRight.x) && (position.y > screenBottomLeft.y && position.y < screenTopRight.y);
     }
 
-    protected IEnumerator EnragedFlashRoutine()
+    protected IEnumerator SelfDestructFlashRoutine()
     {
         Color flashingColor = Color.red;
         Color normalColor = Color.white;
@@ -626,7 +626,7 @@ public class Enemy : MonoBehaviour
         {
             yield return new WaitForSeconds(Random.Range(_minFiringDelay, _maxFiringDelay));
             
-            if (isEnraged) break;
+            if (isStartingToSelfDestruct) break;
 
             bool targetedShot = false;
             Vector3 directionToShoot = transform.up;

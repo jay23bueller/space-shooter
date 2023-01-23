@@ -97,7 +97,7 @@ MonoBehaviour:
   _defaultChargeSpeed: 3.5
   _currentTime: 0
   _distanceBeforeCharging: 6.3
-  _chargingAccelerationRate: 7
+  _chargingAccelerationRate: 15
   _thrusterGO: {fileID: 605835848610291839}
   _chargingAudioClip: {fileID: 8300000, guid: d5fcf17ca2e9a684a9526f401a151375, type: 3}
   _beepingAudioSource: {fileID: -3572019017299655436}
