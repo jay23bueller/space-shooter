@@ -233,7 +233,7 @@ public class Player : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.J))
         {
-            if (!_punishPlayer)
+            if (!_punishPlayer && !_justPunished)
             {
                 _engagingThrusters = true;
                 GetComponent<Collider2D>().enabled = false;
@@ -302,7 +302,7 @@ public class Player : MonoBehaviour
             float batteryCharge = Time.deltaTime * _currentThrusterGainRate * ((_thrusterCurrentEnergy < .5f * _thrusterMaxEnergy) && _justPunished ? _thrusterRecoveryMultiplier : 1f);
 
             _thrusterCurrentEnergy = Mathf.Clamp(batteryCharge + _thrusterCurrentEnergy, _thrusterMinEnergy, _thrusterMaxEnergy);
-            if (_thrusterCurrentEnergy >= .5f * _thrusterMaxEnergy)
+            if (_justPunished && _thrusterCurrentEnergy >= .5f * _thrusterMaxEnergy)
             {
                 _justPunished = false;
             }
