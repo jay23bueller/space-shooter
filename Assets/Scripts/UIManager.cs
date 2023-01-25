@@ -54,9 +54,6 @@ public class UIManager : MonoBehaviour
     private TMP_Text _streakText;
     [SerializeField]
     private TMP_Text _thrustText;
-    [SerializeField]
-    private Image _magnetImage;
-    private Color _magnetImageColor;
     private float _weaponCooldownTimer;
     private float _weaponCooldownDuration = 5f;
     private Animator _streakTextAnimator;
@@ -66,14 +63,18 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private Animator _magnetReadyAnimator;
     [SerializeField]
-    private float _pulseSpeed = 6f;
+    private float _periodModifier = 6f;
     [SerializeField]
     private float _vanishDurationPercentage = .1f;
     [SerializeField]
     private float _resettingDurationPercentage = .9f;
+    [SerializeField]
+    private Image _magnetImage;
+    private Color _magnetImageColor;
     private float _pulseTimer = 0f;
     private MagnetUIState _magnetUIState;
     private float _magnetResetDuration;
+    private float _magnetElapsedTime;
     #endregion
     #region UnityMethods
     private void Start()
@@ -100,9 +101,6 @@ public class UIManager : MonoBehaviour
     #endregion
     #region Methods
 
-    private float _elapsedTime;
-
-    
 
     private void CheckMagnetImage()
     {
@@ -115,13 +113,13 @@ public class UIManager : MonoBehaviour
                     break;
                 }
                 _magnetImageColor.a = Mathf.Clamp(_magnetImageColor.a - (Time.deltaTime * 1 / (_magnetResetDuration* _vanishDurationPercentage)), 0f, 1f);
-                _elapsedTime += Time.deltaTime * 1 / (_magnetResetDuration * _vanishDurationPercentage);
+                _magnetElapsedTime += Time.deltaTime * 1 / (_magnetResetDuration * _vanishDurationPercentage);
                 _magnetImage.color = _magnetImageColor;
                 break;
 
             case MagnetUIState.Pulsing:
 
-                _magnetImageColor.a = Mathf.Cos(_pulseTimer * _pulseSpeed);
+                _magnetImageColor.a = Mathf.Cos(_pulseTimer * _periodModifier);
                 _magnetImage.color = _magnetImageColor;
                 _pulseTimer += Time.deltaTime;
                 
@@ -133,11 +131,11 @@ public class UIManager : MonoBehaviour
                 {
                     _magnetUIState = MagnetUIState.Ready;
                     _pulseTimer = 0f;
-                    _elapsedTime = 0f;
+                    _magnetElapsedTime = 0f;
                     _magnetReadyAnimator.SetTrigger("reset");
                     break;
                 }
-                _magnetImageColor.a = Mathf.Clamp(_magnetImageColor.a + (Time.deltaTime * 1/(_magnetResetDuration - _elapsedTime)), 0f, 1f);
+                _magnetImageColor.a = Mathf.Clamp(_magnetImageColor.a + (Time.deltaTime * 1/(_magnetResetDuration - _magnetElapsedTime)), 0f, 1f);
                 _magnetImage.color = _magnetImageColor;
 
                 break;
