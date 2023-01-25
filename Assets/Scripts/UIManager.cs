@@ -11,6 +11,14 @@ public class UIManager : MonoBehaviour
         TripleShot = 1,
         HomingMissile = 2
     }
+
+    public enum MagnetUIState
+    {
+        Ready,
+        Pulsing,
+        Resetting,
+        Vanish
+    }
     #region Variables
     [SerializeField]
     private TMP_Text _scoreText;
@@ -46,16 +54,34 @@ public class UIManager : MonoBehaviour
     private TMP_Text _streakText;
     [SerializeField]
     private TMP_Text _thrustText;
+    [SerializeField]
+    private Image _magnetImage;
+    private Color _magnetImageColor;
     private float _weaponCooldownTimer;
     private float _weaponCooldownDuration = 5f;
     private Animator _streakTextAnimator;
     private Animator _scoreTextAnimator;
+
+    //Magnet
+    [SerializeField]
+    private Animator _magnetReadyAnimator;
+    [SerializeField]
+    private float _pulseSpeed = 6f;
+    [SerializeField]
+    private float _vanishDurationPercentage = .1f;
+    [SerializeField]
+    private float _resettingDurationPercentage = .9f;
+    private float _pulseTimer = 0f;
+    private MagnetUIState _magnetUIState;
+    private float _magnetResetDuration;
     #endregion
     #region UnityMethods
     private void Start()
     {
         _streakTextAnimator = _streakText.GetComponent<Animator>();
         _scoreTextAnimator = _scoreText.GetComponent<Animator>();
+        _magnetImageColor = _magnetImage.color;
+
     }
 
     private void Update()
@@ -66,9 +92,67 @@ public class UIManager : MonoBehaviour
             _ammoFillImage.rectTransform.localScale = new Vector2(previousLocalScale.x, Mathf.Clamp(previousLocalScale.y - (1 / _weaponCooldownDuration * Time.deltaTime),0f,1f));
 
         }
+
+        CheckMagnetImage();
+
+
     }
     #endregion
     #region Methods
+
+    private float _elapsedTime;
+
+    
+
+    private void CheckMagnetImage()
+    {
+        switch (_magnetUIState)
+        {
+            case MagnetUIState.Vanish:               
+                if (_magnetImageColor.a == 0f)
+                {
+                    _magnetUIState = MagnetUIState.Resetting;
+                    break;
+                }
+                _magnetImageColor.a = Mathf.Clamp(_magnetImageColor.a - (Time.deltaTime * 1 / (_magnetResetDuration* _vanishDurationPercentage)), 0f, 1f);
+                _elapsedTime += Time.deltaTime * 1 / (_magnetResetDuration * _vanishDurationPercentage);
+                _magnetImage.color = _magnetImageColor;
+                break;
+
+            case MagnetUIState.Pulsing:
+
+                _magnetImageColor.a = Mathf.Cos(_pulseTimer * _pulseSpeed);
+                _magnetImage.color = _magnetImageColor;
+                _pulseTimer += Time.deltaTime;
+                
+                break;
+
+            case MagnetUIState.Resetting:
+
+                if (_magnetImageColor.a == 1f)
+                {
+                    _magnetUIState = MagnetUIState.Ready;
+                    _pulseTimer = 0f;
+                    _elapsedTime = 0f;
+                    _magnetReadyAnimator.SetTrigger("reset");
+                    break;
+                }
+                _magnetImageColor.a = Mathf.Clamp(_magnetImageColor.a + (Time.deltaTime * 1/(_magnetResetDuration - _elapsedTime)), 0f, 1f);
+                _magnetImage.color = _magnetImageColor;
+
+                break;
+        }
+    }
+
+    public void SetMagnetUIDuration(float duration)
+    {
+        _magnetResetDuration = duration;
+    }
+
+    public void UpdateMagnetImageState(MagnetUIState state)
+    {
+        _magnetUIState = state;
+    }    
 
     public void UpdateStreakText(int streak, bool shake)
     {

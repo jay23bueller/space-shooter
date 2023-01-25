@@ -191,7 +191,7 @@ public class SpawnManager : MonoBehaviour
         _spawnedAllEnemiesInWave = true;
     }
 
-    private IEnumerator SpawnPowerup()
+    private IEnumerator SpawnPowerupRoutine()
     {
         while(_canSpawn)
         {
@@ -203,20 +203,17 @@ public class SpawnManager : MonoBehaviour
 
 
             yield return new WaitForSeconds(UnityEngine.Random.Range(_minPowerupSpawnDelay, _maxPowerupSpawnDelay));
-            
-            
-            Vector3 spawnLocation = 
-                new Vector3(
-                    UnityEngine.Random.Range(GameManager.LEFT_BOUND + GameManager.SPAWN_LEFTRIGHT_OFFSET, GameManager.RIGHT_BOUND - GameManager.SPAWN_LEFTRIGHT_OFFSET), 
-                    GameManager.ENVIRONMENT_TOP_BOUND
-                    );
 
-            Instantiate(
-                _powerups[powerupIndex],
-                spawnLocation,
-                Quaternion.identity
-                );
-            _powerupSpawnCount++;
+
+            SpawnPowerup(powerupIndex, false, Vector3.zero);
+        }
+    }
+
+    private void powerupCheckForPlayerMagnet(ref Powerup powerup)
+    {
+        if (_player != null && _player.playerMagnetState == Player.MagnetState.Using && powerup != null)
+        {
+            powerup.targetTransform = _player.transform;
         }
     }
 
@@ -226,49 +223,60 @@ public class SpawnManager : MonoBehaviour
         {
             yield return new WaitForSeconds(_homingMissileSpawnInterval);
 
-            Vector3 spawnLocation =
-                new Vector3(
-                    UnityEngine.Random.Range(GameManager.LEFT_BOUND + GameManager.SPAWN_LEFTRIGHT_OFFSET, GameManager.RIGHT_BOUND - GameManager.SPAWN_LEFTRIGHT_OFFSET),
-                    GameManager.ENVIRONMENT_TOP_BOUND
-                    );
-            Instantiate(
-                _powerups[_homingMissileIndex],
-                spawnLocation,
-                Quaternion.identity
-                );
-            _powerupSpawnCount++;
+            SpawnPowerup(_homingMissileIndex, false, Vector3.zero);
         }
     }
-    public void SpawnHealth()
+
+    public void SpawnPowerup(int index, bool customPosition, Vector3 position)
     {
-        Vector3 spawnLocation = 
-            new Vector3(
-                GameManager.RIGHT_BOUND - ((GameManager.RIGHT_BOUND - GameManager.LEFT_BOUND) * .5f),
-                GameManager.ENVIRONMENT_TOP_BOUND
-                );
-            
-        Instantiate(
-            _powerups[_healthCollectibleIndex],
+        Vector3 spawnLocation = Vector3.zero;
+        if(customPosition)
+        {
+            spawnLocation = position;
+        }
+        else
+        {
+            if (index == _healthCollectibleIndex || index == _ammoCollectibleIndex || index == _energyCollectibleIndex)
+                spawnLocation =
+                        new Vector3(
+                            GameManager.RIGHT_BOUND - ((GameManager.RIGHT_BOUND - GameManager.LEFT_BOUND) * .5f),
+                        GameManager.ENVIRONMENT_TOP_BOUND
+                        );
+            else
+                spawnLocation =
+                        new Vector3(
+                        UnityEngine.Random.Range(GameManager.LEFT_BOUND + GameManager.SPAWN_LEFTRIGHT_OFFSET, GameManager.RIGHT_BOUND - GameManager.SPAWN_LEFTRIGHT_OFFSET),
+                        GameManager.ENVIRONMENT_TOP_BOUND
+                        );
+        }
+
+
+
+        GameObject powerupGO = Instantiate(
+            _powerups[index],
             spawnLocation,
             Quaternion.identity
             );
+
+        if (powerupGO != null)
+        {
+            Powerup powerup = powerupGO.GetComponent<Powerup>();
+            powerupCheckForPlayerMagnet(ref powerup);
+        }
+        _powerupSpawnCount++;
+
+    }
+   
+    public void SpawnHealth()
+    {
+        SpawnPowerup(_healthCollectibleIndex, false, Vector3.zero);
 
         AudioSource.PlayClipAtPoint(_streakAndHealthClip, Camera.main.transform.position);
     }
 
     public void SpawnAmmoCollectible()
     {
-        Vector3 spawnLocation =
-            new Vector3(
-                GameManager.RIGHT_BOUND - ((GameManager.RIGHT_BOUND - GameManager.LEFT_BOUND) * .5f),
-                GameManager.ENVIRONMENT_TOP_BOUND
-                );
-
-        Instantiate(
-            _powerups[_ammoCollectibleIndex],
-            spawnLocation,
-            Quaternion.identity
-            );
+        SpawnPowerup(_ammoCollectibleIndex, false, Vector3.zero);
 
         AudioSource.PlayClipAtPoint(_streakAndHealthClip, Camera.main.transform.position);
     }
@@ -310,7 +318,7 @@ public class SpawnManager : MonoBehaviour
 
                 if (_enemiesKilled % _enemySpawnsBeforeAmmoDrop == 0)
                 {
-                    StartCoroutine(SpawnPowerupAtPosition(position, powerupSpawnDelayDuration, PowerupType.AmmoCollectible));
+                    StartCoroutine(SpawnPowerupAtPosition(position, powerupSpawnDelayDuration, _ammoCollectibleIndex));
                 }
 
                 if (_streak != 0 && _streak % _streakAmountToGetEnergyCollectible == 0)
@@ -323,7 +331,7 @@ public class SpawnManager : MonoBehaviour
                     }
                   
                     _chanceToSpawnShieldEnemyPercentage = currentStreakLevel * _spawnShieldEnemyPercentIncrement;
-                    StartCoroutine(SpawnPowerupAtPosition(new Vector3(GameManager.RIGHT_BOUND - (GameManager.RIGHT_BOUND - GameManager.LEFT_BOUND) * .5f, GameManager.ENVIRONMENT_TOP_BOUND), powerupSpawnDelayDuration, PowerupType.EnergyCollectible));
+                    StartCoroutine(SpawnPowerupAtPosition(new Vector3(GameManager.RIGHT_BOUND - (GameManager.RIGHT_BOUND - GameManager.LEFT_BOUND) * .5f, GameManager.ENVIRONMENT_TOP_BOUND), powerupSpawnDelayDuration, _energyCollectibleIndex));
                     AudioSource.PlayClipAtPoint(_streakAndHealthClip, Camera.main.transform.position);
                 }
             }
@@ -352,27 +360,10 @@ public class SpawnManager : MonoBehaviour
         
     }
 
-    private IEnumerator SpawnPowerupAtPosition(Vector3 position, float delay, PowerupType powerup)
+    private IEnumerator SpawnPowerupAtPosition(Vector3 position, float delay, int index)
     {
-        int index = -1;
-
-        switch(powerup)
-        {
-            case PowerupType.AmmoCollectible: index = _ammoCollectibleIndex;
-                break;
-            case PowerupType.EnergyCollectible: index = _energyCollectibleIndex;
-                break;
-        }
-
-        if (index == -1)
-            yield break;
-
         yield return new WaitForSeconds(delay);
-        Instantiate(
-            _powerups[index],
-            position,
-            Quaternion.identity
-            );
+        SpawnPowerup(index, true, position);
     }
 
     private IEnumerator StartWaveRoutine(float delay)
@@ -381,7 +372,7 @@ public class SpawnManager : MonoBehaviour
         _waveStarted = true;
         _uiManager.DisplayWaveText(false);
         StartCoroutine(SpawnEnemy());
-        StartCoroutine(SpawnPowerup());
+        StartCoroutine(SpawnPowerupRoutine());
         StartCoroutine(SpawnHomingMissile());
     }
 

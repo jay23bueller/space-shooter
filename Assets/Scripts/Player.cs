@@ -75,6 +75,7 @@ public class Player : MonoBehaviour
     private WaitForSeconds _thrusterAcceleratedGainCooldownWFS;
 
 
+
     [Header("Powerup")]
     [SerializeField]
     private float _powerupCooldownDuration = 5;
@@ -135,6 +136,12 @@ public class Player : MonoBehaviour
     [Header("Shield")]
     [SerializeField]
     private GameObject _shieldGO;
+    [SerializeField]
+    private Color _shieldFullHealthColor;
+    [SerializeField]
+    private Color _shieldMediumHealthColor;
+    [SerializeField]
+    private Color _shieldLowHealthColor;
     private int _shieldMaxHealth = 3;
     private int _shieldCurrentHealth;
     private bool _isShieldEnabled;
@@ -174,6 +181,31 @@ public class Player : MonoBehaviour
     private AudioClip _playerLostLifeClip;
     private int _maxLives = 3;
 
+    [Header("Magnet")]
+    [SerializeField]
+    private ParticleSystem _magneticPS;
+    [SerializeField]
+    private AudioSource _magnetAudioSource;
+    [SerializeField]
+    private AudioClip _magnetDeactivationClip;
+    [SerializeField]
+    private AudioClip _magnetReadyClip;
+    [SerializeField]
+    private float _magnetDuration = 3f;
+    [SerializeField]
+    private float _magneticRadius = 10f;
+    [SerializeField]
+    private float _magnetResetDuration = 3f;
+    private float _magnetTimer;
+    public MagnetState playerMagnetState { get => _magnetState; }
+    private MagnetState _magnetState;
+    public enum MagnetState
+    {
+        Ready,
+        Using,
+        Resetting
+    }
+
     private bool _disruptWeapon;
 
     #endregion
@@ -190,7 +222,7 @@ public class Player : MonoBehaviour
         _uiManager.UpdateScoreText(_score, false);
         _uiManager.SetAmmoMaxCount(_ammoMaxCount);
         _uiManager.UpdateAmmoText(_ammoCurrentCount);
-        
+        _uiManager.SetMagnetUIDuration(_magnetResetDuration);
         _thrusterAcceleratedGainCooldownWFS = new WaitForSeconds(_thrusterAcceleratedGainRateDuration);
         _anim = GetComponent<Animator>();
         if (_spawnManager == null)
@@ -206,7 +238,12 @@ public class Player : MonoBehaviour
 
         _thrusterCurrentEnergy = _thrusterMaxEnergy;
         _currentThrusterDrainRate = _defaultThrusterDrainRate;
+
+        _magneticPS = GetComponent<ParticleSystem>();
     }
+
+
+    
 
     // Update is called once per frame
     void Update()
@@ -219,6 +256,7 @@ public class Player : MonoBehaviour
             UpdateThrusterUI();
             FireWeapon();
             CheckAmmoCount();
+            CheckMagnet();
         }
 
 
@@ -228,6 +266,50 @@ public class Player : MonoBehaviour
     #endregion
 
     #region Methods
+    private void CheckMagnet()
+    {
+        switch (_magnetState)
+        {
+            case MagnetState.Ready:
+                if (Input.GetKeyDown(KeyCode.O))
+                {
+                    _magnetState = MagnetState.Using;
+                    _magnetTimer = _magnetDuration + Time.time;
+                    _magneticPS.Play();
+                    _magnetAudioSource.Play();
+                    _uiManager.UpdateMagnetImageState(UIManager.MagnetUIState.Pulsing);
+                    RaycastHit2D[] hits = Physics2D.CircleCastAll(transform.position, _magneticRadius, Vector2.zero, 0f, LayerMask.GetMask("Powerup"));
+
+                    foreach (var hit in hits)
+                    {
+                        if (hit.collider != null)
+                            hit.collider.GetComponent<Powerup>().targetTransform = transform;
+                    }
+                }
+                break;
+            case MagnetState.Using:
+                if (_magnetTimer < Time.time)
+                {
+                    _magneticPS.Stop();
+                    _magnetAudioSource.Stop();
+                    _magnetState = MagnetState.Resetting;
+                    _uiManager.UpdateMagnetImageState(UIManager.MagnetUIState.Vanish);
+                    _magnetTimer = _magnetResetDuration + Time.time;
+                    _magnetAudioSource.PlayOneShot(_magnetDeactivationClip);
+                    Debug.Log("End magnet");
+                }
+                break;
+            case MagnetState.Resetting:
+                if (_magnetTimer < Time.time)
+                {
+                    _magnetState = MagnetState.Ready;
+                    _magnetAudioSource.PlayOneShot(_magnetReadyClip);
+                    Debug.Log("Magnet Ready!");
+                }
+                break;
+        }
+    }
+
 
     private void CheckForThrusterInput()
     {
@@ -507,23 +589,24 @@ public class Player : MonoBehaviour
             case 0:
                 _isShieldEnabled = false;
                 _shieldGO.SetActive(false);
-                _shieldGO.GetComponent<SpriteRenderer>().color = Color.white;
                 break;
             case 1:
-                _shieldGO.GetComponent<SpriteRenderer>().color = Color.red;
+                _shieldGO.GetComponent<SpriteRenderer>().color = _shieldLowHealthColor;
                 break;
             case 2:
-                _shieldGO.GetComponent<SpriteRenderer>().color = Color.yellow;
+                _shieldGO.GetComponent<SpriteRenderer>().color = _shieldMediumHealthColor;
                 break;
         };
         
 
     }
 
+
+
     public void EnableShield()
     {
         _shieldCurrentHealth = _shieldMaxHealth;
-        _shieldGO.GetComponent<SpriteRenderer>().color = Color.white;
+        _shieldGO.GetComponent<SpriteRenderer>().color = _shieldFullHealthColor;
         _isShieldEnabled = true;
         _shieldGO.SetActive(true);
     }

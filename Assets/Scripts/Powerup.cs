@@ -21,6 +21,9 @@ public class Powerup : MonoBehaviour
     private AudioClip _powerupAudioClip;
     [SerializeField]
     private GameObject _explosionPrefab;
+    
+    public Transform targetTransform { get; set; }
+    public bool beingDestroyed { get => _beingDestroyed; }
     private bool _beingDestroyed;
     #endregion
 
@@ -78,12 +81,22 @@ public class Powerup : MonoBehaviour
 
     #region Methods
 
+
     private void Move()
     {
         if (transform.position.y < GameManager.ENVIRONMENT_BOTTOM_BOUND - 0.01f)
             Destroy(gameObject);
         else
-            transform.Translate(Vector2.down * _speed * Time.deltaTime);
+        {
+            Vector3 moveDirection = Vector3.down;
+            if(targetTransform != null)
+            {
+                moveDirection = (targetTransform.position - transform.position).normalized;
+            }
+
+            transform.Translate(moveDirection * _speed * Time.deltaTime, Space.World);
+        }
+            
     }
 
     public void GetDestroyed()

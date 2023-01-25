@@ -85,7 +85,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66d5dd6ad813c924b9f64f49444a77f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _speed: 2
+  _speed: 3.5
   _normalScore: 10
   _shieldedScore: 40
   _minFiringDelay: 0
@@ -118,6 +118,10 @@ MonoBehaviour:
   _minDodgingDistance: 2
   _maxDodgingDistance: 4
   _dodgedLaserDelay: 1.5
+  _currentMinLaserPowerupDelay: 0.9
+  _currentMaxLaserPowerupDelay: 1.9
+  _powerupShotAtDelay: 3
+  _backFiringFOV: 75
 --- !u!61 &4394001658417918074
 BoxCollider2D:
   m_ObjectHideFlags: 0

@@ -161,6 +161,19 @@ public class Enemy : MonoBehaviour
     private float _dodgingDistance;
     private bool _dodgingEnabled;
 
+    [Header("Shooting Powerup")]
+    [SerializeField]
+    private float _currentMinLaserPowerupDelay = .9f;
+    [SerializeField]
+    private float _currentMaxLaserPowerupDelay = 1.9f;
+    [SerializeField]
+    private float _powerupShotAtDelay = 3f;
+    private bool _shotAtPowerup;
+
+    [Header("Back Firing")]
+    [SerializeField]
+    private float _backFiringFOV = 60f;
+
     #endregion
 
     #region UnityMethods
@@ -598,23 +611,30 @@ public class Enemy : MonoBehaviour
 
     }
 
+
     private IEnumerator FireLaserPowerupRoutine()
     {
         while(true)
         {
-            yield return new WaitForSeconds(Random.Range(.9f,1.9f));
+            if (_shotAtPowerup)
+                yield return new WaitForSeconds(_powerupShotAtDelay);
+            else
+                yield return new WaitForSeconds(Random.Range(_currentMinLaserPowerupDelay, _currentMaxLaserPowerupDelay));
 
             RaycastHit2D hit  = Physics2D.CircleCast(transform.position, .05f, transform.up, 20f, LayerMask.GetMask("Powerup"));
 
             if (hit.collider != null)
             {
-               GameObject laser = Instantiate(_laserPrefab, transform.position + transform.up * 1f, transform.rotation);
+                GameObject laser = Instantiate(_laserPrefab, transform.position + transform.up * 1f, transform.rotation);
 
-                if(laser != null)
+                if (laser != null)
                 {
                     laser.GetComponent<Laser>().InitializeFiring(0, false);
                 }
+                _shotAtPowerup = true;
             }
+            else
+                _shotAtPowerup = false;
                 
         }
     }
@@ -634,9 +654,7 @@ public class Enemy : MonoBehaviour
             {
                 directionToShoot = (_player.transform.position - transform.position).normalized;
                 float dotProduct = Vector3.Dot(-transform.up, directionToShoot);
-               
-                //At the moment hard-coded to be less than 45 degrees
-                if (Mathf.Acos(dotProduct) < .78f)
+                if (Mathf.Acos(dotProduct) < _backFiringFOV * Mathf.Deg2Rad)
                 {
                     targetedShot = true;
                 }
