@@ -218,7 +218,7 @@ public class SpawnManager : MonoBehaviour
         }
     }
 
-    private IEnumerator SpawnShotgun()
+    private IEnumerator SpawnShotgunRoutine()
     {
         while (_canSpawn)
         {
@@ -374,7 +374,7 @@ public class SpawnManager : MonoBehaviour
         _uiManager.DisplayWaveText(false);
         StartCoroutine(SpawnEnemy());
         StartCoroutine(SpawnPowerupRoutine());
-        StartCoroutine(SpawnShotgun());
+        StartCoroutine(SpawnShotgunRoutine());
     }
 
     public Transform FindNearestEnemyToPlayer()
