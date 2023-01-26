@@ -4018,6 +4018,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 163892733}
     - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
+      propertyPath: _shotgunIndex
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
       propertyPath: _ammoIncrement
       value: 5
       objectReference: {fileID: 0}
@@ -4048,7 +4052,7 @@ PrefabInstance:
     - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
       propertyPath: _powerups.Array.data[4]
       value: 
-      objectReference: {fileID: 8280209617936306660, guid: 1fd5e074065c612468723e27ee3cc69c, type: 3}
+      objectReference: {fileID: 8280209617936306660, guid: a0208e748cf29174faf9d9c0bfd81660, type: 3}
     - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
       propertyPath: _powerups.Array.data[5]
       value: 
@@ -4060,11 +4064,15 @@ PrefabInstance:
     - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
       propertyPath: _powerups.Array.data[7]
       value: 
-      objectReference: {fileID: 8280209617936306660, guid: a0208e748cf29174faf9d9c0bfd81660, type: 3}
+      objectReference: {fileID: 8280209617936306660, guid: 1fd5e074065c612468723e27ee3cc69c, type: 3}
     - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
       propertyPath: _powerups.Array.data[8]
       value: 
       objectReference: {fileID: 795033785503102533, guid: 9669e9f9283c1784781aa52c9c799a14, type: 3}
+    - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
+      propertyPath: _shotgunSpawningInterval
+      value: 20
+      objectReference: {fileID: 0}
     - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
       propertyPath: _turnsBeforeSpawningAmmo
       value: 4
@@ -4099,19 +4107,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
       propertyPath: _weightedIndices.Array.data[0].weight
-      value: 0.22
+      value: 0.26
       objectReference: {fileID: 0}
     - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
       propertyPath: _weightedIndices.Array.data[1].weight
       value: 0.22
       objectReference: {fileID: 0}
     - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
+      propertyPath: _weightedIndices.Array.data[2].weight
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
       propertyPath: _weightedIndices.Array.data[3].weight
-      value: 0.1
+      value: 0.13
       objectReference: {fileID: 0}
     - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
       propertyPath: _weightedIndices.Array.data[4].weight
-      value: 0.16
+      value: 0.07
       objectReference: {fileID: 0}
     - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
       propertyPath: _weightedIndices.Array.data[5].weight

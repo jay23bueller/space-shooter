@@ -29,9 +29,9 @@ public class SpawnManager : MonoBehaviour
     [SerializeField]
     private AudioClip _streakAndHealthClip;
     [SerializeField]
-    private int _homingMissileSpawnInterval = 10;
+    private int _shotgunSpawningInterval = 10;
     [SerializeField]
-    private int _homingMissileIndex;
+    private int _shotgunIndex;
     [SerializeField]
     private int _healthCollectibleIndex;
     [SerializeField]
@@ -218,13 +218,13 @@ public class SpawnManager : MonoBehaviour
         }
     }
 
-    private IEnumerator SpawnHomingMissile()
+    private IEnumerator SpawnShotgun()
     {
         while (_canSpawn)
         {
-            yield return new WaitForSeconds(_homingMissileSpawnInterval);
+            yield return new WaitForSeconds(_shotgunSpawningInterval);
 
-            SpawnPowerup(_homingMissileIndex, false, Vector3.zero);
+            SpawnPowerup(_shotgunIndex, false, Vector3.zero);
         }
     }
 
@@ -374,7 +374,7 @@ public class SpawnManager : MonoBehaviour
         _uiManager.DisplayWaveText(false);
         StartCoroutine(SpawnEnemy());
         StartCoroutine(SpawnPowerupRoutine());
-        StartCoroutine(SpawnHomingMissile());
+        StartCoroutine(SpawnShotgun());
     }
 
     public Transform FindNearestEnemyToPlayer()
