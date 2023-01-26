@@ -8,7 +8,8 @@ public enum FiringMode
 {
     Default,
     TripleShot,
-    HomingMissile
+    HomingMissile,
+    Shotgun
     
 }
 public class Player : MonoBehaviour
@@ -131,6 +132,16 @@ public class Player : MonoBehaviour
     private float _missileCooldownDuration = 1f;
     private float _weaponCooldownDuration;
 
+    [Header("Shotgun")]
+    [SerializeField]
+    float _angleDisplacement = 25f;
+    [SerializeField]
+    int _numberOfShotgunLasers = 5;
+    [SerializeField]
+    private float _shotgunCooldownDuration = .4f;
+    private float _startAngle;
+    private float _totalAngleCoverage;
+
 
     //Shield
     [Header("Shield")]
@@ -214,8 +225,9 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+
         //Set starting position
-        transform.position = new Vector3(0f,0f,0f);
+        transform.position = new Vector3(0f, 0f, 0f);
         _spawnManager = GameObject.FindGameObjectWithTag(SPAWN_MANAGER_TAG).GetComponent<SpawnManager>();
         _ammoCurrentCount = _ammoMaxCount;
         _currentThrusterGainRate = _thrusterGainRate;
@@ -240,9 +252,11 @@ public class Player : MonoBehaviour
         _currentThrusterDrainRate = _defaultThrusterDrainRate;
 
         _magneticPS = GetComponent<ParticleSystem>();
+
+        _startAngle = -90f + _angleDisplacement;
+        float endAngle = 90f - _angleDisplacement;
+        _totalAngleCoverage = endAngle - _startAngle;
     }
-
-
     
 
     // Update is called once per frame
@@ -296,7 +310,6 @@ public class Player : MonoBehaviour
                     _uiManager.UpdateMagnetImageState(UIManager.MagnetUIState.Vanish);
                     _magnetTimer = _magnetResetDuration + Time.time;
                     _magnetAudioSource.PlayOneShot(_magnetDeactivationClip);
-                    Debug.Log("End magnet");
                 }
                 break;
             case MagnetState.Resetting:
@@ -304,7 +317,6 @@ public class Player : MonoBehaviour
                 {
                     _magnetState = MagnetState.Ready;
                     _magnetAudioSource.PlayOneShot(_magnetReadyClip);
-                    Debug.Log("Magnet Ready!");
                 }
                 break;
         }
@@ -488,16 +500,8 @@ public class Player : MonoBehaviour
                 {
                     case FiringMode.Default:
                     case FiringMode.TripleShot:
-                        List<Laser> lasers = new List<Laser>();
-                        if (FiringMode.Default == _firingMode)
-                            lasers.Add(Instantiate(_laserPrefab, _laserSpawnTransform.position, _laserSpawnTransform.rotation).GetComponent<Laser>());
-                        else
-                            lasers.AddRange(Instantiate(_tripleShotPrefab, _laserSpawnTransform.position, _laserSpawnTransform.rotation).GetComponentsInChildren<Laser>());
-                        
-                        foreach (Laser laser in lasers)
-                            laser.InitializeFiring(1, _disruptWeapon);
-                        
-                        _audioSource.PlayOneShot(_laserAudioClip);
+                    case FiringMode.Shotgun:
+                        SpawnLaser(_firingMode);
                         break;
 
                     case FiringMode.HomingMissile:
@@ -518,6 +522,38 @@ public class Player : MonoBehaviour
 
         }
             
+    }
+
+    private void SpawnLaser(FiringMode mode)
+    {
+        List<Laser> lasers = new List<Laser>();
+        switch (mode)
+        {
+            case FiringMode.Default:
+                lasers.Add(Instantiate(_laserPrefab, _laserSpawnTransform.position, _laserSpawnTransform.rotation).GetComponent<Laser>());
+                break;
+            case FiringMode.TripleShot:
+                lasers.AddRange(Instantiate(_tripleShotPrefab, transform.position, transform.rotation).GetComponentsInChildren<Laser>());
+                break;
+            case FiringMode.Shotgun:
+                
+                for(int i = 0; i < _numberOfShotgunLasers; i++)
+                {
+                    //chuncks of the totalAngleCoverage is _numberOfShotgunLasers-1
+                    Quaternion laserRotation = Quaternion.AngleAxis((_totalAngleCoverage / (_numberOfShotgunLasers - 1) * i) + _startAngle, Vector3.forward);
+
+                    lasers.Add(Instantiate(_laserPrefab, _laserSpawnTransform.position, laserRotation).GetComponent<Laser>());
+                }    
+                break;
+        }
+
+        foreach(var laser in lasers)
+        {
+            if (laser != null)
+                laser.InitializeFiring(1, _disruptWeapon);
+        }
+
+        _audioSource.PlayOneShot(_laserAudioClip);
     }
 
     private IEnumerator ResetWeaponCooldown()
@@ -611,15 +647,26 @@ public class Player : MonoBehaviour
         _shieldGO.SetActive(true);
     }
 
-    public void EnableWeapon(FiringMode mode)
+    public void EnableWeapon(FiringMode mode, PowerupType type)
     {
         _firingMode = mode;
         if (_resetWeaponRountine != null)
             StopCoroutine(_resetWeaponRountine);
-        PowerupType powerup = _firingMode == FiringMode.TripleShot ? PowerupType.TripleShot : PowerupType.HomingMissile;
-        _weaponCooldownDuration = mode == FiringMode.HomingMissile ? _missileCooldownDuration : _laserCooldownDuration;
+        switch(_firingMode)
+        {
+            case FiringMode.HomingMissile:
+                _weaponCooldownDuration = _missileCooldownDuration;
+                break;
+            case FiringMode.TripleShot:
+                _weaponCooldownDuration = _laserCooldownDuration;
+                break;
+            case FiringMode.Shotgun:
+                _weaponCooldownDuration = _shotgunCooldownDuration;
+                break;
+        }
+
         _uiManager.UpdateAmmoImage((UIManager.WeaponIconName)mode);
-        _resetWeaponRountine = StartCoroutine(ResetPowerup(powerup));
+        _resetWeaponRountine = StartCoroutine(ResetPowerup(type));
     }
 
     private IEnumerator ResetPowerup(PowerupType powerup)
@@ -630,6 +677,7 @@ public class Player : MonoBehaviour
             case PowerupType.HomingMissile:
             case PowerupType.WeaponDisruption:
             case PowerupType.SpeedBoost:
+            case PowerupType.Shotgun:
                 yield return new WaitForSeconds(_powerupCooldownDuration);
                 break;
             case PowerupType.EnergyCollectible:

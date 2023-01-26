@@ -9,7 +9,8 @@ public class UIManager : MonoBehaviour
     {
         Laser = 0,
         TripleShot = 1,
-        HomingMissile = 2
+        HomingMissile = 2,
+        Shotgun = 3
     }
 
     public enum MagnetUIState
@@ -66,8 +67,6 @@ public class UIManager : MonoBehaviour
     private float _periodModifier = 6f;
     [SerializeField]
     private float _vanishDurationPercentage = .1f;
-    [SerializeField]
-    private float _resettingDurationPercentage = .9f;
     [SerializeField]
     private Image _magnetImage;
     private Color _magnetImageColor;
@@ -210,6 +209,7 @@ public class UIManager : MonoBehaviour
         {
             case WeaponIconName.TripleShot:
             case WeaponIconName.HomingMissile:
+            case WeaponIconName.Shotgun:
                 _ammoFillImage.rectTransform.localScale = new Vector2(1f, 1f);
                 _weaponCooldownTimer = Time.time + _weaponCooldownDuration;
             break;

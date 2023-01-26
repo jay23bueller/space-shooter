@@ -9,7 +9,8 @@ public enum PowerupType
     Shield,
     SpeedBoost,
     WeaponDisruption,
-    EnergyCollectible
+    EnergyCollectible,
+    Shotgun
 }
 public class Powerup : MonoBehaviour
 {
@@ -21,6 +22,8 @@ public class Powerup : MonoBehaviour
     private AudioClip _powerupAudioClip;
     [SerializeField]
     private GameObject _explosionPrefab;
+    [SerializeField]
+    private float _magnetSpeed = 5.0f;
     
     public Transform targetTransform { get; set; }
     public bool beingDestroyed { get => _beingDestroyed; }
@@ -46,8 +49,14 @@ public class Powerup : MonoBehaviour
                 {
                     case PowerupType.TripleShot:
                     case PowerupType.HomingMissile:
-                        FiringMode mode = _powerup == PowerupType.TripleShot ? FiringMode.TripleShot : FiringMode.HomingMissile;
-                        collision.GetComponent<Player>().EnableWeapon(mode);
+                    case PowerupType.Shotgun:
+                        FiringMode mode = FiringMode.TripleShot;
+                        if (_powerup == PowerupType.Shotgun)
+                            mode = FiringMode.Shotgun;
+                        if (_powerup == PowerupType.HomingMissile)
+                            mode = FiringMode.HomingMissile;
+
+                        collision.GetComponent<Player>().EnableWeapon(mode, PowerupType.TripleShot);
                         break;
                     case PowerupType.SpeedBoost:
                         collision.GetComponent<Player>().EnableSpeedBoost();
@@ -92,6 +101,7 @@ public class Powerup : MonoBehaviour
             if(targetTransform != null)
             {
                 moveDirection = (targetTransform.position - transform.position).normalized;
+                _speed = _magnetSpeed;
             }
 
             transform.Translate(moveDirection * _speed * Time.deltaTime, Space.World);

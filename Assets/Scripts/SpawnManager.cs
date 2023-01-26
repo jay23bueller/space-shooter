@@ -81,6 +81,7 @@ public class SpawnManager : MonoBehaviour
     private void Start()
     {
         _player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
+        
     }
     #endregion
 
@@ -270,7 +271,7 @@ public class SpawnManager : MonoBehaviour
     public void SpawnHealth()
     {
         SpawnPowerup(_healthCollectibleIndex, false, Vector3.zero);
-
+        Debug.Log("Spawning Health");
         AudioSource.PlayClipAtPoint(_streakAndHealthClip, Camera.main.transform.position);
     }
 
@@ -419,9 +420,12 @@ public class SpawnManager : MonoBehaviour
         for(int i = 0; i < _weightedIndices.Length; i++)
         {
             currentTotal += _weightedIndices[i].weight / totalWeight;
-
+           
             if (currentTotal >= scaledRandomValue)
-                return i;
+            {
+                return _weightedIndices[i].index;
+            }
+                
         }
 
         return -1;

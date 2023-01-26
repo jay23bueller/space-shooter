@@ -217,15 +217,15 @@ MonoBehaviour:
   - {fileID: 21300000, guid: ae542f06acd6d6d42b611a8dfb4d936b, type: 3}
   - {fileID: 21300000, guid: 4284d53c1381b8c439fb5f6555c4af4f, type: 3}
   - {fileID: 21300000, guid: f452c91ff256f904e8e983e85aa1afd3, type: 3}
+  - {fileID: 21300000, guid: 71996d481efdc7e4f8e3fb97229aef91, type: 3}
   _ammoImage: {fileID: 1228522819}
   _ammoFillImage: {fileID: 2091640473}
   _streakText: {fileID: 1034961094}
   _thrustText: {fileID: 170674035}
-  _magnetImage: {fileID: 1789676704}
   _magnetReadyAnimator: {fileID: 269909841}
-  _pulseSpeed: 6
+  _periodModifier: 6
   _vanishDurationPercentage: 0.1
-  _resettingDurationPercentage: 0.9
+  _magnetImage: {fileID: 1789676704}
 --- !u!4 &163892734
 Transform:
   m_ObjectHideFlags: 0
@@ -3835,6 +3835,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Asteroid
       objectReference: {fileID: 0}
+    - target: {fileID: 34559481051888741, guid: 1c48d4b10b6b82a448f544ccecd918e2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 34559481051888760, guid: 1c48d4b10b6b82a448f544ccecd918e2, type: 3}
       propertyPath: m_RootOrder
       value: 3
@@ -3900,6 +3904,14 @@ PrefabInstance:
       propertyPath: _audioManager
       value: 
       objectReference: {fileID: 379907735}
+    - target: {fileID: 5545497930555065300, guid: acf95df6e14323a45a79d9cdf4ac4806, type: 3}
+      propertyPath: _magnetDuration
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5545497930555065300, guid: acf95df6e14323a45a79d9cdf4ac4806, type: 3}
+      propertyPath: _shotgunCooldownDuration
+      value: 0.4
+      objectReference: {fileID: 0}
     - target: {fileID: 5545497930555065301, guid: acf95df6e14323a45a79d9cdf4ac4806, type: 3}
       propertyPath: m_RootOrder
       value: 2
@@ -4010,20 +4022,64 @@ PrefabInstance:
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
+      propertyPath: _homingMissileIndex
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
+      propertyPath: _powerups.Array.size
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
       propertyPath: _streakAndHealthClip
       value: 
       objectReference: {fileID: 8300000, guid: 334f936dbdf682a4bad3969822bb9c71, type: 3}
     - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
-      propertyPath: _energyCollectibleIndex
-      value: 7
+      propertyPath: _ammoCollectibleIndex
+      value: 5
       objectReference: {fileID: 0}
+    - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
+      propertyPath: _energyCollectibleIndex
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
+      propertyPath: _healthCollectibleIndex
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
+      propertyPath: _powerups.Array.data[4]
+      value: 
+      objectReference: {fileID: 8280209617936306660, guid: 1fd5e074065c612468723e27ee3cc69c, type: 3}
+    - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
+      propertyPath: _powerups.Array.data[5]
+      value: 
+      objectReference: {fileID: 795033785503102533, guid: 17a61f7fb80b17443951a15e643eeed3, type: 3}
+    - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
+      propertyPath: _powerups.Array.data[6]
+      value: 
+      objectReference: {fileID: 795033785503102533, guid: ee76fc9e484386b4485eaaff5568a6a4, type: 3}
+    - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
+      propertyPath: _powerups.Array.data[7]
+      value: 
+      objectReference: {fileID: 8280209617936306660, guid: a0208e748cf29174faf9d9c0bfd81660, type: 3}
+    - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
+      propertyPath: _powerups.Array.data[8]
+      value: 
+      objectReference: {fileID: 795033785503102533, guid: 9669e9f9283c1784781aa52c9c799a14, type: 3}
     - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
       propertyPath: _turnsBeforeSpawningAmmo
       value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
+      propertyPath: _homingMissileSpawnInterval
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
       propertyPath: _powerupSpawnDelayDecrement
       value: 1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
+      propertyPath: _weightedIndices.Array.size
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
       propertyPath: _spawnShieldEnemyPercentIncrement
@@ -4032,6 +4088,34 @@ PrefabInstance:
     - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
       propertyPath: _streakAmountToGetEnergyCollectible
       value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
+      propertyPath: _weightedIndices.Array.data[4].index
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
+      propertyPath: _weightedIndices.Array.data[5].index
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
+      propertyPath: _weightedIndices.Array.data[0].weight
+      value: 0.22
+      objectReference: {fileID: 0}
+    - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
+      propertyPath: _weightedIndices.Array.data[1].weight
+      value: 0.22
+      objectReference: {fileID: 0}
+    - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
+      propertyPath: _weightedIndices.Array.data[3].weight
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
+      propertyPath: _weightedIndices.Array.data[4].weight
+      value: 0.16
+      objectReference: {fileID: 0}
+    - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
+      propertyPath: _weightedIndices.Array.data[5].weight
+      value: 0.1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
