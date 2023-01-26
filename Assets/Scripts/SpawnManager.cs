@@ -99,7 +99,7 @@ public class SpawnManager : MonoBehaviour
 
     }
 
-    private IEnumerator SpawnEnemy()
+    private IEnumerator SpawnEnemyRoutine()
     {
         while (_currentWaveEnemyIndex < _waves[_currentWaveIndex].waveItems.Length)
         {
@@ -319,7 +319,7 @@ public class SpawnManager : MonoBehaviour
 
                 if (_enemiesKilled % _enemySpawnsBeforeAmmoDrop == 0)
                 {
-                    StartCoroutine(SpawnPowerupAtPosition(position, powerupSpawnDelayDuration, _ammoCollectibleIndex));
+                    StartCoroutine(SpawnPowerupAtPositionRoutine(position, powerupSpawnDelayDuration, _ammoCollectibleIndex));
                 }
 
                 if (_streak != 0 && _streak % _streakAmountToGetEnergyCollectible == 0)
@@ -332,7 +332,7 @@ public class SpawnManager : MonoBehaviour
                     }
                   
                     _chanceToSpawnShieldEnemyPercentage = currentStreakLevel * _spawnShieldEnemyPercentIncrement;
-                    StartCoroutine(SpawnPowerupAtPosition(new Vector3(GameManager.RIGHT_BOUND - (GameManager.RIGHT_BOUND - GameManager.LEFT_BOUND) * .5f, GameManager.ENVIRONMENT_TOP_BOUND), powerupSpawnDelayDuration, _energyCollectibleIndex));
+                    StartCoroutine(SpawnPowerupAtPositionRoutine(new Vector3(GameManager.RIGHT_BOUND - (GameManager.RIGHT_BOUND - GameManager.LEFT_BOUND) * .5f, GameManager.ENVIRONMENT_TOP_BOUND), powerupSpawnDelayDuration, _energyCollectibleIndex));
                     AudioSource.PlayClipAtPoint(_streakAndHealthClip, Camera.main.transform.position);
                 }
             }
@@ -343,7 +343,10 @@ public class SpawnManager : MonoBehaviour
 
             if (_spawnedAllEnemiesInWave && _enemies.Count == 0)
             {
-                StopAllCoroutines();
+                StopCoroutine(SpawnPowerupRoutine());
+                StopCoroutine(SpawnShotgunRoutine());
+                StopCoroutine(SpawnEnemyRoutine());
+
                 _currentWaveEnemyIndex = 0;
                 _spawnedAllEnemiesInWave = false;
                 _waveStarted = false;
@@ -361,7 +364,7 @@ public class SpawnManager : MonoBehaviour
         
     }
 
-    private IEnumerator SpawnPowerupAtPosition(Vector3 position, float delay, int index)
+    private IEnumerator SpawnPowerupAtPositionRoutine(Vector3 position, float delay, int index)
     {
         yield return new WaitForSeconds(delay);
         SpawnPowerup(index, true, position);
@@ -372,7 +375,7 @@ public class SpawnManager : MonoBehaviour
         yield return new WaitForSeconds(delay);
         _waveStarted = true;
         _uiManager.DisplayWaveText(false);
-        StartCoroutine(SpawnEnemy());
+        StartCoroutine(SpawnEnemyRoutine());
         StartCoroutine(SpawnPowerupRoutine());
         StartCoroutine(SpawnShotgunRoutine());
     }
