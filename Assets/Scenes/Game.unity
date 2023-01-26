@@ -4026,6 +4026,10 @@ PrefabInstance:
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
+      propertyPath: _variantCollection
+      value: 
+      objectReference: {fileID: 20000000, guid: d4df749bcc6b3194c9945edf3ae25523, type: 2}
+    - target: {fileID: 5637057628212662891, guid: d82f869aaec2050428a64de28e3aaa48, type: 3}
       propertyPath: _homingMissileIndex
       value: 7
       objectReference: {fileID: 0}

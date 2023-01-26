@@ -41,12 +41,15 @@ public class SpawnManager : MonoBehaviour
     private int _energyCollectibleIndex;
     [SerializeField]
     private WeightedIndex[] _weightedIndices;
+    private Coroutine _spawnPowerupCoroutine;
+    private Coroutine _spawnShotgunCoroutine;
 
     [Header("Enemies")]
     [SerializeField]
     private GameObject _enemyContainer;
     [SerializeField]
     private List<GameObject> _enemies = new List<GameObject>();
+    private Coroutine _spawnEnemyCoroutine;
 
 
 
@@ -76,11 +79,15 @@ public class SpawnManager : MonoBehaviour
     private bool _waveStarted;
     public bool waveStarted { get => _waveStarted; }
 
+    [SerializeField]
+    ShaderVariantCollection _variantCollection;
+
     #endregion
     #region UnityMethods
     private void Start()
     {
         _player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
+        _variantCollection.WarmUp();
         
     }
     #endregion
@@ -271,7 +278,6 @@ public class SpawnManager : MonoBehaviour
     public void SpawnHealth()
     {
         SpawnPowerup(_healthCollectibleIndex, false, Vector3.zero);
-        Debug.Log("Spawning Health");
         AudioSource.PlayClipAtPoint(_streakAndHealthClip, Camera.main.transform.position);
     }
 
@@ -343,9 +349,9 @@ public class SpawnManager : MonoBehaviour
 
             if (_spawnedAllEnemiesInWave && _enemies.Count == 0)
             {
-                StopCoroutine(SpawnPowerupRoutine());
-                StopCoroutine(SpawnShotgunRoutine());
-                StopCoroutine(SpawnEnemyRoutine());
+                StopCoroutine(_spawnEnemyCoroutine);
+                StopCoroutine(_spawnPowerupCoroutine);
+                StopCoroutine(_spawnShotgunCoroutine);
 
                 _currentWaveEnemyIndex = 0;
                 _spawnedAllEnemiesInWave = false;
@@ -375,9 +381,9 @@ public class SpawnManager : MonoBehaviour
         yield return new WaitForSeconds(delay);
         _waveStarted = true;
         _uiManager.DisplayWaveText(false);
-        StartCoroutine(SpawnEnemyRoutine());
-        StartCoroutine(SpawnPowerupRoutine());
-        StartCoroutine(SpawnShotgunRoutine());
+        _spawnEnemyCoroutine = StartCoroutine(SpawnEnemyRoutine());
+        _spawnPowerupCoroutine = StartCoroutine(SpawnPowerupRoutine());
+        _spawnShotgunCoroutine = StartCoroutine(SpawnShotgunRoutine());
     }
 
     public Transform FindNearestEnemyToPlayer()

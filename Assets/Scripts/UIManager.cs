@@ -259,6 +259,11 @@ public class UIManager : MonoBehaviour
         _disrupted.gameObject.SetActive(false);
         _ammoText.gameObject.SetActive(false);
         _thrusterSlider.gameObject.SetActive(false);
+        _magnetUIState = MagnetUIState.Ready;
+        _magnetImage.gameObject.SetActive(false);
+        _ammoFillImage.gameObject.SetActive(false);
+        _ammoImage.gameObject.SetActive(false);
+        _thrustText.gameObject.SetActive(false);
         StartCoroutine(FlickerTextRoutine(_gameOverGO, true, true));
     }
 

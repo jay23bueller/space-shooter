@@ -9,7 +9,21 @@ public class DemonstratingDotProduct : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        StartCoroutine(CoroutineDemo());
+        StartCoroutine(CoroutineStopper());
+    }
+
+    private IEnumerator CoroutineStopper()
+    {
+        yield return new WaitForSeconds(5f);
+        StopCoroutine(CoroutineDemo());
+
+    }
+
+    private IEnumerator CoroutineDemo()
+    {
+        yield return new WaitForSeconds(10f);
+        Debug.Log("Happened still");
     }
 
     // Update is called once per frame

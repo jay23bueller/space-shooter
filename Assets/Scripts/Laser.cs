@@ -96,7 +96,7 @@ public class Laser : MonoBehaviour
         if (_canMove)
         {
 
-            if (transform.position.y < GameManager.ENVIRONMENT_TOP_BOUND && transform.position.y > GameManager.ENVIRONMENT_BOTTOM_BOUND)
+            if (transform.position.y < GameManager.ENVIRONMENT_TOP_BOUND && transform.position.y > GameManager.ENVIRONMENT_BOTTOM_BOUND - 1f)
                 transform.Translate(transform.up * _speed * Time.deltaTime, Space.World);
             else
                 Destroy(gameObject);
