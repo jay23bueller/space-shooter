@@ -688,7 +688,8 @@ public class Player : MonoBehaviour
         switch (powerup)
         {
             case PowerupType.TripleShot:
-            case PowerupType.HomingMissile: 
+            case PowerupType.HomingMissile:
+            case PowerupType.Shotgun:
                 _firingMode = FiringMode.Default;
                 _weaponCooldownDuration = _laserCooldownDuration;
                 _uiManager.UpdateAmmoImage(UIManager.WeaponIconName.Laser);
