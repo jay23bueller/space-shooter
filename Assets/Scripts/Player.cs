@@ -140,7 +140,7 @@ public class Player : MonoBehaviour
     [SerializeField]
     private float _shotgunCooldownDuration = .4f;
     private float _startAngle;
-    private float _shotgunAngleOffset;
+    private float _shotgunAngleAmount;
 
 
     //Shield
@@ -256,7 +256,7 @@ public class Player : MonoBehaviour
         _startAngle = -90f + _angleDisplacement;
         float endAngle = 90f - _angleDisplacement;
         float _totalAngleCoverage = endAngle - _startAngle;
-        _shotgunAngleOffset = _totalAngleCoverage / (_numberOfShotgunLasers - 1);
+        _shotgunAngleAmount = _totalAngleCoverage / (_numberOfShotgunLasers - 1);
     }
     
 
@@ -542,7 +542,7 @@ public class Player : MonoBehaviour
                 for(int i = 0; i < _numberOfShotgunLasers; i++)
                 {
                     //chunks of the totalAngleCoverage is _numberOfShotgunLasers-1
-                    Quaternion laserRotation = Quaternion.AngleAxis(( _shotgunAngleOffset * i) + _startAngle, Vector3.forward);
+                    Quaternion laserRotation = Quaternion.AngleAxis(( _shotgunAngleAmount * i) + _startAngle, Vector3.forward);
 
                     lasers.Add(Instantiate(_laserPrefab, _laserSpawnTransform.position, laserRotation).GetComponent<Laser>());
                 }    
