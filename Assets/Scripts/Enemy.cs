@@ -1,6 +1,7 @@
 using System.Collections;
 using Random = UnityEngine.Random;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public enum MovementMode
 {
@@ -10,19 +11,22 @@ public enum MovementMode
     Vertical,
     ZigZag,
     Circular,
-    PlayerTargeted
+    PlayerTargeted,
+    Boss
 }
 
 public class Enemy : MonoBehaviour
 {
     #region Constants
-    private const string PLAYER_TAG = "Player";
-    private const string LASER_TAG = "Laser";
-    private const string ENEMY_TAG = "Enemy";
-    private const string POWERUP_TAG = "Powerup";
-    private const string ENEMYLASER_TAG = "EnemyLaser"; //enums, tags are stored as an array, can use specific indexes
-    private const string SPAWNMANAGER_TAG = "SpawnManager";
+    protected const string PLAYER_TAG = "Player";
+    protected const string LASER_TAG = "Laser";
+    protected const string ENEMY_TAG = "Enemy";
+    protected const string POWERUP_TAG = "Powerup";
+    protected const string ENEMYLASER_TAG = "EnemyLaser"; //enums, tags are stored as an array, can use specific indexes
+    protected const string SPAWNMANAGER_TAG = "SpawnManager";
     #endregion
+
+
 
     #region Variables
     [SerializeField]
@@ -30,18 +34,18 @@ public class Enemy : MonoBehaviour
 
     protected delegate void Movement();
     protected Movement _currentMovement;
-    private MovementMode _currentMovementMode;
+    protected MovementMode _currentMovementMode;
     private bool _isMirrored;
     protected bool _canMove;
-    private float _moveDirection;
+    protected float _moveDirection = 1f;
     protected bool _isDying;
     public bool isDying { get => _isDying; }
 
     [Header("Score")]
     [SerializeField]
-    private int _normalScore = 10;
+    protected int _normalScore = 10;
     [SerializeField]
-    private int _shieldedScore = 50;
+    protected int _shieldedScore = 50;
 
     [Header("Firing")]
     [SerializeField]
@@ -62,7 +66,7 @@ public class Enemy : MonoBehaviour
     //Shield
     [Header("Shield")]
     [SerializeField]
-    private GameObject _shieldGO;
+    protected GameObject _shieldGO;
     protected bool _isShieldEnabled;
 
 
@@ -174,19 +178,20 @@ public class Enemy : MonoBehaviour
     [SerializeField]
     private float _backFiringFOV = 60f;
 
+    protected delegate IEnumerator FiringRoutine();
+    protected FiringRoutine _currentFiringRoutine;
+    protected bool _isIntialized;
+
     #endregion
 
     #region UnityMethods
 
 
 
-    protected virtual void Start()
+    protected virtual void Awake()
     {
-        
         _anim = GetComponent<Animator>();
         _audioSource = GetComponent<AudioSource>();
-        _spawnManager = GameObject.FindGameObjectWithTag(SPAWNMANAGER_TAG).GetComponent<SpawnManager>();
-
     }
 
 
@@ -209,7 +214,7 @@ public class Enemy : MonoBehaviour
             if (other.CompareTag(PLAYER_TAG))
             {
                 other.GetComponent<Player>().UpdateLives(-1);
-                GetDestroyed(false);
+                TakeDamage(false);
             }
                 
                 
@@ -223,7 +228,7 @@ public class Enemy : MonoBehaviour
             if (other.CompareTag(PLAYER_TAG))
             {
                 other.GetComponent<Player>().UpdateLives(-1);
-                GetDestroyed(false);
+                TakeDamage(false);
             }
 
 
@@ -238,34 +243,51 @@ public class Enemy : MonoBehaviour
     private void SelfDestruct()
     {
         if(!_isDying)
-            GetDestroyed(false);
+            TakeDamage(false);
+    }
+    
+
+    public virtual void TakeDamage(bool playerScored)
+    {
+        if(_isIntialized)
+        {
+            if (_isShieldEnabled)
+            {
+                StopCoroutine(FireLaserRoutine());
+                _shieldGO.SetActive(false);
+                _isShieldEnabled = false;
+                _seekingPlayer = true;
+                _anim.enabled = false;
+                _isStartingToSelfDestruct = true;
+                _currentMovement = MoveSelfDestruct;
+                StartCoroutine(SelfDestructFlashRoutine());
+                Invoke("SelfDestruct", 3f);
+                return;
+            }
+
+            
+            
+            if (playerScored)
+            {
+                _player.AddScore(_isStartingToSelfDestruct ? _shieldedScore : _normalScore);
+                _wasKilled = true;
+            }
+
+                
+
+            DisableEnemy();
+            
+        }
+
+
     }
 
-    public virtual void GetDestroyed(bool playerScored)
+    protected void DisableEnemy()
     {
-        if(_isShieldEnabled)
-        {
-            StopCoroutine(FireLaserRoutine());
-            _shieldGO.SetActive(false);
-            _isShieldEnabled = false;
-            _seekingPlayer = true;
-            _anim.enabled = false;
-            _isStartingToSelfDestruct = true;
-            _currentMovement = MoveSelfDestruct;
-            StartCoroutine(SelfDestructFlashRoutine());
-            Invoke("SelfDestruct", 3f);
-            return;
-        }
-        if (playerScored)
-        {
-            _player.AddScore(_isStartingToSelfDestruct ? _shieldedScore : _normalScore);
-            _wasKilled = true;
-        }
-
         StopAllCoroutines();
         GetComponent<Collider2D>().enabled = false;
         _canMove = false;
-        
+
         _speed = 0f;
         _thrusterGO.SetActive(false);
         _anim.enabled = true;
@@ -273,6 +295,8 @@ public class Enemy : MonoBehaviour
         _beepingAudioSource.Stop();
         _anim.SetTrigger("OnEnemyDeath");
     }
+
+
 
     //Move the character to the bottom and if it is out of the viewport, teleport it to the top
     //at a random x location
@@ -473,8 +497,10 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    public void SetMovementModeAndFiringDelays(MovementMode mode, bool isMirrored, float minFiringDelay, float maxFiringDelay, bool enableShield)
+    
+    public virtual void SetMovementModeAndFiringDelays(MovementMode mode, bool isMirrored, float minFiringDelay, float maxFiringDelay, bool enableShield)
     {
+        _spawnManager = GameObject.FindGameObjectWithTag(SPAWNMANAGER_TAG).GetComponent<SpawnManager>();
         _currentMovementMode = mode;
         _isMirrored = isMirrored;
         _player = GameObject.FindGameObjectWithTag(PLAYER_TAG).GetComponent<Player>();
@@ -550,8 +576,10 @@ public class Enemy : MonoBehaviour
                 break;
         }
 
+        _currentFiringRoutine = FireLaserRoutine;
 
-        StartCoroutine(FireLaserRoutine());
+        _isIntialized = true;
+        StartCoroutine(_currentFiringRoutine());
         _canMove = true;
     }
 
@@ -694,9 +722,9 @@ public class Enemy : MonoBehaviour
         transform.position += waypointMoveDirection * _speed * Time.deltaTime;
     }
 
-    public void InformSpawnManager(float powerupSpawnDelayDuration)
+    public virtual void InformSpawnManager(float powerupSpawnDelayDuration)
     {
-        _spawnManager.EnemyDestroyed(gameObject, powerupSpawnDelayDuration,_wasKilled);
+        _spawnManager.EnemyDestroyed(gameObject, powerupSpawnDelayDuration, _wasKilled, false);
     }
 
     public void Die()

@@ -6,6 +6,7 @@ public class WaveInfo : ScriptableObject
 {
     public WaveItem[] waveItems = new WaveItem[3];
 
+    public bool isBossWave;
 
     [Serializable]
     public struct WaveItem

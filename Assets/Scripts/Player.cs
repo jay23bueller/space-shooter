@@ -230,6 +230,7 @@ public class Player : MonoBehaviour
         transform.position = new Vector3(0f, 0f, 0f);
         _spawnManager = GameObject.FindGameObjectWithTag(SPAWN_MANAGER_TAG).GetComponent<SpawnManager>();
         _ammoCurrentCount = _ammoMaxCount;
+        _weaponCooldownDuration = _laserCooldownDuration;
         _currentThrusterGainRate = _thrusterGainRate;
         _uiManager.UpdateScoreText(_score, false);
         _uiManager.SetAmmoMaxCount(_ammoMaxCount);
@@ -461,6 +462,7 @@ public class Player : MonoBehaviour
     public void UpdateAmmoCapacityAndResetCurrentAmmo(int additionalAmmo)
     {
         _ammoMaxCount += additionalAmmo;
+        _powerupAmmoAmount += 2;
         _ammoCurrentCount = _ammoMaxCount;
         _uiManager.SetAmmoMaxCount(_ammoMaxCount);
         _uiManager.UpdateAmmoText(_ammoCurrentCount);
@@ -494,6 +496,7 @@ public class Player : MonoBehaviour
         {
             if(_ammoCurrentCount > 0)
             {
+                _canFire = false;
                 _ammoCurrentCount--;
                 _uiManager.UpdateAmmoText(_ammoCurrentCount);
 
@@ -512,7 +515,7 @@ public class Player : MonoBehaviour
                         break;
                 }
                 
-                _canFire = false;
+                
                 StartCoroutine(ResetWeaponCooldown());
             }
             else
@@ -712,9 +715,10 @@ public class Player : MonoBehaviour
         }
     }
 
+    private int _powerupAmmoAmount = 3;
     public void AddAmmo()
     {
-        _ammoCurrentCount = Mathf.Clamp(_ammoCurrentCount+5, 0, _ammoMaxCount);
+        _ammoCurrentCount = Mathf.Clamp(_ammoCurrentCount+_powerupAmmoAmount, 0, _ammoMaxCount);
         _ammoDelayBeforeSpawningTimer = Time.time + _ammoDelayBeforeSpawning;
         _uiManager.UpdateAmmoText(_ammoCurrentCount);
     }

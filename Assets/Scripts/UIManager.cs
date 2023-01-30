@@ -55,7 +55,6 @@ public class UIManager : MonoBehaviour
     private TMP_Text _streakText;
     [SerializeField]
     private TMP_Text _thrustText;
-    private float _weaponCooldownTimer;
     private float _weaponCooldownDuration = 5f;
     private Animator _streakTextAnimator;
     private Animator _scoreTextAnimator;
@@ -74,6 +73,12 @@ public class UIManager : MonoBehaviour
     private MagnetUIState _magnetUIState;
     private float _magnetResetDuration;
     private float _magnetElapsedTime;
+
+    ////Boss
+    //[SerializeField]
+    //private GameObject _bossEnergyGO;
+    //[SerializeField]
+    //private Image _bossFillImage;
     #endregion
     #region UnityMethods
     private void Start()
@@ -86,10 +91,10 @@ public class UIManager : MonoBehaviour
 
     private void Update()
     {
-        if(Time.time < _weaponCooldownTimer)
+        if(_ammoFillImage.rectTransform.localScale.y  > 0)
         {
             Vector2 previousLocalScale = _ammoFillImage.rectTransform.localScale;
-            _ammoFillImage.rectTransform.localScale = new Vector2(previousLocalScale.x, Mathf.Clamp(previousLocalScale.y - (1 / _weaponCooldownDuration * Time.deltaTime),0f,1f));
+            _ammoFillImage.rectTransform.localScale = new Vector2(previousLocalScale.x, Mathf.Clamp(previousLocalScale.y - (1 / _weaponCooldownDuration) * Time.deltaTime,0f,1f));
 
         }
 
@@ -100,6 +105,10 @@ public class UIManager : MonoBehaviour
     #endregion
     #region Methods
 
+    //public void EnableBossUI()
+    //{
+    //    _bossEnergyGO.SetActive(true);
+    //}
 
     private void CheckMagnetImage()
     {
@@ -211,7 +220,6 @@ public class UIManager : MonoBehaviour
             case WeaponIconName.HomingMissile:
             case WeaponIconName.Shotgun:
                 _ammoFillImage.rectTransform.localScale = new Vector2(1f, 1f);
-                _weaponCooldownTimer = Time.time + _weaponCooldownDuration;
             break;
         }
     }
@@ -219,6 +227,7 @@ public class UIManager : MonoBehaviour
     public void DisplayWinText()
     {
         _waveText.text = "YOU WIN";
+       
         StartCoroutine(FlickerTextRoutine(_waveText.gameObject, true, true));
         StartCoroutine(EnableRestartRoutine());
     }
@@ -264,6 +273,7 @@ public class UIManager : MonoBehaviour
         _ammoFillImage.gameObject.SetActive(false);
         _ammoImage.gameObject.SetActive(false);
         _thrustText.gameObject.SetActive(false);
+        DisplayWaveText(false);
         StartCoroutine(FlickerTextRoutine(_gameOverGO, true, true));
     }
 

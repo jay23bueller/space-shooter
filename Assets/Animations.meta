@@ -1,5 +1,7 @@
 fileFormatVersion: 2
 guid: 2cb1f09fd4c6bd749be2ce55e3cb3874
+labels:
+- Animation
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}

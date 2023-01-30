@@ -63,7 +63,7 @@ public class LaserEnemy : Enemy
     #endregion
 
     #region UnityMethods
-    protected override void Start()
+    protected override void Awake()
     {
         _playerHitWFS = new WaitForSeconds(_playerHitDelay/_playerHitDelaySegments);
         _playerNotHitWFS = new WaitForSeconds(_playerNoHitDelay/_playerHitDelaySegments);
@@ -71,7 +71,7 @@ public class LaserEnemy : Enemy
         _lineRenderer = GetComponent<LineRenderer>();
    
         _laserBeamChargingPositionOffset = GetComponent<CircleCollider2D>().radius;
-        base.Start();
+        base.Awake();
     }
 
 
@@ -84,7 +84,7 @@ public class LaserEnemy : Enemy
     #endregion
 
     #region Methods
-    public override void GetDestroyed(bool playerScored)
+    public override void TakeDamage(bool playerScored)
     {
         if(!_isShieldEnabled)
         {
@@ -100,7 +100,7 @@ public class LaserEnemy : Enemy
         }
 
         
-        base.GetDestroyed(playerScored);
+        base.TakeDamage(playerScored);
     }
 
     protected override IEnumerator FireLaserRoutine()

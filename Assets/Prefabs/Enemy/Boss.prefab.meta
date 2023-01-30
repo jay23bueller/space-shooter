@@ -1,9 +1,6 @@
 fileFormatVersion: 2
-guid: da89863e75f6b8442bd30cdfe472ba16
-labels:
-- Images
-folderAsset: yes
-DefaultImporter:
+guid: 0e47b2c5cc57fd94281ee342d20cf5a6
+PrefabImporter:
   externalObjects: {}
   userData: 
   assetBundleName: 

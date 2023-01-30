@@ -29,7 +29,7 @@ public class SpawnManager : MonoBehaviour
     [SerializeField]
     private AudioClip _streakAndHealthClip;
     [SerializeField]
-    private int _shotgunSpawningInterval = 10;
+    private float _shotgunSpawningInterval = 10;
     [SerializeField]
     private int _shotgunIndex;
     [SerializeField]
@@ -81,6 +81,8 @@ public class SpawnManager : MonoBehaviour
 
     [SerializeField]
     ShaderVariantCollection _variantCollection;
+    [SerializeField]
+    private AudioManager _audioManager;
 
     #endregion
     #region UnityMethods
@@ -106,13 +108,22 @@ public class SpawnManager : MonoBehaviour
 
     }
 
+    public void AddEnemy(GameObject enemy)
+    {
+        if (enemy != null) 
+        { 
+            _enemies.Add(enemy);
+        };
+    
+    }
+
     private IEnumerator SpawnEnemyRoutine()
     {
         while (_currentWaveEnemyIndex < _waves[_currentWaveIndex].waveItems.Length)
         {
             Vector3 spawnLocation = Vector3.zero;
             WaveInfo.WaveItem waveItem = _waves[_currentWaveIndex].waveItems[_currentWaveEnemyIndex];
-
+            //    _uiManager.EnableBossUI();
             //First enemy wave won't be delayed
             if (_currentWaveEnemyIndex != 0)
                 yield return new WaitForSeconds(UnityEngine.Random.Range(waveItem.enemyWaveInfo.enemy.delaysPerWave[_currentWaveIndex].spawnDelays.minSpawnDelay, waveItem.enemyWaveInfo.enemy.delaysPerWave[_currentWaveIndex].spawnDelays.maxSpawnDelay));
@@ -158,6 +169,12 @@ public class SpawnManager : MonoBehaviour
                                 isMirrored ? GameManager.RIGHT_BOUND : GameManager.LEFT_BOUND,
                                 GameManager.ENVIRONMENT_TOP_BOUND
                                 );
+                        break;
+                    case MovementMode.Boss:
+                        spawnLocation =
+                            new Vector3(
+                                (GameManager.RIGHT_BOUND - GameManager.LEFT_BOUND) * .5f + GameManager.LEFT_BOUND,
+                                GameManager.ENVIRONMENT_TOP_BOUND);
                         break;
                 }
 
@@ -303,14 +320,17 @@ public class SpawnManager : MonoBehaviour
         {
             _minPowerupSpawnDelay -= _powerupSpawnDelayDecrement;
             _maxPowerupSpawnDelay -= _powerupSpawnDelayDecrement;
+            _shotgunSpawningInterval -= _powerupSpawnDelayDecrement;
         }
         _player.UpdatePowerupDuration(_currentWaveIndex);
         _uiManager.UpdateWaveText(_currentWaveIndex + 1);
         _uiManager.DisplayWaveText(true);
+        if (_waves[_currentWaveIndex].isBossWave)
+            _audioManager.StartBossMusic();
         StartCoroutine(StartWaveRoutine(delay));
     }
 
-    public void EnemyDestroyed(GameObject enemy, float powerupSpawnDelayDuration, bool wasKilled)
+    public void EnemyDestroyed(GameObject enemy, float powerupSpawnDelayDuration, bool wasKilled, bool isBoss)
     {
         if(_canSpawn)
         {
@@ -346,9 +366,12 @@ public class SpawnManager : MonoBehaviour
 
 
             _uiManager.UpdateStreakText(_streak, shakeStreakText);
-
-            if (_spawnedAllEnemiesInWave && _enemies.Count == 0)
+            if (_spawnedAllEnemiesInWave && _enemies.Count <= 0)
             {
+                if(isBoss)
+                {
+                    if(_player != null) { _player.GetComponent<Collider2D>().enabled = false; }
+                }
                 StopCoroutine(_spawnEnemyCoroutine);
                 StopCoroutine(_spawnPowerupCoroutine);
                 StopCoroutine(_spawnShotgunCoroutine);
@@ -364,6 +387,7 @@ public class SpawnManager : MonoBehaviour
                 else
                 {
                     _uiManager.DisplayWinText();
+                    _audioManager.StartWinMusic();
                 }
             }
         }

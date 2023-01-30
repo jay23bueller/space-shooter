@@ -1,5 +1,7 @@
 fileFormatVersion: 2
 guid: 4562abd0715ad474fbb9a566418b06dd
+labels:
+- Enemy
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}
