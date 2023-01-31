@@ -55,7 +55,7 @@ public class Laser : MonoBehaviour
 
             if(collision.CompareTag("Enemy") && !_isEnemyWeapon)
             {
-                collision.GetComponent<Enemy>().TakeDamage(true);
+                collision.GetComponent<BaseEnemy>().TakeDamage(true);
                 destroySelf = true;
             }
 

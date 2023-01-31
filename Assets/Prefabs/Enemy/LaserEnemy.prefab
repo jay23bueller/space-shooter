@@ -114,7 +114,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6082611025670000495}
-  - component: {fileID: 4899799128005654316}
   - component: {fileID: 3070172606087240925}
   - component: {fileID: 83915769502381220}
   - component: {fileID: -4652954531052481723}
@@ -122,6 +121,7 @@ GameObject:
   - component: {fileID: 1336299497256094500}
   - component: {fileID: 8217219188344449104}
   - component: {fileID: -453252426729794072}
+  - component: {fileID: 7917624342030722346}
   m_Layer: 0
   m_Name: LaserEnemy
   m_TagString: Enemy
@@ -146,69 +146,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 180}
---- !u!114 &4899799128005654316
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1347617643270974644}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2eca7e512a3dea249afed959f4ed5c2b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _speed: 4
-  _normalScore: 10
-  _shieldedScore: 40
-  _minFiringDelay: 0
-  _maxFiringDelay: 0
-  _laserPrefab: {fileID: 7891439289125116962, guid: a2e8a6a3dffeff346ad42fc577a26758, type: 3}
-  _laserAudioClip: {fileID: 8300000, guid: 75676f361bdfeaf41a46623e95df3dbc, type: 3}
-  _shieldGO: {fileID: 5588488001815219898}
-  _maxChargeSpeed: 10
-  _defaultChargeSpeed: 3.5
-  _currentTime: 0
-  _distanceBeforeCharging: 6.3
-  _chargingAccelerationRate: 15
-  _thrusterGO: {fileID: 4951576658931256379}
-  _chargingAudioClip: {fileID: 8300000, guid: d5fcf17ca2e9a684a9526f401a151375, type: 3}
-  _beepingAudioSource: {fileID: -453252426729794072}
-  _chargeDelay: 1
-  _pitchIncrementDelay: 0.02
-  _pitchDelta: 0.015
-  _radius: 0
-  _circularRotationSpeed: 40
-  _leftSlant: -30
-  _rightSlant: -150
-  _distanceFromSlant: 10
-  _zigZagMaxDistance: 3
-  _waypointPaths:
-  - {fileID: 11400000, guid: dd18ad5639aea8645ae3a88f14c9f51e, type: 2}
-  - {fileID: 11400000, guid: 6516d64e5b516bc4b8bbf2b2260a0e5e, type: 2}
-  _dodgingSpeed: 10
-  _detectedLaserDelay: 0.7
-  _minDodgingDistance: 2
-  _maxDodgingDistance: 4
-  _dodgedLaserDelay: 1.5
-  _chargingShotPrefab: {fileID: 72968116251033869, guid: 44a954815df011c4bb201df1a209a927, type: 3}
-  _laserBeamChargingClip: {fileID: 8300000, guid: c7837417a860c5e40a51248409439676, type: 3}
-  _lineRendererZOffset: -0.05
-  _segmentSize: 2
-  _audioDelay: 0
-  _laserPitch: 3
-  _additionalSegmentPieces: 2
-  _lineRendererPositionOffset: 1.03
-  _screenPositionDelta: 1.5
-  _weaponHitPrefab: {fileID: 72968116251033869, guid: 1cbb9ca60eb710643a7cff413cb8bc51, type: 3}
-  _laserFireDelay: 0.02
-  _laserStartDelaySegments: 10
-  _attemptToHurtDelay: 2
-  _playerHitDelay: 1.5
-  _playerHitDelaySegments: 8
-  _playerNoHitDelay: 2.2
-  _playerNoHitDelaySegments: 10
-  _widthDelta: 0.02
 --- !u!212 &3070172606087240925
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -607,6 +544,45 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &7917624342030722346
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1347617643270974644}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa17fb9f2a24c524fa6931e23b1eccbc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PLAYER_TAG: Player
+  _speed: 0
+  _shieldGO: {fileID: 5588488001815219898}
+  _thrusterGO: {fileID: 4951576658931256379}
+  _scoreValue: 20
+  _shieldScoreValue: 60
+  _beepingAudioSource: {fileID: -453252426729794072}
+  _chargingAudioClip: {fileID: 8300000, guid: d5fcf17ca2e9a684a9526f401a151375, type: 3}
+  _chargingShotPrefab: {fileID: 72968116251033869, guid: 44a954815df011c4bb201df1a209a927, type: 3}
+  _laserBeamChargingClip: {fileID: 8300000, guid: c7837417a860c5e40a51248409439676, type: 3}
+  _audioSource: {fileID: 972632327501650988}
+  _lineRendererZOffset: -0.05
+  _segmentSize: 2
+  _audioDelay: 0
+  _laserPitch: 3
+  _additionalSegmentPieces: 2
+  _lineRendererPositionOffset: 1.03
+  _screenPositionDelta: 1.5
+  _weaponHitPrefab: {fileID: 72968116251033869, guid: 1cbb9ca60eb710643a7cff413cb8bc51, type: 3}
+  _laserFireDelay: 0.02
+  _laserStartDelaySegments: 10
+  _attemptToHurtDelay: 2
+  _playerHitDelay: 1.5
+  _playerHitDelaySegments: 8
+  _playerNoHitDelay: 2.2
+  _playerNoHitDelaySegments: 10
+  _widthDelta: 0.02
 --- !u!1 &1947977118032992976
 GameObject:
   m_ObjectHideFlags: 0

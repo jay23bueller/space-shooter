@@ -72,7 +72,7 @@ public class Missile : Laser
         if(_canMove)
         {
 
-            if(_targetTransform != null && !_targetTransform.GetComponent<Enemy>().isDying)
+            if(_targetTransform != null && !_targetTransform.GetComponent<BaseEnemy>().isDying)
             {
                 Vector3 targetPosition = _targetTransform.position;
                 Vector3 moveDirection = (targetPosition - transform.position).normalized;

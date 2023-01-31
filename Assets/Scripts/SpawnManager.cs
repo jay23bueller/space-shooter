@@ -4,10 +4,32 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+public enum MovementMode
+{
+    WaypointVPath = 0,
+    WaypointDiamondPath = 1,
+    Horizontal,
+    Vertical,
+    ZigZag,
+    Circular,
+    PlayerTargeted,
+    Boss
+}
 public class SpawnManager : MonoBehaviour
 {
     #region Variables
     private bool _canSpawn = true;
+
+    [Header("Movements")]
+    public MovementInfo horizontalMovementInfo;
+    public MovementInfo verticalMovementInfo;
+    public MovementInfo playerTargetedMovementInfo;
+    public CircularMovementInfo circularMovementInfo;
+    public SelfDestructMovementInfo selfDestructMovementInfo;
+    public WaypointMovementInfo diamondWaypointMovementInfo;
+    public WaypointMovementInfo vWaypointMovementInfo;
+    public ZigZagMovementInfo zigZagMovementInfo;
+    public BossMovementInfo bossMovementInfo;
 
     [Header("Player")]
     [SerializeField]
@@ -95,7 +117,10 @@ public class SpawnManager : MonoBehaviour
     #endregion
 
     #region Methods
-
+    public SelfDestructMovement CreateSelfDestructMovement()
+    {
+        return null;
+    }
     public void PlayerLostLife()
     {
         if(_streak != 0)
@@ -191,12 +216,116 @@ public class SpawnManager : MonoBehaviour
                     if (enemy != null)
                     {
                         bool enableShield = _chanceToSpawnShieldEnemyPercentage >= UnityEngine.Random.value ? true : false;
-                       
-                        enemy.GetComponent<Enemy>().SetMovementModeAndFiringDelays(
-                            waveItem.enemyWaveInfo.enemy.movementType, isMirrored,
-                            waveItem.enemyWaveInfo.enemy.delaysPerWave[_currentWaveIndex].weaponFireRateDelays.minFireRateDelay,
+
+                        Movement movement = null;
+                        switch(waveItem.enemyWaveInfo.enemy.movementType)
+                        {
+                            case MovementMode.PlayerTargeted:
+
+                                movement = new DirectionMovement(
+                                    playerTargetedMovementInfo.moveSpeed,
+                                    Vector3.zero
+                                    );
+
+                                break;
+                               
+                            case MovementMode.Circular:
+
+                                Vector3 diagonalStartPosition = new Vector3(isMirrored ? GameManager.RIGHT_BOUND : GameManager.LEFT_BOUND, GameManager.ENVIRONMENT_TOP_BOUND);
+
+                                Vector3 diagonalEndPosition = (Quaternion.AngleAxis(isMirrored ? circularMovementInfo.rightSlantedDirection : circularMovementInfo.leftSlantedDirection, Vector3.forward) * Vector3.right * circularMovementInfo.distanceFromSlant) + diagonalStartPosition;
+
+                                Vector3 slantedDirection = (diagonalEndPosition - diagonalStartPosition).normalized;
+                                Vector3 radiusEndPosition = diagonalEndPosition + ((isMirrored ? Vector3.left : Vector3.right) * circularMovementInfo.radius);
+
+                                float circularRotationSpeed = (isMirrored ? -1f : 1f) * circularMovementInfo.circularRotationSpeed;
+                                float circularRadian = isMirrored ? 180f * Mathf.Deg2Rad : 0f;
+                                movement = new CircularMovement(
+                                    circularMovementInfo.moveSpeed,
+                                    circularMovementInfo.distanceFromTargetPosition,
+                                    diagonalEndPosition,
+                                    slantedDirection,
+                                    radiusEndPosition,
+                                    circularRotationSpeed,
+                                    circularMovementInfo.radius,
+                                    isMirrored ? ReversibleMovement.ReversibleState.Reverse : ReversibleMovement.ReversibleState.Normal
+                                    );
+                                break;
+
+                            case MovementMode.ZigZag:
+                                
+                                movement = new ZigZagMovement(
+                                    zigZagMovementInfo.moveSpeed,
+                                    isMirrored ? ReversibleMovement.ReversibleState.Reverse :
+                                    ReversibleMovement.ReversibleState.Normal,
+                                    zigZagMovementInfo.zigZagMaxDistance,
+                                    spawnLocation.x
+                                    );
+
+                                break;
+
+                            case MovementMode.Horizontal:
+
+                                movement = new HorizontalMovement(
+                                    horizontalMovementInfo.moveSpeed,
+                                    isMirrored ? ReversibleMovement.ReversibleState.Reverse : ReversibleMovement.ReversibleState.Normal
+                                    );
+
+                                break;
+
+                            case MovementMode.Vertical:
+
+                                movement = new VerticalMovement(verticalMovementInfo.moveSpeed);
+
+                                break;
+
+                            case MovementMode.WaypointVPath:
+                                movement = new WaypointMovement(
+                                    vWaypointMovementInfo.moveSpeed,
+                                    isMirrored ? ReversibleMovement.ReversibleState.Reverse :
+                                    ReversibleMovement.ReversibleState.Normal,
+                                    vWaypointMovementInfo.distanceFromNextPoint,
+                                    vWaypointMovementInfo.waypoints
+                                    );
+
+                                break;
+                            case MovementMode.WaypointDiamondPath:
+                                movement = new WaypointMovement(
+                                    diamondWaypointMovementInfo.moveSpeed,
+                                    isMirrored ? ReversibleMovement.ReversibleState.Reverse :
+                                    ReversibleMovement.ReversibleState.Normal,
+                                    diamondWaypointMovementInfo.distanceFromNextPoint,
+                                    diamondWaypointMovementInfo.waypoints
+                                    );
+                                break;
+                            case MovementMode.Boss:
+                                movement = new BossMovement(
+                                    bossMovementInfo.moveSpeed,
+                                    bossMovementInfo.bossInitializingSpeedMultiplier
+                                    );
+                            break;
+                        }
+                        BaseEnemy enemyComponent = enemy.GetComponent<BaseEnemy>();
+                        
+                        if(enemyComponent is MinionEnemy)
+                        {
+                            ((MinionEnemy)enemyComponent).InitializeEnemy(movement, waveItem.enemyWaveInfo.enemy.delaysPerWave[_currentWaveIndex].weaponFireRateDelays.minFireRateDelay,
                             waveItem.enemyWaveInfo.enemy.delaysPerWave[_currentWaveIndex].weaponFireRateDelays.maxFireRateDelay,
                             enableShield);
+                        }
+                        else
+                        {
+                            enemyComponent.InitializeEnemy(movement, waveItem.enemyWaveInfo.enemy.delaysPerWave[_currentWaveIndex].weaponFireRateDelays.minFireRateDelay,
+                            waveItem.enemyWaveInfo.enemy.delaysPerWave[_currentWaveIndex].weaponFireRateDelays.maxFireRateDelay);
+                        }
+
+
+                        //enemy.GetComponent<Enemy>().SetMovementModeAndFiringDelays(
+                        //    waveItem.enemyWaveInfo.enemy.movementType, isMirrored,
+                        //    waveItem.enemyWaveInfo.enemy.delaysPerWave[_currentWaveIndex].weaponFireRateDelays.minFireRateDelay,
+                        //    waveItem.enemyWaveInfo.enemy.delaysPerWave[_currentWaveIndex].weaponFireRateDelays.maxFireRateDelay,
+                        //    enableShield);
+                        //_enemies.Add(enemy);
                         _enemies.Add(enemy);
                     }
                     
@@ -422,7 +551,7 @@ public class SpawnManager : MonoBehaviour
 
             if (distance == -1 || closestEnemyTransform == null)
             {
-                closestEnemyTransform = enemy != null && !enemy.GetComponent<Enemy>().isDying ? enemy.transform : null;
+                closestEnemyTransform = enemy != null && !enemy.GetComponent<BaseEnemy>().isDying ? enemy.transform : null;
 
                 if (closestEnemyTransform != null)
                     distance = Vector3.Distance(_player.transform.position, closestEnemyTransform.position);
@@ -432,7 +561,7 @@ public class SpawnManager : MonoBehaviour
                 float newEnemyDistance = Vector3.Distance(_player.transform.position, enemy.transform.position);
                 if (newEnemyDistance < distance)
                 {
-                    closestEnemyTransform = enemy != null && !enemy.GetComponent<Enemy>().isDying ? enemy.transform : closestEnemyTransform;
+                    closestEnemyTransform = enemy != null && !enemy.GetComponent<BaseEnemy>().isDying ? enemy.transform : closestEnemyTransform;
                     if (enemy != null)
                         distance = newEnemyDistance;
                 }

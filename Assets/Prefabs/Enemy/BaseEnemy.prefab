@@ -42,13 +42,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6082611025670000495}
-  - component: {fileID: 6974620834743416986}
   - component: {fileID: 4394001658417918074}
   - component: {fileID: 3070172606087240925}
   - component: {fileID: 83915769502381220}
   - component: {fileID: -4652954531052481723}
   - component: {fileID: 972632327501650988}
   - component: {fileID: -3572019017299655436}
+  - component: {fileID: -2087072667143366523}
   m_Layer: 0
   m_Name: BaseEnemy
   m_TagString: Enemy
@@ -73,51 +73,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 180}
---- !u!114 &6974620834743416986
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1347617643270974644}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 66d5dd6ad813c924b9f64f49444a77f9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _speed: 5
-  _normalScore: 10
-  _shieldedScore: 40
-  _minFiringDelay: 0
-  _maxFiringDelay: 0
-  _laserPrefab: {fileID: 7891439289125116962, guid: a2e8a6a3dffeff346ad42fc577a26758, type: 3}
-  _laserAudioClip: {fileID: 8300000, guid: 75676f361bdfeaf41a46623e95df3dbc, type: 3}
-  _shieldGO: {fileID: 4729023130339664272}
-  _maxChargeSpeed: 10
-  _defaultChargeSpeed: 3.5
-  _currentTime: 0
-  _distanceBeforeCharging: 6.3
-  _chargingAccelerationRate: 15
-  _thrusterGO: {fileID: 605835848610291839}
-  _chargingAudioClip: {fileID: 8300000, guid: d5fcf17ca2e9a684a9526f401a151375, type: 3}
-  _beepingAudioSource: {fileID: -3572019017299655436}
-  _chargeDelay: 1
-  _pitchIncrementDelay: 0.2
-  _pitchDelta: 0.015
-  _radius: 2.5
-  _circularRotationSpeed: 60
-  _leftSlant: -30
-  _rightSlant: -150
-  _distanceFromSlant: 10
-  _zigZagMaxDistance: 3
-  _waypointPaths:
-  - {fileID: 11400000, guid: dd18ad5639aea8645ae3a88f14c9f51e, type: 2}
-  - {fileID: 11400000, guid: 6516d64e5b516bc4b8bbf2b2260a0e5e, type: 2}
-  _dodgingSpeed: 12
-  _detectedLaserDelay: 1
-  _minDodgingDistance: 2
-  _maxDodgingDistance: 4
-  _dodgedLaserDelay: 3
 --- !u!61 &4394001658417918074
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -429,6 +384,35 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &-2087072667143366523
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1347617643270974644}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5445c0257f83414469492842cf844a6c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _speed: 0
+  _shieldGO: {fileID: 4729023130339664272}
+  _thrusterGO: {fileID: 605835848610291839}
+  _scoreValue: 10
+  _shieldScoreValue: 40
+  _beepingAudioSource: {fileID: -3572019017299655436}
+  _chargingAudioClip: {fileID: 8300000, guid: d5fcf17ca2e9a684a9526f401a151375, type: 3}
+  _laserPrefab: {fileID: 7891439289125116962, guid: a2e8a6a3dffeff346ad42fc577a26758, type: 3}
+  _laserAudioClip: {fileID: 8300000, guid: 75676f361bdfeaf41a46623e95df3dbc, type: 3}
+  _dodgingSpeed: 10
+  _detectedLaserDelay: 1
+  _minDodgingDistance: 2
+  _maxDodgingDistance: 4
+  _dodgedLaserDelay: 1.5
+  _powerupShotAtDelay: 3
+  _currentMinLaserPowerupDelay: 0.9
+  _currentMaxLaserPowerupDelay: 1.3
 --- !u!1 &2255125568480116863
 GameObject:
   m_ObjectHideFlags: 0

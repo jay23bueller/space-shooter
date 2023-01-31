@@ -45,41 +45,60 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8991ab792aac8dd4c8f95ef0ae1b8fb4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  horizontalMovementInfo: {fileID: 11400000, guid: 05cf3ba841f222d4f892323e1e6557cd, type: 2}
+  verticalMovementInfo: {fileID: 11400000, guid: eb2b087712c5d8345aa470cdab7b1c99, type: 2}
+  circularMovementInfo: {fileID: 11400000, guid: f71b3bfd035299245891807e8337eb3d, type: 2}
+  selfDestructMovementInfo: {fileID: 11400000, guid: 8311053b1d80683449e6b559d54ef5c5, type: 2}
+  diamondWaypointMovementInfo: {fileID: 11400000, guid: e3607e895aeb49a44a3684859ba19bc7, type: 2}
+  vWaypointMovementInfo: {fileID: 11400000, guid: d23333a6207319345b2e9721d1830dcc, type: 2}
+  zigZagMovementInfo: {fileID: 11400000, guid: d0e2449583a6ed448b9b34adfbeea713, type: 2}
+  bossMovementInfo: {fileID: 11400000, guid: 1c319ee34c8efd942ba6b6191fe4e37d, type: 2}
+  _ammoIncrement: 5
   _powerups:
   - {fileID: 935228819368299148, guid: 107a0784677ef7248bb2b29ced462add, type: 3}
   - {fileID: 6798021054927502858, guid: e0ef36cb2060e0a439a83437f1198c06, type: 3}
   - {fileID: 795033785503102533, guid: 07f9176aef8eecd4a9c6cbedd6ba93e4, type: 3}
   - {fileID: 8280209617936306660, guid: 718a6e8ea795c3a40b5e0b1fdf87c015, type: 3}
+  - {fileID: 8280209617936306660, guid: a0208e748cf29174faf9d9c0bfd81660, type: 3}
   - {fileID: 795033785503102533, guid: 17a61f7fb80b17443951a15e643eeed3, type: 3}
   - {fileID: 795033785503102533, guid: ee76fc9e484386b4485eaaff5568a6a4, type: 3}
-  - {fileID: 8280209617936306660, guid: a0208e748cf29174faf9d9c0bfd81660, type: 3}
+  - {fileID: 8280209617936306660, guid: 1fd5e074065c612468723e27ee3cc69c, type: 3}
   - {fileID: 795033785503102533, guid: 9669e9f9283c1784781aa52c9c799a14, type: 3}
-  _turnsBeforeSpawningAmmo: 5
-  _enemySpawnsBeforeAmmoDrop: 4
-  _healthDropClip: {fileID: 8300000, guid: 334f936dbdf682a4bad3969822bb9c71, type: 3}
-  _homingMissileSpawnInterval: 20
-  _homingMissileIndex: 6
-  _healthCollectibleIndex: 5
-  _ammoCollectibleIndex: 4
-  _energyCollectibleIndex: 0
+  _minPowerupSpawnDelay: 3
+  _maxPowerupSpawnDelay: 7
+  _powerupSpawnDelayDecrement: 1.2
+  _turnsBeforeSpawningAmmo: 3
+  _enemySpawnsBeforeAmmoDrop: 3
+  _streakAndHealthClip: {fileID: 8300000, guid: 334f936dbdf682a4bad3969822bb9c71, type: 3}
+  _shotgunSpawningInterval: 20
+  _shotgunIndex: 7
+  _healthCollectibleIndex: 6
+  _ammoCollectibleIndex: 5
+  _energyCollectibleIndex: 8
   _weightedIndices:
-  - weight: 0.25
+  - weight: 0.26
     index: 0
-  - weight: 0.32
+  - weight: 0.22
     index: 1
   - weight: 0.3
     index: 2
   - weight: 0.13
     index: 3
+  - weight: 0.07
+    index: 4
   _enemyContainer: {fileID: 7683424367433563454}
   _enemies: []
   _waves:
   - {fileID: 11400000, guid: 5d8815acc4d70d041aea2a0732d46eef, type: 2}
   - {fileID: 11400000, guid: 300f6624dff12db4d8aad4283c228137, type: 2}
   - {fileID: 11400000, guid: a18f4ddbd4fe00d4dbed9cf785d681fb, type: 2}
+  - {fileID: 11400000, guid: 08c21a6bac342d04fab51a628be06eb3, type: 2}
   _delayInBetweenWaves: 2.5
   _uiManager: {fileID: 0}
-  _streakAmountToGetEnergyCollectible: 7
+  _streakAmountToGetEnergyCollectible: 6
+  _spawnShieldEnemyPercentIncrement: 0.095
+  _variantCollection: {fileID: 20000000, guid: d4df749bcc6b3194c9945edf3ae25523, type: 2}
+  _audioManager: {fileID: 0}
 --- !u!1 &7683424367433563454
 GameObject:
   m_ObjectHideFlags: 0
