@@ -176,6 +176,7 @@ public class CircularMovement : ReversibleMovement, IResetable
         this._radiusEndPosition = radiusEndPosition;
         this._circularRotationSpeed = circularRotationSpeed;
         this._radius = radius;
+        _circularRadian = reversibleState == ReversibleState.Reverse ? 180f * Mathf.Deg2Rad : 0f;
     }
     public enum CircularMovementState
     {
