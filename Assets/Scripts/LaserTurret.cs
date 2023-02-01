@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 
 public class LaserTurret : MonoBehaviour
@@ -117,12 +114,13 @@ public class LaserTurret : MonoBehaviour
                             {
                                 _cooldownTimer = Time.time + _playerCooldownDelay;
                                 _phase = FiringLaserBeamPhase.Cooldown;
+                                return;
                             }
                             else
                             {
                                 _phase = FiringLaserBeamPhase.Waiting;
                                 _waitingTimer = Time.time + _waitingDelay;
-
+                                return;
                             }
 
                         }

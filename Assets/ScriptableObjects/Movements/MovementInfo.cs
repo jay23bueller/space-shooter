@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 
 [CreateAssetMenu(fileName = "MovementInfo", menuName = "MovementInfo/BaseMovementInfo")]
 public class MovementInfo : ScriptableObject
