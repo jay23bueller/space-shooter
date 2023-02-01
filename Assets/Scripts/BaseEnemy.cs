@@ -4,7 +4,7 @@ using UnityEngine;
 
 public abstract class BaseEnemy: MonoBehaviour
 {
-    
+    #region Variables
     protected string PLAYER_TAG = "Player";
     protected string SPAWNMANAGER_TAG = "SpawnManager";
 
@@ -35,12 +35,46 @@ public abstract class BaseEnemy: MonoBehaviour
     protected Movement _currentMovement;
     protected bool _wasKilled;
 
+    #endregion
 
+    #region UnityMethods
     protected virtual void Awake()
     {
         _anim = GetComponent<Animator>();
         
     }
+
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other != null && !_isDying)
+        {
+            if (other.CompareTag(PLAYER_TAG))
+            {
+                other.GetComponent<Player>().UpdateLives(-1);
+                TakeDamage(false);
+            }
+
+
+        }
+    }
+
+    private void OnTriggerStay2D(Collider2D other)
+    {
+        if (other != null && !_isDying)
+        {
+            if (other.CompareTag(PLAYER_TAG))
+            {
+                other.GetComponent<Player>().UpdateLives(-1);
+                TakeDamage(false);
+            }
+
+
+        }
+    }
+
+    #endregion
+
+    #region Methods
     protected abstract void Move();
 
     public virtual void InitializeEnemy(Movement movement, float minFiringDelay, float maxFiringDelay)
@@ -79,33 +113,6 @@ public abstract class BaseEnemy: MonoBehaviour
 
     public abstract void TakeDamage(bool playerScored);
 
-    void OnTriggerEnter2D(Collider2D other)
-    {
-        if (other != null && !_isDying)
-        {
-            if (other.CompareTag(PLAYER_TAG))
-            {
-                other.GetComponent<Player>().UpdateLives(-1);
-                TakeDamage(false);
-            }
-
-
-        }
-    }
-
-    private void OnTriggerStay2D(Collider2D other)
-    {
-        if (other != null && !_isDying)
-        {
-            if (other.CompareTag(PLAYER_TAG))
-            {
-                other.GetComponent<Player>().UpdateLives(-1);
-                TakeDamage(false);
-            }
-
-
-        }
-    }
 
     protected virtual void DisableEnemy()
     {
@@ -128,6 +135,8 @@ public abstract class BaseEnemy: MonoBehaviour
     {
         _spawnManager.EnemyDestroyed(gameObject, powerupSpawnDelayDuration, _wasKilled, false);
     }
+
+    #endregion
 }
 
 public abstract class Movement
