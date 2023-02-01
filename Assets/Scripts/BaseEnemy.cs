@@ -7,7 +7,8 @@ public abstract class BaseEnemy: MonoBehaviour
     #region Variables
     protected string PLAYER_TAG = "Player";
     protected string SPAWNMANAGER_TAG = "SpawnManager";
-
+    //boolean created in case a child class needs to handle additional 
+    //teleportation logic.
     protected bool _justTeleported;
     [SerializeField]
     protected float _speed;
@@ -76,7 +77,8 @@ public abstract class BaseEnemy: MonoBehaviour
 
     #region Methods
     protected abstract void Move();
-
+    //The collider on enemies spawning in will be disabled in order 
+    //to initialize the data.
     public virtual void InitializeEnemy(Movement movement, float minFiringDelay, float maxFiringDelay)
     {
         _player = GameObject.FindGameObjectWithTag(PLAYER_TAG).GetComponent<Player>();
@@ -138,7 +140,9 @@ public abstract class BaseEnemy: MonoBehaviour
 
     #endregion
 }
-
+//Class set up to not cram all the movement-related
+//variables into each enemy class. Gets populated at runtime
+//with values from MovementInfo based ScriptableObjects.
 public abstract class Movement
 {
     protected float _moveSpeed;
@@ -284,7 +288,8 @@ public class SelfDestructMovement : Movement
         
     }
 }
-
+//Used by some of the Movement classes that can
+//have their parameters reset.
 public interface IResetable
 {
     public void Reset();
