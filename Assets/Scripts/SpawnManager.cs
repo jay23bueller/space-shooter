@@ -83,6 +83,7 @@ public class SpawnManager : MonoBehaviour
     private float _delayInBetweenWaves = 2.5f;
     private int _enemiesKilled;
     private int _currentWaveIndex;
+    public int currentWaveIndex { get => _currentWaveEnemyIndex; }
     private int _currentWaveEnemyIndex;
     private bool _spawnedAllEnemiesInWave;
 
@@ -305,9 +306,11 @@ public class SpawnManager : MonoBehaviour
                                     );
                             break;
                         }
+
+                        _enemies.Add(enemy);
                         BaseEnemy enemyComponent = enemy.GetComponent<BaseEnemy>();
                         
-                        if(enemyComponent is MinionEnemy)
+                        if (enemyComponent is MinionEnemy)
                         {
                             ((MinionEnemy)enemyComponent).InitializeEnemy(movement, waveItem.enemyWaveInfo.enemy.delaysPerWave[_currentWaveIndex].weaponFireRateDelays.minFireRateDelay,
                             waveItem.enemyWaveInfo.enemy.delaysPerWave[_currentWaveIndex].weaponFireRateDelays.maxFireRateDelay,
@@ -326,7 +329,7 @@ public class SpawnManager : MonoBehaviour
                         //    waveItem.enemyWaveInfo.enemy.delaysPerWave[_currentWaveIndex].weaponFireRateDelays.maxFireRateDelay,
                         //    enableShield);
                         //_enemies.Add(enemy);
-                        _enemies.Add(enemy);
+                        
                     }
                     
 

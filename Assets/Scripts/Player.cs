@@ -497,9 +497,12 @@ public class Player : MonoBehaviour
             if(_ammoCurrentCount > 0)
             {
                 _canFire = false;
-                _ammoCurrentCount--;
-                _uiManager.UpdateAmmoText(_ammoCurrentCount);
-
+                if(_spawnManager.waveStarted)
+                {
+                    _ammoCurrentCount--;
+                    _uiManager.UpdateAmmoText(_ammoCurrentCount);
+                }
+                    
                 switch (_firingMode)
                 {
                     case FiringMode.Default:
